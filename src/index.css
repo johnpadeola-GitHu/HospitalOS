@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Surfaces — lighter, cleaner than the old periwinkle */
+  --bg: #F4F6FA;
+  --surface: #F8FAFC;
+  --surface-2: #FFFFFF;
+  --sidebar: #FFFFFF;
+
+  /* Ink */
+  --ink: #384B66;
+  --ink-strong: #16233B;
+  --muted: #7A8AA3;
+  --border: #E4E9F2;
+  --border-strong: #CBD5E5;
+
+  /* Accent */
+  --accent: #1E3A6E;
+  --accent-bg: #E8EFFB;
+  --accent-soft: #F2F6FD;
+
+  /* Semantic */
+  --good: #1D7A4C;
+  --good-bg: #E6F4EC;
+  --warn: #A35A2E;
+  --warn-bg: #FBF0DC;
+  --bad: #B0281F;
+  --bad-bg: #FBEAE8;
+  --info: #2F5FA8;
+  --info-bg: #E8F0FB;
+
+  /* Chart */
+  --chart-1: #1E3A6E;
+  --chart-2: #6B9BD1;
+  --chart-3: #9CC0E4;
+
+  --radius: 10px;
+  --shadow-sm: 0 1px 2px rgba(22, 35, 59, 0.05);
+  --shadow: 0 1px 3px rgba(22, 35, 59, 0.07), 0 4px 12px rgba(22, 35, 59, 0.04);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.006em;
+}
+
+a { color: inherit; text-decoration: none; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
