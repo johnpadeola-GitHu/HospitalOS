@@ -155,3 +155,68 @@ Refreshed to match the LabOS visual language:
 - Lighter surfaces (#F4F6FA bg, white cards), soft shadows, Inter 400-700
 Tokens live in src/index.css; primitives in src/lib/ui.jsx — edit those to cascade
 changes across all 53 screens.
+
+## Authentication & platform admin
+Sign-in replaces the old dev switcher. Demo credentials:
+- Hospital staff: any @hospitalos.ng address / password `demo`
+- Platform admin: `support@agorox.africa` / password `agorox`
+
+Only support@agorox.africa carries `platformAdmin: true`, which reveals the
+Hospital/Platform toggle in the topbar. setView("platform") is a no-op for every
+other account. The Platform view covers tenant management (plans, seats, MRR,
+suspend/activate), platform health, feature flags per tier, and deployments.
+
+SECURITY: credentials are checked client-side — fine for preview, NOT secure. A
+browser cannot keep a secret. When the Workers/D1 backend lands, signIn() posts
+to an auth endpoint and the returned JWT drives the same context; nothing
+downstream changes.
+
+## Help
+Overview -> Help & documentation: searchable articles covering every workflow.
+Content lives in src/modules/help/helpContent.js.
+
+## RBAC (src/lib/rbac.js)
+Two levels:
+- **Areas** gate nav groups and routes — can this role reach Pharmacy at all?
+- **Actions** gate buttons — `"<area>:<action>"`, e.g. `patient-care:discharge`.
+  Roles may grant `"<area>:*"` for all actions in an area, or `"*"` (super-admin).
+
+Separation of duties is enforced, not decorative:
+- Nurse can admit and record vitals, but **cannot discharge**
+- Lab scientist can collect and result; **verify** is a distinct grant
+- Cashier can take payments and file claims, but **cannot approve** them
+- Pharmacist cannot reach Diagnostics at all
+
+Use `can(area)` for routes/nav and `may("area:action")` for buttons, both from
+useAuth(). `denied(permission)` records a refused attempt to the audit log.
+
+## Immutable audit (src/lib/audit.js)
+Append-only by construction: entries are frozen on write, the internal array is
+never returned by reference, and there is **no update or delete API**. Each entry
+is hash-chained to its predecessor (`prevHash` + FNV-1a digest), so:
+- editing any past record breaks verification **at that record**
+- deleting a record breaks verification **at the next one**
+
+`verifyChain()` recomputes the whole chain; System -> Security & audit shows a
+live integrity banner, filters by action/actor/text, and displays each hash.
+Sign-ins, failed sign-ins, denials, admissions, transfers, discharges, lab
+collection/verification and claim decisions are all recorded.
+
+LIMITS: this is tamper-**evident**, not tamper-proof — a browser cannot stop
+someone with devtools. Real immutability needs server-side append-only storage;
+the same chain design carries over and detects rows edited directly in D1.
+
+## Medical records (src/modules/records/)
+The clinical record — previously missing entirely.
+- **Patient chart** (/records): notes, problem list, allergies, results history
+- **Notes** use SOAP structure and are **frozen on write**. No edit, no delete.
+  Corrections are amendments referencing the original; both stay visible.
+- **Problem list**: ICD-10 coded diagnoses (active / chronic / resolved)
+- **Allergies**: `checkAllergy()` is called by dispensing — a match warns, and a
+  **severe allergy blocks dispensing** with no UI override.
+
+## Accommodation tiers (src/modules/wards/bedService.js)
+Seven tiers with nightly rates: General ₦15k, Semi-Private ₦35k, Private ₦60k,
+Suite ₦120k, VIP ₦220k, Executive ₦350k, Critical Care ₦180k.
+Occupancy is timestamped on admission; `listBillableBedNights()` feeds Billing as
+a fifth revenue source (whole nights, minimum one).

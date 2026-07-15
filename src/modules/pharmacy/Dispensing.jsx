@@ -6,6 +6,8 @@ import {
 } from "./pharmacyService";
 import { listPatients } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { checkAllergy } from "../records/recordsService";
 
 const STOCK_TINT = {
   ok: { bg: "#E6EFDF", fg: "#4A6329", label: "In stock" },
@@ -14,6 +16,7 @@ const STOCK_TINT = {
 };
 
 export default function Dispensing() {
+  const { may } = useAuth();
   const [drugs, setDrugs] = useState([]);
   const [dispenses, setDispenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +113,7 @@ export default function Dispensing() {
                       </span>
                     </td>
                     <td style={{ ...td, textAlign: "right" }}>
-                      <Button onClick={() => setDispenseFor(d)} disabled={d.state === "out"}>
+                      <Button onClick={() => setDispenseFor(d)} disabled={d.state === "out" || !may("pharmacy:dispense")}>
                         Dispense
                       </Button>
                     </td>
@@ -167,6 +170,15 @@ function DispenseModal({ drug, onClose, onDone }) {
   const [qty, setQty] = useState("1");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [allergies, setAllergies] = useState([]);
+
+  // Safety: warn if the selected patient has a recorded allergy to this drug.
+  useEffect(() => {
+    if (!selected) { setAllergies([]); return; }
+    let alive = true;
+    checkAllergy(selected.id, drug.name).then((a) => alive && setAllergies(a));
+    return () => { alive = false; };
+  }, [selected, drug.name]);
 
   useEffect(() => {
     let alive = true;
@@ -215,7 +227,7 @@ function DispenseModal({ drug, onClose, onDone }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={submit} disabled={busy || !selected || overStock || n < 1}>
+          <Button variant="primary" onClick={submit} disabled={busy || !selected || overStock || n < 1 || allergies.some((a) => a.severity === "severe")}>
             {busy ? "Dispensing…" : "Dispense"}
           </Button>
         </>
@@ -258,6 +270,22 @@ function DispenseModal({ drug, onClose, onDone }) {
           </div>
         )}
       </div>
+
+      {allergies.length > 0 && (
+        <div style={allergyWarn}>
+          <span style={{ fontWeight: 700 }}>⚠ Allergy alert</span>
+          {allergies.map((a) => (
+            <div key={a.id} style={{ marginTop: 3 }}>
+              {a.substance} — {a.reaction || "reaction recorded"} ({a.severity})
+            </div>
+          ))}
+          {allergies.some((a) => a.severity === "severe") && (
+            <div style={{ marginTop: 5, fontWeight: 600 }}>
+              Severe allergy on record. Dispensing is blocked.
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
         <div style={{ width: 120 }}>
@@ -338,6 +366,7 @@ const resultRow = {
   fontSize: 13,
 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
+const allergyWarn = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "10px 12px", borderRadius: 8, marginBottom: 14, lineHeight: 1.5 };
 const errBox = {
   background: "#F7E9E9",
   color: "#7A2E2E",

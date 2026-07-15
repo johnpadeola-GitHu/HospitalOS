@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
+import Login from "./auth/Login";
+import Platform from "./modules/platform/Platform";
 import AppLayout from "./layout/AppLayout";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import NoAccess from "./pages/NoAccess";
 import RegistrationADT from "./modules/patients/RegistrationADT";
+import Records from "./modules/records/Records";
 import WardsBoard from "./modules/wards/WardsBoard";
 import OutpatientClinic from "./modules/outpatient/OutpatientClinic";
 import Laboratory from "./modules/lab/Laboratory";
@@ -42,6 +45,7 @@ import PHReporting from "./modules/public-health/Reporting";
 import Radiotherapy from "./modules/radiotherapy/Radiotherapy";
 import Rehab from "./modules/rehab/Rehab";
 import POCT from "./modules/lab/POCT";
+import Help from "./modules/help/Help";
 import Instruments from "./modules/instruments/Instruments";
 import Formulary from "./modules/pharmacy/Formulary";
 import Procurement from "./modules/finance/Procurement";
@@ -62,6 +66,7 @@ import { ALL_ROUTES } from "./nav/navGroups";
 const MODULES = {
   "/": Dashboard,
   "/patients/adt": RegistrationADT,
+  "/records": Records,
   "/outpatient": OutpatientClinic,
   "/emergency": Emergency,
   "/critical-care": CriticalCare,
@@ -92,6 +97,7 @@ const MODULES = {
   "/radiotherapy": Radiotherapy,
   "/rehab": Rehab,
   "/poct": POCT,
+  "/help": Help,
   "/instruments": Instruments,
   "/pharmacy/formulary": Formulary,
   "/finance/procurement": Procurement,
@@ -123,10 +129,11 @@ function Guarded({ route }) {
   return Built ? <Built /> : <ModulePlaceholder title={route.label} group={route.groupLabel} />;
 }
 
-export default function App() {
+function Shell() {
+  const { signedIn } = useAuth();
+  if (!signedIn) return <Login />;
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
             {ALL_ROUTES.map((r) => (
@@ -134,8 +141,15 @@ export default function App() {
             ))}
             <Route path="*" element={<ModulePlaceholder title="Not found" group="" />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Shell />
     </AuthProvider>
   );
 }

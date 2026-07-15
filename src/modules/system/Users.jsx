@@ -1,14 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  ROLES,
-  PERMISSIONS,
-  listUsers,
-  createUser,
-  updateUserRole,
-  toggleUserActive,
-  roleLabel,
-  permissionsFor,
-} from "./systemService";
+import { listUsers, createUser, updateUserRole, toggleUserActive } from "./systemService";
+import { ROLES, AREAS, ACTIONS, roleLabel, canDo, areasFor } from "../../lib/rbac";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 
 const ROLE_KEYS = Object.keys(ROLES);
@@ -198,32 +190,42 @@ function AddUserModal({ onClose, onDone }) {
         </select>
       </Field>
       <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
-        Grants access to: {permissionsFor(form.role).map((p) => PERMISSIONS.find((x) => x.key === p)?.label).join(", ")}
+        Grants access to: {areasFor(form.role).map((k) => AREAS.find((a) => a.key === k)?.label).filter(Boolean).join(", ")}
       </div>
     </Modal>
   );
 }
 
 function MatrixModal({ onClose }) {
+  const [tab, setTab] = useState("areas");
+  const cols = tab === "areas" ? AREAS : ACTIONS;
+  const has = (roleKey, key) => (tab === "areas" ? areasFor(roleKey).includes(key) : canDo(roleKey, key));
+
   return (
     <Modal
       title="Role permission matrix"
       onClose={onClose}
-      footer={
-        <Button variant="ghost" onClick={onClose}>
-          Close
-        </Button>
-      }
+      footer={<Button variant="ghost" onClick={onClose}>Close</Button>}
     >
-      <div style={{ overflowX: "auto", margin: "-4px -4px" }}>
-        <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%" }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+        {[["areas", "Areas"], ["actions", "Actions"]].map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)} style={{ ...tabBtn, ...(tab === id ? tabActive : null) }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 10, lineHeight: 1.5 }}>
+        {tab === "areas"
+          ? "Areas gate the sidebar and routes \u2014 whether a role can reach a section at all."
+          : "Actions gate the buttons within an area \u2014 what a role may actually do there."}
+      </div>
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ borderCollapse: "collapse", fontSize: 11.5, width: "100%" }}>
           <thead>
             <tr>
               <th style={matrixCorner}>Role</th>
-              {PERMISSIONS.map((p) => (
-                <th key={p.key} style={matrixColHead} title={p.label}>
-                  {p.key}
-                </th>
+              {cols.map((c) => (
+                <th key={c.key} style={matrixColHead} title={c.label}>{c.key.split(":").pop()}</th>
               ))}
             </tr>
           </thead>
@@ -231,13 +233,11 @@ function MatrixModal({ onClose }) {
             {Object.entries(ROLES).map(([key, r]) => (
               <tr key={key} style={{ borderTop: "1px solid var(--border)" }}>
                 <td style={matrixRowHead}>{r.label}</td>
-                {PERMISSIONS.map((p) => (
-                  <td key={p.key} style={matrixCell}>
-                    {r.permissions.includes(p.key) ? (
-                      <span style={{ color: "#4A6329", fontWeight: 600 }}>&#10003;</span>
-                    ) : (
-                      <span style={{ color: "var(--border-strong)" }}>&middot;</span>
-                    )}
+                {cols.map((c) => (
+                  <td key={c.key} style={matrixCell}>
+                    {has(key, c.key)
+                      ? <span style={{ color: "var(--good)", fontWeight: 700 }}>&#10003;</span>
+                      : <span style={{ color: "var(--border-strong)" }}>&middot;</span>}
                   </td>
                 ))}
               </tr>
@@ -248,6 +248,9 @@ function MatrixModal({ onClose }) {
     </Modal>
   );
 }
+
+const tabBtn = { font: "inherit", fontSize: 12, fontWeight: 600, padding: "5px 11px", borderRadius: 7, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" };

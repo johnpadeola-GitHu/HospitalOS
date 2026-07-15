@@ -9,6 +9,8 @@ import {
 } from "./patientService";
 import { WARD_NAMES, freeBedsForWard } from "../wards/bedService";
 import { StatusBadge, Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -18,6 +20,7 @@ const FILTERS = [
 ];
 
 export default function RegistrationADT() {
+  const { may, user } = useAuth();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -110,19 +113,17 @@ export default function RegistrationADT() {
                   </td>
                   <td style={{ ...td, textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: 6 }}>
-                      {p.status !== "admitted" && p.status !== "discharged" && (
-                        <Button onClick={() => setAdt({ patient: p, action: "admit" })}>
-                          Admit
-                        </Button>
+                      {p.status !== "admitted" && p.status !== "discharged" && may("patient-care:admit") && (
+                        <Button onClick={() => setAdt({ patient: p, action: "admit" })}>Admit</Button>
                       )}
                       {p.status === "admitted" && (
                         <>
-                          <Button onClick={() => setAdt({ patient: p, action: "transfer" })}>
-                            Transfer
-                          </Button>
-                          <Button onClick={() => setAdt({ patient: p, action: "discharge" })}>
-                            Discharge
-                          </Button>
+                          {may("patient-care:transfer") && (
+                            <Button onClick={() => setAdt({ patient: p, action: "transfer" })}>Transfer</Button>
+                          )}
+                          {may("patient-care:discharge") && (
+                            <Button onClick={() => setAdt({ patient: p, action: "discharge" })}>Discharge</Button>
+                          )}
                         </>
                       )}
                     </div>
@@ -136,6 +137,7 @@ export default function RegistrationADT() {
 
       {showRegister && (
         <RegisterModal
+          actor={user}
           onClose={() => setShowRegister(false)}
           onSaved={async () => {
             setShowRegister(false);
@@ -146,6 +148,7 @@ export default function RegistrationADT() {
 
       {adt && (
         <AdtModal
+          actor={user}
           patient={adt.patient}
           action={adt.action}
           onClose={() => setAdt(null)}
@@ -159,7 +162,7 @@ export default function RegistrationADT() {
   );
 }
 
-function RegisterModal({ onClose, onSaved }) {
+function RegisterModal({ onClose, onSaved, actor }) {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -184,7 +187,9 @@ function RegisterModal({ onClose, onSaved }) {
     setBusy(true);
     setErr("");
     try {
-      await registerPatient(form);
+      const created = await registerPatient(form);
+      record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "patient", entityId: created.hospitalNo,
+               detail: `Registered ${created.lastName}, ${created.firstName}`, severity: "info" });
       await onSaved();
     } catch (e) {
       setErr(e.message || "Could not register patient.");
@@ -242,7 +247,7 @@ function RegisterModal({ onClose, onSaved }) {
   );
 }
 
-function AdtModal({ patient, action, onClose, onDone }) {
+function AdtModal({ patient, action, onClose, onDone, actor }) {
   const [ward, setWard] = useState(patient.ward || WARD_NAMES[0]);
   const [bed, setBed] = useState("");
   const [freeBeds, setFreeBeds] = useState([]);
@@ -273,9 +278,19 @@ function AdtModal({ patient, action, onClose, onDone }) {
     setBusy(true);
     setErr("");
     try {
-      if (action === "admit") await admitPatient(patient.id, { ward, bed });
-      else if (action === "transfer") await transferPatient(patient.id, { ward, bed });
-      else if (action === "discharge") await dischargePatient(patient.id);
+      if (action === "admit") {
+        await admitPatient(patient.id, { ward, bed });
+        record({ actor, action: AUDIT_ACTIONS.CLINICAL, entity: "admission", entityId: patient.hospitalNo,
+                 detail: `Admitted ${patient.lastName} to ${ward} ${bed}`, severity: "info" });
+      } else if (action === "transfer") {
+        await transferPatient(patient.id, { ward, bed });
+        record({ actor, action: AUDIT_ACTIONS.CLINICAL, entity: "transfer", entityId: patient.hospitalNo,
+                 detail: `Transferred ${patient.lastName} to ${ward} ${bed}`, severity: "info" });
+      } else if (action === "discharge") {
+        await dischargePatient(patient.id);
+        record({ actor, action: AUDIT_ACTIONS.CLINICAL, entity: "discharge", entityId: patient.hospitalNo,
+                 detail: `Discharged ${patient.lastName}`, severity: "info" });
+      }
       await onDone();
     } catch (e) {
       setErr(e.message || "Action failed.");

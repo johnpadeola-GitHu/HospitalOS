@@ -9,6 +9,7 @@ import { listBillableOrders } from "../lab/labService";
 import { listBillableDispenses } from "../pharmacy/pharmacyService";
 import { listBillableStudies } from "../radiology/radiologyService";
 import { listBillableProcedures } from "../theatre/theatreService";
+import { listBillableBedNights } from "../wards/bedService";
 
 const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
 
@@ -17,13 +18,14 @@ const _payments = {};
 let _receiptSeq = 0;
 
 async function allCharges() {
-  const [lab, pharmacy, radiology, theatre] = await Promise.all([
+  const [lab, pharmacy, radiology, theatre, accommodation] = await Promise.all([
     listBillableOrders(),
     listBillableDispenses(),
     listBillableStudies(),
     listBillableProcedures(),
+    listBillableBedNights(),
   ]);
-  return [...lab, ...pharmacy, ...radiology, ...theatre];
+  return [...lab, ...pharmacy, ...radiology, ...theatre, ...accommodation];
 }
 
 // Build one account per patient with charges, paid total, and balance.

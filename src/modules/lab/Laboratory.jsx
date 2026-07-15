@@ -13,6 +13,8 @@ import {
 } from "./labService";
 import { listPatients } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -30,6 +32,7 @@ const FLAG_STYLE = {
 };
 
 export default function Laboratory() {
+  const { may, user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -49,7 +52,13 @@ export default function Laboratory() {
   }, [refresh]);
 
   const act = async (fn, id) => {
+    const o = orders.find((x) => x.id === id);
     await fn(id);
+    if (o) {
+      const verb = fn === verifyOrder ? "Verified" : "Collected sample for";
+      record({ actor: user, action: AUDIT_ACTIONS.CLINICAL, entity: "lab-order", entityId: o.accession,
+               detail: `${verb} ${o.testName} — ${o.patientName}`, severity: "info" });
+    }
     await refresh();
   };
 
@@ -122,7 +131,7 @@ export default function Laboratory() {
                     </td>
                     <td style={{ ...td, textAlign: "right" }}>
                       <div style={{ display: "inline-flex", gap: 6 }}>
-                        {o.status === "ordered" && (
+                        {o.status === "ordered" && may("diagnostics:collect") && (
                           <Button onClick={() => act(collectSample, o.id)}>Collect</Button>
                         )}
                         {(o.status === "collected" || o.status === "resulted") && (
@@ -130,7 +139,7 @@ export default function Laboratory() {
                             {o.status === "collected" ? "Enter results" : "Edit results"}
                           </Button>
                         )}
-                        {o.status === "resulted" && (
+                        {o.status === "resulted" && may("diagnostics:verify") && (
                           <Button onClick={() => act(verifyOrder, o.id)}>Verify</Button>
                         )}
                       </div>

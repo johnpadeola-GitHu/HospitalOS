@@ -8,6 +8,8 @@ import {
   claimsSummary,
 } from "./claimsService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -20,6 +22,7 @@ const FILTERS = [
 ];
 
 export default function Claims() {
+  const { may, user } = useAuth();
   const [claims, setClaims] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +45,10 @@ export default function Claims() {
   const act = async (id, next) => {
     setErr("");
     try {
+      const c = claims.find((x) => x.id === id);
       await setClaimStatus(id, next);
+      record({ actor: user, action: AUDIT_ACTIONS.FINANCIAL, entity: "claim", entityId: c?.ref || id,
+               detail: `Claim ${next} — ${c?.insurer || ""} ${c ? "\u20a6" + c.amount.toLocaleString() : ""}`, severity: "info" });
       await refresh();
     } catch (e) {
       setErr(e.message);
@@ -110,7 +116,7 @@ export default function Claims() {
                   </td>
                   <td style={{ ...td, textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: 6 }}>
-                      {c.status === "submitted" && (
+                      {c.status === "submitted" && may("finance:approve-claim") && (
                         <>
                           <Button onClick={() => act(c.id, "approved")}>Approve</Button>
                           <Button onClick={() => act(c.id, "rejected")}>Reject</Button>

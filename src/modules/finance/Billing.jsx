@@ -1,10 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { listAccounts, recordPayment, billingSummary } from "./billingService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
 export default function Billing() {
+  const { may, user } = useAuth();
   const [accounts, setAccounts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -79,10 +82,8 @@ export default function Billing() {
                   <td style={{ ...td, textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: 6 }}>
                       <Button onClick={() => setDetailFor(a)}>View</Button>
-                      {a.balance > 0 && (
-                        <Button variant="primary" onClick={() => setPayFor(a)}>
-                          Take payment
-                        </Button>
+                      {a.balance > 0 && may("finance:take-payment") && (
+                        <Button variant="primary" onClick={() => setPayFor(a)}>Take payment</Button>
                       )}
                     </div>
                   </td>

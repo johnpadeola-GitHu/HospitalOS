@@ -14,6 +14,11 @@
   --border: #E4E9F2;
   --border-strong: #CBD5E5;
 
+  /* Charcoal — sidebar & engine text */
+  --charcoal: #33393F;
+  --charcoal-strong: #22272B;
+  --charcoal-bg: #EDEEF0;
+
   /* Accent */
   --accent: #1E3A6E;
   --accent-bg: #E8EFFB;

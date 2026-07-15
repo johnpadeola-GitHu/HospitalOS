@@ -13,6 +13,7 @@ export const NAV_GROUPS = [
       { id: "my-patients", label: "My patients", path: "/patients/mine" , icon: "UserRound" },
       { id: "worklist", label: "Worklist", path: "/worklist" , icon: "ListChecks" },
       { id: "alerts", label: "Alerts & critical values", path: "/alerts" , icon: "BellRing" },
+      { id: "help", label: "Help & documentation", path: "/help" , icon: "BookOpen" },
     ],
   },
   {
@@ -21,6 +22,7 @@ export const NAV_GROUPS = [
     icon: "HeartPulse",
     items: [
       { id: "registration", label: "Registration & ADT", path: "/patients/adt" , icon: "UserPlus" },
+      { id: "records", label: "Medical records", path: "/records" , icon: "FileHeart" },
       { id: "outpatient", label: "Outpatient (GOPD & clinics)", path: "/outpatient" , icon: "ClipboardList" },
       { id: "emergency", label: "Emergency & observation", path: "/emergency" , icon: "Siren" },
       { id: "wards", label: "Wards & bed management", path: "/wards" , icon: "BedDouble" },

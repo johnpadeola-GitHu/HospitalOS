@@ -5,19 +5,37 @@
 
 const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
 
-// Each ward has a fixed set of bed codes. occupantId links to a patient id
-// (from patientService); null means the bed is free.
+// Accommodation tiers — the six categories from the architecture, each with a
+// nightly rate. The tier drives bed charges, so a VIP suite bills differently
+// from a general bed.
+export const TIERS = {
+  general:     { key: "general",     label: "General Ward",     rate: 15000 },
+  "semi-private": { key: "semi-private", label: "Semi-Private",  rate: 35000 },
+  private:     { key: "private",     label: "Private Room",     rate: 60000 },
+  suite:       { key: "suite",       label: "Private Suite",    rate: 120000 },
+  vip:         { key: "vip",         label: "VIP Suite",        rate: 220000 },
+  executive:   { key: "executive",   label: "Executive Suite",  rate: 350000 },
+  critical:    { key: "critical",    label: "Critical Care",    rate: 180000 },
+};
+
+export const TIER_LIST = Object.values(TIERS);
+
+// Each ward has a fixed set of bed codes and an accommodation tier.
 const WARD_DEFS = [
-  { name: "Medical Ward A", code: "MA", beds: 8 },
-  { name: "Medical Ward B", code: "MB", beds: 8 },
-  { name: "Surgical Ward A", code: "SA", beds: 6 },
-  { name: "Surgical Ward B", code: "SB", beds: 6 },
-  { name: "ICU", code: "ICU", beds: 4 },
-  { name: "HDU", code: "HDU", beds: 4 },
-  { name: "Paediatric Ward", code: "PED", beds: 6 },
-  { name: "Maternity Ward", code: "MAT", beds: 6 },
-  { name: "Private Suite", code: "PS", beds: 5 },
-  { name: "Isolation Unit", code: "ISO", beds: 3 },
+  { name: "Medical Ward A", code: "MA", beds: 8, tier: "general" },
+  { name: "Medical Ward B", code: "MB", beds: 8, tier: "general" },
+  { name: "Surgical Ward A", code: "SA", beds: 6, tier: "general" },
+  { name: "Surgical Ward B", code: "SB", beds: 6, tier: "general" },
+  { name: "Semi-Private Wing", code: "SPW", beds: 6, tier: "semi-private" },
+  { name: "Private Rooms", code: "PR", beds: 6, tier: "private" },
+  { name: "Private Suite", code: "PS", beds: 5, tier: "suite" },
+  { name: "VIP Suite", code: "VIP", beds: 3, tier: "vip" },
+  { name: "Executive Suite", code: "EXE", beds: 2, tier: "executive" },
+  { name: "ICU", code: "ICU", beds: 4, tier: "critical" },
+  { name: "HDU", code: "HDU", beds: 4, tier: "critical" },
+  { name: "Paediatric Ward", code: "PED", beds: 6, tier: "general" },
+  { name: "Maternity Ward", code: "MAT", beds: 6, tier: "general" },
+  { name: "Isolation Unit", code: "ISO", beds: 3, tier: "private" },
 ];
 
 // Build the bed table.
@@ -27,8 +45,10 @@ for (const w of WARD_DEFS) {
     _beds.push({
       id: `${w.code}-${String(i).padStart(2, "0")}`,
       ward: w.name,
+      tier: w.tier,
       occupantId: null,
       occupantName: null,
+      since: null,
     });
   }
 }
@@ -54,6 +74,9 @@ export async function listWards() {
     return {
       name: w.name,
       code: w.code,
+      tier: w.tier,
+      tierLabel: TIERS[w.tier].label,
+      rate: TIERS[w.tier].rate,
       total: beds.length,
       occupied,
       free: beds.length - occupied,
@@ -80,10 +103,12 @@ export async function assignBed(bedId, occupantId, occupantName) {
     if (b.occupantId === occupantId) {
       b.occupantId = null;
       b.occupantName = null;
+      b.since = null;
     }
   }
   target.occupantId = occupantId;
   target.occupantName = occupantName;
+  target.since = new Date().toISOString();
   return { ...target };
 }
 
@@ -93,6 +118,29 @@ export async function releaseBedFor(occupantId) {
     if (b.occupantId === occupantId) {
       b.occupantId = null;
       b.occupantName = null;
+      b.since = null;
     }
   }
+}
+
+// Feed for Billing: accommodation charges for currently occupied beds.
+// Bills whole nights, minimum one, at the tier rate for that ward.
+export async function listBillableBedNights() {
+  await delay(60);
+  return _beds
+    .filter((b) => b.occupantId && b.since)
+    .map((b) => {
+      const nights = Math.max(1, Math.ceil((Date.now() - new Date(b.since)) / 86400000));
+      const tier = TIERS[b.tier];
+      return {
+        patientId: b.occupantId,
+        patientName: b.occupantName,
+        hospitalNo: "\u2014",
+        source: "Accommodation",
+        description: `${tier.label} — ${b.ward} ${b.id} (${nights} night${nights > 1 ? "s" : ""})`,
+        reference: b.id,
+        amount: tier.rate * nights,
+        at: b.since,
+      };
+    });
 }
