@@ -45,7 +45,16 @@ import PHReporting from "./modules/public-health/Reporting";
 import Radiotherapy from "./modules/radiotherapy/Radiotherapy";
 import Rehab from "./modules/rehab/Rehab";
 import POCT from "./modules/lab/POCT";
-import Help from "./modules/help/Help";
+import Help from "./engines/help/HelpEngine";
+import LabUtilities from "./modules/lab-utilities/LabUtilities";
+import Biobank from "./modules/biobank/Biobank";
+import DiagnosticIntel from "./modules/diagnostic-intel/DiagnosticIntel";
+import Communication from "./modules/communication/Communication";
+import Bookings from "./modules/bookings/Bookings";
+import Ultrasound from "./modules/imaging/Ultrasound";
+import CTScan from "./modules/imaging/CTScan";
+import MRIScan from "./modules/imaging/MRIScan";
+import { HelpProvider } from "./engines/help";
 import Instruments from "./modules/instruments/Instruments";
 import Formulary from "./modules/pharmacy/Formulary";
 import Procurement from "./modules/finance/Procurement";
@@ -98,6 +107,14 @@ const MODULES = {
   "/rehab": Rehab,
   "/poct": POCT,
   "/help": Help,
+  "/lab-utilities": LabUtilities,
+  "/biobank": Biobank,
+  "/diagnostic-intel": DiagnosticIntel,
+  "/communication": Communication,
+  "/bookings": Bookings,
+  "/ultrasound": Ultrasound,
+  "/ct-scan": CTScan,
+  "/mri": MRIScan,
   "/instruments": Instruments,
   "/pharmacy/formulary": Formulary,
   "/finance/procurement": Procurement,
@@ -149,7 +166,9 @@ function Shell() {
 export default function App() {
   return (
     <AuthProvider>
-      <Shell />
+      <HelpProvider>
+        <Shell />
+      </HelpProvider>
     </AuthProvider>
   );
 }

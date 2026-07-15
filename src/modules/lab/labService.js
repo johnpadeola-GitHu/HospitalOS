@@ -8,60 +8,8 @@ const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
 
 // Test catalogue. Each analyte carries a unit and a reference range.
 // crit low/high are the panic thresholds that raise a critical flag.
-export const TEST_CATALOGUE = [
-  {
-    code: "FBC",
-    name: "Full Blood Count",
-    department: "Haematology",
-    price: 2500,
-    analytes: [
-      { key: "hb", label: "Haemoglobin", unit: "g/dL", low: 12, high: 17, critLow: 7, critHigh: 20 },
-      { key: "wbc", label: "White Cell Count", unit: "x10\u2079/L", low: 4, high: 11, critLow: 1, critHigh: 30 },
-      { key: "plt", label: "Platelets", unit: "x10\u2079/L", low: 150, high: 400, critLow: 20, critHigh: 1000 },
-    ],
-  },
-  {
-    code: "UE",
-    name: "Urea & Electrolytes",
-    department: "Clinical Chemistry",
-    price: 3500,
-    analytes: [
-      { key: "na", label: "Sodium", unit: "mmol/L", low: 135, high: 145, critLow: 120, critHigh: 160 },
-      { key: "k", label: "Potassium", unit: "mmol/L", low: 3.5, high: 5.1, critLow: 2.5, critHigh: 6.5 },
-      { key: "urea", label: "Urea", unit: "mmol/L", low: 2.5, high: 7.8, critLow: null, critHigh: 40 },
-      { key: "creat", label: "Creatinine", unit: "\u00b5mol/L", low: 60, high: 110, critLow: null, critHigh: 600 },
-    ],
-  },
-  {
-    code: "GLU",
-    name: "Blood Glucose",
-    department: "Clinical Chemistry",
-    price: 1200,
-    analytes: [
-      { key: "glu", label: "Glucose", unit: "mmol/L", low: 3.9, high: 7.8, critLow: 2.2, critHigh: 25 },
-    ],
-  },
-  {
-    code: "MP",
-    name: "Malaria Parasite",
-    department: "Microbiology",
-    price: 1500,
-    analytes: [
-      { key: "mp", label: "MP (qualitative)", unit: "", low: null, high: null, critLow: null, critHigh: null, qualitative: true },
-    ],
-  },
-  {
-    code: "LFT",
-    name: "Liver Function Test",
-    department: "Clinical Chemistry",
-    price: 4000,
-    analytes: [
-      { key: "alt", label: "ALT", unit: "U/L", low: 7, high: 56, critLow: null, critHigh: 500 },
-      { key: "ast", label: "AST", unit: "U/L", low: 10, high: 40, critLow: null, critHigh: 500 },
-      { key: "bili", label: "Total Bilirubin", unit: "\u00b5mol/L", low: 3, high: 17, critLow: null, critHigh: 300 },
-    ],
-  },
-];
+export { TEST_CATALOGUE, DISCIPLINES, testsInDiscipline, searchCatalogue, CATALOGUE_SIZE } from "./catalogue";
+import { TEST_CATALOGUE } from "./catalogue";
 
 export const STATUSES = ["ordered", "collected", "resulted", "verified"];
 export const STATUS_LABELS = {

@@ -14,6 +14,7 @@ export const NAV_GROUPS = [
       { id: "worklist", label: "Worklist", path: "/worklist" , icon: "ListChecks" },
       { id: "alerts", label: "Alerts & critical values", path: "/alerts" , icon: "BellRing" },
       { id: "help", label: "Help & documentation", path: "/help" , icon: "BookOpen" },
+      { id: "communication", label: "Communication hub", path: "/communication" , icon: "MessagesSquare" },
     ],
   },
   {
@@ -32,6 +33,7 @@ export const NAV_GROUPS = [
       { id: "specialties", label: "Specialist clinics", path: "/specialties" , icon: "Stethoscope" },
       { id: "oncology", label: "Oncology", path: "/oncology" , icon: "Ribbon" },
       { id: "rehab", label: "Rehabilitation & therapy", path: "/rehab" , icon: "Accessibility" },
+      { id: "bookings", label: "Online bookings", path: "/bookings" , icon: "CalendarPlus" },
     ],
   },
   {
@@ -42,8 +44,14 @@ export const NAV_GROUPS = [
       { id: "laboratory", label: "Laboratory", path: "/lab" , icon: "TestTube" },
       { id: "blood-bank", label: "Blood bank & transfusion", path: "/blood-bank" , icon: "Droplet" },
       { id: "radiology", label: "Radiology & imaging", path: "/radiology" , icon: "ScanLine" },
+      { id: "ultrasound", label: "Ultrasound", path: "/ultrasound" , icon: "Waves" },
+      { id: "ct-scan", label: "CT scan", path: "/ct-scan" , icon: "ScanFace" },
+      { id: "mri", label: "MRI", path: "/mri" , icon: "Magnet" },
       { id: "radiotherapy", label: "Radiotherapy", path: "/radiotherapy" , icon: "Radiation" },
       { id: "poct", label: "Point of care testing", path: "/poct" , icon: "Timer" },
+      { id: "lab-utilities", label: "Lab utilities", path: "/lab-utilities" , icon: "Calculator" },
+      { id: "biobank", label: "Biobanking", path: "/biobank" , icon: "Archive" },
+      { id: "diagnostic-intel", label: "Diagnostic intelligence", path: "/diagnostic-intel" , icon: "Brain" },
     ],
   },
   {

@@ -4,6 +4,7 @@ import Sidebar from "../nav/Sidebar";
 import { ALL_ROUTES } from "../nav/navGroups";
 import { useAuth } from "../auth/AuthContext";
 import Platform from "../modules/platform/Platform";
+import GlobalSearch from "./GlobalSearch";
 
 function useCrumb() {
   const { pathname } = useLocation();
@@ -39,11 +40,7 @@ export default function AppLayout() {
           </div>
 
           {!platformMode && (
-            <div style={searchBox}>
-              <Icons.Search size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
-              <span style={{ fontSize: 12.5, color: "var(--muted)", flex: 1 }}>Search patients, orders, records…</span>
-              <kbd style={kbd}>Ctrl K</kbd>
-            </div>
+            <GlobalSearch />
           )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -82,6 +79,24 @@ export default function AppLayout() {
 
         <main style={main}>
           <div style={container}>{platformMode ? <Platform /> : <Outlet />}</div>
+          <footer style={footer}>
+            <div style={footerInner}>
+              <div>
+                Powered by <b style={{ color: "var(--charcoal)" }}>AgoroX Technologies</b>
+                <span style={dotSep}>·</span>v1.0.0
+                <span style={dotSep}>·</span>&copy; 2026. All Rights Reserved.
+              </div>
+              <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>
+                <a href="#" style={footLink}>Privacy Policy</a>
+                <span style={dotSep}>·</span>
+                <a href="#" style={footLink}>EULA</a>
+                <span style={dotSep}>·</span>
+                <a href="#" style={footLink}>IP Policy</a>
+                <span style={dotSep}>·</span>
+                <a href="#" style={footLink}>Contact Support</a>
+              </div>
+            </div>
+          </footer>
         </main>
       </div>
     </div>
@@ -94,8 +109,12 @@ const topbar = {
   background: "var(--surface-2)", borderBottom: "1px solid var(--border)",
 };
 // Generous padding on all four sides, with a max width so content breathes.
-const main = { flex: 1, overflowY: "auto", background: "var(--bg)", padding: "28px 32px 48px" };
-const container = { maxWidth: 1320, margin: "0 auto" };
+const main = { flex: 1, overflowY: "auto", background: "var(--bg)", padding: "28px 32px 0", display: "flex", flexDirection: "column" };
+const container = { maxWidth: 1320, margin: "0 auto", width: "100%", flex: 1, paddingBottom: 36 };
+const footer = { maxWidth: 1320, margin: "0 auto", width: "100%", borderTop: "1px solid var(--border)", padding: "16px 0 22px" };
+const footerInner = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)" };
+const footLink = { color: "var(--muted)", fontWeight: 500 };
+const dotSep = { margin: "0 7px", color: "var(--border-strong)" };
 const searchBox = {
   display: "flex", alignItems: "center", gap: 8, flex: "0 1 380px",
   background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 10px",

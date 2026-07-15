@@ -5,6 +5,7 @@ import {
   listServices, listFlags, toggleFlag, listDeployments,
 } from "./platformService";
 import { PageHeader, StatCard, Card, Pill, Button } from "../../lib/ui";
+import Settlement from "./Settlement";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 const ago = (iso) => {
@@ -15,6 +16,7 @@ const ago = (iso) => {
 };
 
 export default function Platform() {
+  const [tab, setTab] = useState("overview");
   const [data, setData] = useState(null);
   const [err, setErr] = useState("");
 
@@ -59,6 +61,15 @@ export default function Platform() {
         actions={<Pill tone="accent">support@agorox.africa</Pill>}
       />
 
+      <div style={tabs}>
+        {[["overview", "Overview"], ["settlement", "Settlement & usage"]].map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)} style={{ ...tabBtn, ...(tab === id ? tabActive : null) }}>{label}</button>
+        ))}
+      </div>
+
+      {tab === "settlement" && <Settlement />}
+
+      {tab === "overview" && <>
       {err && <div style={errBanner}>{err}</div>}
 
       <div style={statGrid}>
@@ -152,10 +163,14 @@ export default function Platform() {
           </table>
         </Card>
       </div>
+      </>}
     </div>
   );
 }
 
+const tabs = { display: "flex", gap: 6, marginBottom: 16 };
+const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 16px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };

@@ -233,3 +233,88 @@ automatically under its category.
 The "System" sidebar group is labelled **Administration**. The permission key
 remains `system` — RBAC and route guards reference it, and renaming the key would
 ripple through every role definition for no benefit.
+
+## Help engine (src/engines/help/)
+Help is now a standalone ENGINE, not a module. It owns no clinical data and
+imports from no module — the dependency runs one way.
+- `registerArticles()` / `registerCategory()` — any module contributes its own
+  docs at import time, so a module ships its help with it.
+- `useHelp().openHelp(id)` + `<HelpLink articleId="..." />` — contextual help:
+  a question mark beside a control opens the exact article explaining it.
+- `searchWithExcerpt()` — powers the global search's documentation results.
+
+## Global search (src/layout/GlobalSearch.jsx)
+Previously a decorative span. Now a real command palette: Ctrl+K / Cmd+K, arrow
+keys, Enter to open. Searches three sources at once — navigation (permission
+filtered, you cannot jump to an area you cannot reach), patients, and the full
+documentation with excerpts.
+
+## Lab catalogue (src/modules/lab/catalogue.js)
+41 tests / 83 analytes across 8 disciplines: Clinical Chemistry, Haematology,
+Microbiology, Serology & Immunology, Endocrinology, Molecular Diagnostics,
+Histopathology & Cytology, Transfusion Medicine. Each test carries specimen type,
+turnaround time, price, and per-analyte reference + panic ranges.
+Reference ranges are adult defaults — production should make these configurable
+per lab and per demographic.
+
+## Settlement & usage (src/modules/platform/settlementService.js)
+AgoroX revenue side, inside the Platform view (support@agorox.africa only).
+- **Settlement**: 3.25% platform fee on hospital collections, per cycle, with a
+  Pending → Processing → Settled lifecycle, payout destination, and fee trend.
+- **Usage metering**: per-tenant seats, encounters, lab orders, storage, API
+  calls — the evidence behind an invoice — plus seat under-utilisation flagged
+  as a churn signal.
+
+## Footer
+Every page: "Powered by AgoroX Technologies · v1.0.0 · © 2026. All Rights
+Reserved." with Privacy Policy · EULA · IP Policy · Contact Support.
+Links are placeholders pending real policy pages.
+
+## Five new modules (this session)
+
+- **Lab utilities** (/lab-utilities) — 7 clinical calculators (eGFR CKD-EPI,
+  Cockcroft-Gault, BMI, BSA, maintenance fluids, anion gap, corrected calcium),
+  9 unit converters (glucose, creatinine, bilirubin, etc.), a critical-value
+  quick-reference card, and a specimen tube guide. Pure functions, no persistence.
+- **Biobanking** (/biobank) — long-term specimen repository distinct from the
+  active lab worklist: storage unit + capacity tracking (4 units), consent basis
+  per specimen, research-use flagging.
+- **Diagnostic intelligence** (/diagnostic-intel) — read-only cross-diagnostic
+  analytics over Laboratory + Radiology + Blood Bank: completion rates, most-
+  ordered tests, department load, declared-vs-actual turnaround, and positivity
+  rates for qualitative screens. Owns no data of its own.
+- **Communication hub** (/communication) — SMS/WhatsApp/Email/In-app delivery
+  queue with templates, live status (queued -> delivered), and compose.
+- **Online bookings** (/bookings) — patient-facing appointment requests.
+  Confirming and checking in a booking calls the SAME checkInVisit() the
+  Outpatient queue uses, so a booking becoming a visit is a real integration,
+  not a separate list that happens to look similar. Verified: registering a
+  patient, booking, confirming and checking in measurably grows the Outpatient
+  queue count.
+
+Catalogue expanded 5 -> 41 tests / 83 analytes across 8 disciplines (see
+src/modules/lab/catalogue.js).
+
+## Imaging sub-modules (Ultrasound / CT / MRI)
+
+Three dedicated screens under Diagnostics, each a filtered lens on the SAME
+study records radiologyService and the generic Radiology worklist use — not a
+parallel system. Verified: a study created via the MRI screen is immediately
+visible in listStudies() and the generic Radiology worklist.
+
+Catalogue expanded from 8 to 27 imaging protocols:
+- Ultrasound (8): abdominal, obstetric, pelvic, thyroid, Doppler/vascular,
+  echocardiogram, FAST trauma scan, breast
+- CT (6): head, chest, abdomen & pelvis, spine, angiography, KUB stone protocol
+- MRI (6): brain, spine, knee, abdomen, pelvis, MRCP
+- General Radiography (6) and Mammography (1) round out the set
+
+Each modality carries technical parameters captured at the "performed" stage
+(src/modules/radiology/radiologyService.js TECH_FIELDS): Ultrasound records
+probe + Doppler use; CT records contrast + slice thickness; MRI records
+sequence protocol + field strength. These are shown on the study row and feed
+the eventual report — informational, not separately billed.
+
+Shared workspace component: src/modules/imaging/ModalityWorkspace.jsx. Adding
+a fourth modality (e.g. Nuclear Medicine) is a new MODALITIES entries + one
+thin wrapper screen, not a rebuild.
