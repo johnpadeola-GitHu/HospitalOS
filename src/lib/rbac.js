@@ -19,6 +19,7 @@ export const AREAS = [
   { key: "finance", label: "Finance & trade" },
   { key: "operations", label: "Operations" },
   { key: "academic", label: "Academic" },
+  { key: "specialty-services", label: "Specialty services" },
   { key: "public-health", label: "Public health" },
   { key: "intelligence", label: "Intelligence" },
   { key: "system", label: "System administration" },
@@ -57,7 +58,7 @@ export const ROLES = {
   },
   doctor: {
     label: "Doctor",
-    areas: ["overview", "patient-care", "diagnostics", "pharmacy"],
+    areas: ["overview", "patient-care", "diagnostics", "pharmacy", "specialty-services"],
     grants: [
       "patient-care:*", "diagnostics:order", "diagnostics:result", "diagnostics:verify",
       "diagnostics:transfuse", "pharmacy:dispense",
@@ -65,7 +66,7 @@ export const ROLES = {
   },
   nurse: {
     label: "Nurse",
-    areas: ["overview", "patient-care"],
+    areas: ["overview", "patient-care", "specialty-services"],
     // Nurses admit and record vitals, but do not discharge.
     grants: ["patient-care:register", "patient-care:admit", "patient-care:record-vitals", "patient-care:record-delivery", "patient-care:note"],
   },

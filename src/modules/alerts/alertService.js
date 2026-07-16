@@ -19,6 +19,10 @@ import { listOverdueDialysis } from "../renal/renalService";
 import { listReferrals } from "../referrals/referralsService";
 import { listOverdueImmunisations } from "../public-health/immunizationService";
 import { listOverdueDsars } from "../privacy/privacyService";
+import { listActiveSevereCrises } from "../sickle-cell/sickleCellService";
+import { checkOutbreakThreshold } from "../ipc/ipcService";
+import { listHighRiskPatients as listHighRiskGeriatric } from "../geriatric/geriatricService";
+import { listHighAcuityPatients as listHighAcuityMhu } from "../mental-health/mentalHealthService";
 
 const delay = (ms = 90) => new Promise((r) => setTimeout(r, ms));
 
@@ -258,10 +262,50 @@ function alertFromDsar(d) {
   };
 }
 
+function alertFromCrisis(c) {
+  return {
+    id: `crisis:${c.id}`, source: "Sickle Cell Centre", severity: "critical",
+    patientName: c.patientName, hospitalNo: c.hospitalNo,
+    title: "Severe sickle cell crisis \u2014 active",
+    detail: `${c.type} \u2014 admitted, unresolved`,
+    reference: c.ref, at: c.admittedAt,
+  };
+}
+function alertFromIpcOutbreak(o) {
+  return {
+    id: `outbreak:${o.type}`, source: "Infection Prevention & Control", severity: "critical",
+    patientName: "\u2014", hospitalNo: "\u2014",
+    title: "Outbreak signal",
+    detail: `${o.count} open cases of ${o.type}`,
+    reference: o.type, at: new Date().toISOString(),
+  };
+}
+function alertFromGeriatric(p) {
+  const parts = [];
+  if (p.fallsRiskScore >= 4) parts.push(`Falls risk score ${p.fallsRiskScore}`);
+  if (p.medicationCount >= 5) parts.push(`${p.medicationCount} regular medications`);
+  return {
+    id: `geri:${p.id}`, source: "Geriatric Unit", severity: "warning",
+    patientName: p.patientName, hospitalNo: p.hospitalNo,
+    title: p.fallsRiskScore >= 4 ? "High falls risk" : "Polypharmacy",
+    detail: parts.join(" \u00b7 "),
+    reference: p.ref, at: p.admittedAt,
+  };
+}
+function alertFromMhu(p) {
+  return {
+    id: `mhu:${p.id}`, source: "Mental Health Unit", severity: "critical",
+    patientName: p.patientName, hospitalNo: p.hospitalNo,
+    title: p.observationLevel === "Constant (1:1)" ? "Constant observation" : "Active risk flag",
+    detail: p.riskFlags.length ? p.riskFlags.join(", ") : p.observationLevel,
+    reference: p.ref, at: p.admittedAt,
+  };
+}
+
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars] = await Promise.all([
+  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
     listUrgentStudies(),
@@ -275,8 +319,10 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     listOverdueDialysis(),
     listReferrals({ direction: "inbound", status: "received" }),
     listOverdueImmunisations(),
-    listOverdueDsars(),
+    listOverdueDsars(), listActiveSevereCrises(), checkOutbreakThreshold(),
+    listHighRiskGeriatric(), listHighAcuityMhu(),
   ]);
+  // checkOutbreakThreshold() result is bound to ipcOutbreaks above.
 
   const alerts = [
     ...criticalOrders.map(alertFromLabOrder),
@@ -293,6 +339,10 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     ...pendingReferrals.filter((r) => r.urgency === "Emergency").map(alertFromReferral),
     ...overdueImmunisations.map(alertFromImmunisation),
     ...overdueDsars.map(alertFromDsar),
+    ...severeCrises.map(alertFromCrisis),
+    ...ipcOutbreaks.map(alertFromIpcOutbreak),
+    ...geriatricRisk.map(alertFromGeriatric),
+    ...mhuAcuity.map(alertFromMhu),
   ];
 
   const rank = { critical: 0, warning: 1 };

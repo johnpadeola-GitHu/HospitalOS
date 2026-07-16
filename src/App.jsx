@@ -52,6 +52,16 @@ import Bookings from "./modules/bookings/Bookings";
 import PricingConfig from "./engines/pricing/PricingConfig";
 import Renal from "./modules/renal/Renal";
 import Referrals from "./modules/referrals/Referrals";
+import Nutrition from "./modules/nutrition/Nutrition";
+import SickleCell from "./modules/sickle-cell/SickleCell";
+import Dental from "./modules/dental/Dental";
+import IPC from "./modules/ipc/IPC";
+import SocialWork from "./modules/social-work/SocialWork";
+import OccupationalHealth from "./modules/occupational-health/OccupationalHealth";
+import Chaplaincy from "./modules/chaplaincy/Chaplaincy";
+import Geriatric from "./modules/geriatric/Geriatric";
+import MentalHealth from "./modules/mental-health/MentalHealth";
+import VipServices from "./modules/vip-services/VipServices";
 import Privacy from "./modules/privacy/Privacy";
 import FhirExport from "./engines/fhir/FhirExport";
 import Ultrasound from "./modules/imaging/Ultrasound";
@@ -117,6 +127,16 @@ const MODULES = {
   "/system/pricing": PricingConfig,
   "/renal": Renal,
   "/referrals": Referrals,
+  "/nutrition": Nutrition,
+  "/sickle-cell": SickleCell,
+  "/dental": Dental,
+  "/ipc": IPC,
+  "/social-work": SocialWork,
+  "/occupational-health": OccupationalHealth,
+  "/chaplaincy": Chaplaincy,
+  "/geriatric": Geriatric,
+  "/mental-health": MentalHealth,
+  "/vip-services": VipServices,
   "/system/privacy": Privacy,
   "/system/fhir": FhirExport,
   "/ultrasound": Ultrasound,

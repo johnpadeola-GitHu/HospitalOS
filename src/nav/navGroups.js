@@ -36,6 +36,9 @@ export const NAV_GROUPS = [
       { id: "oncology", label: "Oncology", path: "/oncology" , icon: "Ribbon" },
       { id: "rehab", label: "Rehabilitation & therapy", path: "/rehab" , icon: "Accessibility" },
       { id: "renal", label: "Renal & dialysis", path: "/renal" , icon: "Droplets" },
+      { id: "geriatric", label: "Geriatric unit", path: "/geriatric" , icon: "Users" },
+      { id: "mental-health", label: "Mental health unit", path: "/mental-health" , icon: "Brain" },
+      { id: "vip-services", label: "VIP services", path: "/vip-services" , icon: "Crown" },
     ],
   },
   {
@@ -104,6 +107,20 @@ export const NAV_GROUPS = [
       { id: "cme", label: "CME", path: "/academic/cme" , icon: "Award" },
       { id: "research", label: "Research & trials", path: "/academic/research" , icon: "FlaskConical" },
       { id: "ethics", label: "Ethics committee", path: "/academic/ethics" , icon: "Scale" },
+    ],
+  },
+  {
+    id: "specialty-services",
+    label: "Specialty services",
+    icon: "HeartHandshake",
+    items: [
+      { id: "nutrition", label: "Nutrition & dietetics", path: "/nutrition" , icon: "Apple" },
+      { id: "sickle-cell", label: "Sickle cell centre", path: "/sickle-cell" , icon: "Droplet" },
+      { id: "dental", label: "Dental & oral health", path: "/dental" , icon: "Smile" },
+      { id: "ipc", label: "Infection prevention & control", path: "/ipc" , icon: "ShieldAlert" },
+      { id: "social-work", label: "Medical social services", path: "/social-work" , icon: "HeartHandshake" },
+      { id: "occ-health", label: "Occupational health", path: "/occupational-health" , icon: "ShieldPlus" },
+      { id: "chaplaincy", label: "Chaplaincy & pastoral care", path: "/chaplaincy" , icon: "Church" },
     ],
   },
   {

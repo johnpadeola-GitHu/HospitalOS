@@ -25,7 +25,7 @@ export const ARTICLES = [
     title: "How HospitalOS is organised",
     lead: "The sidebar follows how work moves through a hospital, not the org chart.",
     body: [
-      { p: "HospitalOS is arranged by workflow. The ten sidebar groups run roughly in the order work happens: Overview, Patient care, Diagnostics, Pharmacy, Finance & trade, Operations, Academic, Public health, Intelligence, and Administration." },
+      { p: "HospitalOS is arranged by workflow. The eleven sidebar groups run roughly in the order work happens: Overview, Patient care, Diagnostics, Pharmacy, Finance & trade, Operations, Academic, Specialty services, Public health, Intelligence, and Administration." },
       { h: "Why groups, not departments" },
       { p: "A cardiologist and a geriatrician do the same thing from the software's point of view: run a clinic, see referrals, order tests. So all 21 specialties live inside one Specialist clinics module as filterable departments rather than 21 sidebar rows. The department is context, not a different screen." },
       { h: "You only see what your role grants" },
@@ -334,7 +334,7 @@ export const ARTICLES = [
   {
     id: "alerts", cat: "safety", icon: "BellRing",
     title: "The alert system",
-    lead: "Eleven sources, one feed, and most alerts clear themselves.",
+    lead: "Eighteen sources, one feed, and most alerts clear themselves.",
     body: [
       { p: "Overview \u2192 Alerts is a single feed for the whole hospital. The red badge on the sidebar refreshes every few seconds, so a critical result reaches you wherever you are working." },
       { h: "What raises an alert" },
@@ -352,6 +352,13 @@ export const ARTICLES = [
           ["Oncology", "Chemotherapy cycle overdue", "Warning"],
           ["Public health", "Notifiable disease trending up", "Warning"],
           ["Renal", "Dialysis session overdue", "Critical"],
+          ["Referrals", "Emergency-urgency inbound referral logged", "Critical"],
+          ["Immunisation", "A scheduled dose more than 14 days overdue", "Warning"],
+          ["Privacy", "Data-subject request past the 30-day statutory window", "Critical"],
+          ["Sickle Cell Centre", "An active severe crisis", "Critical"],
+          ["Infection Prevention & Control", "Three or more open cases of the same infection type", "Critical"],
+          ["Geriatric Unit", "High falls risk score or polypharmacy (5+ medications)", "Warning"],
+          ["Mental Health Unit", "Constant (1:1) observation or any active risk flag", "Critical"],
         ],
       } },
       { h: "How alerts clear" },
@@ -891,6 +898,115 @@ export const ARTICLES = [
       { p: "Check Current limitations first, then this FAQ, then search the specific module's help article \u2014 a surprising number of \u201cwhy can't I\u201d questions turn out to be RBAC or a stated preview-build limitation rather than an actual defect." },
     ],
     related: ["roles-explained", "limitations", "result-release", "pricing"],
+  },
+  {
+    id: "nutrition", cat: "clinical", icon: "Apple",
+    title: "Nutrition and dietetics",
+    lead: "A referral-driven service that Renal, Oncology, ICU, and Geriatrics all depend on.",
+    body: [
+      { p: "Specialty services \u2192 Nutrition & dietetics is where a patient goes for a nutritional assessment and a therapeutic diet plan. It is deliberately kept separate from the wards that refer into it, the same reasoning that keeps Renal separate from Lab Utilities \u2014 dietetics is its own discipline with its own referral queue." },
+      { h: "What gets recorded" },
+      { p: "Weight, height (BMI is calculated automatically), nutritional status (Well-nourished through Malnourished-severe), and a diet type \u2014 including specialised diets like renal-restricted (low potassium/phosphate), enteral tube feeding, and parenteral IV nutrition." },
+      { note: "A Malnourished-severe case sets a 7-day review date automatically \u2014 nutrition status is not a one-time assessment." },
+    ],
+    related: ["renal", "oncology"],
+  },
+  {
+    id: "sickle-cell", cat: "clinical", icon: "Droplet",
+    title: "Sickle cell centre",
+    lead: "Genotype registry, crisis management, and disease-modifying therapy \u2014 Nigeria carries among the highest SCD prevalence globally.",
+    body: [
+      { p: "Specialty services \u2192 Sickle cell centre has two tabs: the patient registry (genotype, hydroxyurea and transfusion programme status) and the crisis log (vaso-occlusive pain, acute chest syndrome, splenic sequestration, aplastic crisis, priapism, and stroke)." },
+      { warn: "An active severe crisis raises a hospital-wide critical alert immediately \u2014 this is the acute care a sickle cell centre actually exists to manage, not a background statistic." },
+      { p: "A crisis can only be logged against a patient already in the registry \u2014 register first, then log." },
+    ],
+    related: ["alerts", "blood"],
+  },
+  {
+    id: "dental", cat: "clinical", icon: "Smile",
+    title: "Dental and oral health",
+    lead: "A clinic queue plus a procedure log \u2014 dental care is procedure-driven, not diagnosis-driven.",
+    body: [
+      { p: "Specialty services \u2192 Dental & oral health checks patients through Waiting \u2192 In chair \u2192 Completed, with procedures (examination, scaling, filling, extraction, root canal, X-ray, crown, denture) added and priced per visit." },
+      { note: "Unlike a medical specialty clinic, there is no diagnosis-tracking here \u2014 the visit record is the procedures performed, matching how dental billing actually works." },
+    ],
+  },
+  {
+    id: "ipc", cat: "operations", icon: "ShieldAlert",
+    title: "Infection prevention & control (IPC)",
+    lead: "Hospital-acquired infections and isolation precautions \u2014 internal, not the community disease surveillance Public Health handles.",
+    body: [
+      { p: "Specialty services \u2192 Infection prevention & control is deliberately distinct from Public health \u2192 Disease surveillance: that module reports notifiable disease to NHMIS/IDSR at a national level; this one tracks infections acquired inside your own facility \u2014 surgical site infections, catheter-associated UTIs, central line infections, ventilator-associated pneumonia, C. difficile, and MRSA." },
+      { h: "The outbreak threshold" },
+      { p: "Three or more open cases of the same infection type is the operational signal this module watches for. Crossing it raises a hospital-wide critical alert naming the infection type and count \u2014 an outbreak banner also appears directly on the IPC screen itself." },
+      { h: "Isolation precautions" },
+      { p: "A separate tab tracks who is currently isolated and under what precaution level \u2014 Standard, Contact, Droplet, Airborne, or Contact+Droplet \u2014 independent of the HAI case log, since a patient can be isolated on suspicion before any infection is confirmed." },
+    ],
+    related: ["alerts"],
+  },
+  {
+    id: "social-work", cat: "clinical", icon: "HeartHandshake",
+    title: "Medical social services",
+    lead: "The non-clinical barriers to a safe discharge \u2014 no caregiver, no funds, no transport.",
+    body: [
+      { p: "Specialty services \u2192 Medical social services opens a case for discharge planning, indigent patient financial support, safeguarding concerns, or transport/logistics help \u2014 the things that can hold up a clinically-ready discharge for reasons that have nothing to do with the patient's medical condition." },
+      { p: "Cases move Open \u2192 In progress \u2192 Resolved (or Referred out, if the case needs a service outside the hospital)." },
+    ],
+  },
+  {
+    id: "occupational-health", cat: "operations", icon: "ShieldPlus",
+    title: "Occupational health",
+    lead: "Staff health, not patient care \u2014 fitness-to-work, immunisation status, and workplace injuries.",
+    body: [
+      { p: "Specialty services \u2192 Occupational health tracks hospital staff, not patients: fitness-to-work status (Fit for duty through Temporarily unfit), Hepatitis B immunity, TB screening, and a workplace injury log \u2014 needlestick injuries, slips, manual handling injuries, chemical exposure, and assault." },
+      { note: "A needlestick injury is flagged with warning severity in the audit trail on report \u2014 it is the single most consequential injury type this log tracks, given exposure risk." },
+    ],
+  },
+  {
+    id: "chaplaincy", cat: "operations", icon: "Church",
+    title: "Chaplaincy and pastoral care",
+    lead: "Patient and family visit requests, routed to a chaplain.",
+    body: [
+      { p: "Specialty services \u2192 Chaplaincy & pastoral care is deliberately simple: log a visit request with the patient's faith preference if stated, move it through Requested \u2192 Scheduled \u2192 Completed. This is a support service, not a clinical one, and does not need clinical-workflow depth." },
+    ],
+  },
+  {
+    id: "geriatric", cat: "clinical", icon: "Users",
+    title: "Geriatric unit",
+    lead: "A dedicated inpatient ward, distinct from the Geriatrics outpatient clinic tag.",
+    body: [
+      { p: "Patient care \u2192 Geriatric unit is not the same thing as the Geriatrics department under Specialist Clinics \u2014 that is an outpatient clinic tag; this is an admitting ward with its own assessment tool." },
+      { h: "Comprehensive Geriatric Assessment (CGA)" },
+      { p: "Every admission captures a falls risk score (0-5), a regular medication count, a cognitive screen result, and a frailty level (Very fit through Severely frail) \u2014 the standard domains a real geriatric assessment covers, not a generic vitals chart." },
+      { warn: "A falls risk score of 4 or higher, or 5 or more regular medications (polypharmacy), raises a hospital-wide alert \u2014 both are established geriatric risk indicators, not arbitrary thresholds." },
+    ],
+    related: ["alerts", "lab-utilities-scope"],
+  },
+  {
+    id: "mental-health-unit", cat: "clinical", icon: "Brain",
+    title: "Mental health unit",
+    lead: "A dedicated psychiatric ward, distinct from the Psychiatry outpatient clinic tag.",
+    body: [
+      { p: "Patient care \u2192 Mental health unit is a genuine inpatient ward, separate from the Psychiatry clinic under Specialist Clinics, because inpatient psychiatric care carries safety requirements a general admission record does not." },
+      { h: "Admission status and observation level" },
+      { p: "Every admission records whether it is Voluntary or Involuntary (assessment or treatment order), and an observation level \u2014 Routine (hourly), Close (15-minute), or Constant (1:1) \u2014 that can be changed at any time as a patient's presentation changes, not fixed at admission." },
+      { h: "Risk flags" },
+      { p: "Self-harm risk, suicide risk, risk to others, absconding risk, and vulnerability to exploitation are tracked as toggleable flags, editable independently of the observation level." },
+      { warn: "Constant (1:1) observation or any active risk flag raises a hospital-wide critical alert \u2014 this is the highest-acuity population in the building, and the alert reflects that." },
+    ],
+    related: ["alerts"],
+  },
+  {
+    id: "vip-services", cat: "clinical", icon: "Crown",
+    title: "VIP services",
+    lead: "What actually differentiates VIP care beyond the room it happens in.",
+    body: [
+      { p: "Private Suite, VIP Suite, and Executive Suite already exist as accommodation tiers in Administration \u2192 Pricing, each with its own nightly rate \u2014 that is billing. Patient care \u2192 VIP services is the actual service differentiation: a named consultant of choice, a concierge contact, a dietary preference, and a privacy flag that changes how a patient is handled, not just what they are charged." },
+      { h: "The privacy flag" },
+      { p: "Flagging a profile for strict privacy is a real instruction, not decoration \u2014 it signals no visitor list disclosure and no media/press access for that patient." },
+      { note: "A VIP service profile is separate from the bed assignment itself \u2014 creating one does not admit the patient; it records the service commitments around an admission that has already happened." },
+    ],
+    related: ["beds-tiers", "pricing"],
   },
 ];
 
