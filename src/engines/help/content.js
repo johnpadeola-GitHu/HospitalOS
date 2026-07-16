@@ -296,13 +296,13 @@ export const ARTICLES = [
         "Bed-nights bill at the ward's accommodation tier rate from the admission timestamp.",
       ] },
       { h: "Taking payment" },
-      { p: "Payments record against the outstanding balance (Cash, Card, Transfer, or NHIS) and issue a receipt. Overpayment is blocked. Every receipt appears in Finance \u2192 Payments as a hospital-wide ledger." },
+      { p: "Payments record against the outstanding balance (Cash, Card, Transfer, or NHIA) and issue a receipt. Overpayment is blocked. Every receipt appears in Finance \u2192 Payments as a hospital-wide ledger." },
     ],
     related: ["claims", "beds-tiers"],
   },
   {
     id: "claims", cat: "finance", icon: "FileCheck",
-    title: "Insurance and NHIS claims",
+    title: "Insurance and NHIA claims",
     lead: "A guarded lifecycle with separation of duties built in.",
     body: [
       { p: "Claims move Submitted \u2192 Approved or Rejected \u2192 Paid. The lifecycle is enforced: you cannot pay an unapproved claim, and you cannot reject one that has already been approved." },
@@ -381,7 +381,7 @@ export const ARTICLES = [
     title: "Uploading your own documents & templates",
     lead: "Real file upload \u2014 any category you choose, any file type, up to 15MB.",
     body: [
-      { p: "Administration \u2192 Documents & templates is where your hospital keeps its own forms, policies, and templates \u2014 discharge summary templates, consent forms, NHIS claim forms, statutory notifications, anything you need on hand." },
+      { p: "Administration \u2192 Documents & templates is where your hospital keeps its own forms, policies, and templates \u2014 discharge summary templates, consent forms, NHIA claim forms, statutory notifications, anything you need on hand." },
       { h: "Uploading" },
       { steps: [
         "Drag a file onto the upload area, or click it to browse.",
@@ -390,6 +390,40 @@ export const ARTICLES = [
       ] },
       { warn: "Files are held in your browser session, not on a server yet \u2014 they do not survive a page reload. Do not use this as your only copy of anything important until server-side storage lands." },
     ],
+  },
+  {
+    id: "fhir", cat: "platform", icon: "Share2",
+    title: "FHIR interoperability",
+    lead: "Standards-shaped patient records another system can actually ingest.",
+    body: [
+      { p: "Administration \u2192 FHIR interoperability generates an HL7 FHIR R4 Bundle for any patient \u2014 Patient, Condition, AllergyIntolerance, DocumentReference and DiagnosticReport resources, correctly cross-referenced and ICD-10 coded." },
+      { warn: "A browser cannot host a live FHIR REST endpoint \u2014 that is server territory, the same limitation as the instruments gateway's device listeners. What this screen produces is the real substance of interoperability: correct resource mapping. A generated Bundle is a valid artifact any FHIR-consuming system can ingest today by file, and is exactly what a future REST endpoint would serve \u2014 the mapping logic does not change when the transport does." },
+      { p: "Download the Bundle as JSON directly from the screen." },
+    ],
+  },
+  {
+    id: "privacy", cat: "admin", icon: "ShieldCheck",
+    title: "Privacy & consent (NDPA)",
+    lead: "Consent records and data-subject rights requests under the Nigeria Data Protection Act 2023.",
+    body: [
+      { p: "Administration \u2192 Privacy & consent has two tabs: Consent records (what a patient has agreed their data may be used for, and how that consent was captured) and Data-subject requests (access, rectification, erasure, restriction, portability)." },
+      { h: "The 30-day window" },
+      { p: "Every data-subject request gets a due-by date calculated automatically \u2014 30 days from filing, the statutory response window under the Act. An overdue request is flagged in the list and raises a hospital-wide critical alert." },
+      { warn: "You cannot mark a request Fulfilled or Declined without entering a closing note explaining what was done \u2014 the button stays disabled without one." },
+    ],
+    related: ["ethics", "audit"],
+  },
+  {
+    id: "immunisation", cat: "clinical", icon: "Syringe",
+    title: "Immunisation (NPHCDA schedule)",
+    lead: "The real National Programme on Immunization schedule, tracked per child \u2014 not just coverage bars.",
+    body: [
+      { p: "Public health \u2192 Immunisation tracks children against the NPHCDA Routine Immunization Schedule: BCG, OPV, Pentavalent, PCV, Rotavirus, IPV, Measles, Yellow Fever, Meningitis A, and Vitamin A, each at its recommended age." },
+      { h: "Due vs. overdue" },
+      { p: "A dose becomes Due the moment a child reaches the recommended age for it. It becomes Overdue once more than 14 days have passed beyond that \u2014 the same operational definition used in NHMIS reporting. An overdue dose raises an alert." },
+      { p: "Coverage is reported per antigen series (the figure actually submitted to NHMIS), not as a single blended number \u2014 completed doses of the final shot in a series, divided by children old enough to have received it." },
+    ],
+    related: ["alerts"],
   },
   {
     id: "audit", cat: "admin", icon: "ShieldCheck",
@@ -445,7 +479,7 @@ export const ARTICLES = [
           ["IDSR", "Integrated Disease Surveillance and Response reporting"],
           ["MLLP", "Minimal Lower Layer Protocol \u2014 how HL7 travels over TCP"],
           ["NAFDAC", "Nigeria's drug regulator; registration number on each product"],
-          ["NHIS", "National Health Insurance Scheme"],
+          ["NHIA", "National Health Insurance Authority (formerly NHIS)"],
           ["SOAP", "Subjective, Objective, Assessment, Plan \u2014 clinical note structure"],
           ["Tier", "Accommodation class of a ward, which sets the nightly rate"],
         ],
@@ -531,6 +565,21 @@ export const ARTICLES = [
     related: ["lab"],
   },
 
+  {
+    id: "referrals", cat: "clinical", icon: "ArrowLeftRight",
+    title: "Referrals \u2014 inbound and outbound",
+    lead: "The structural link between this hospital and the wider referral network it sits in.",
+    body: [
+      { p: "Patient care \u2192 Referrals tracks patients moving in both directions: other facilities referring patients to you (Inbound), and you referring patients onward for a service you do not offer or for step-down care (Outbound)." },
+      { h: "Inbound" },
+      { p: "Received \u2192 Accepted or Declined \u2192 Checked-in. A decline requires a reason \u2014 the referring facility needs to know why, not just that. Accepting and then checking a patient in calls the same function Online Bookings uses to add someone to today's Outpatient queue \u2014 a real integration, not a separate list." },
+      { warn: "An Emergency-urgency inbound referral raises a hospital-wide critical alert the moment it is logged, before anyone accepts or declines it." },
+      { h: "Outbound" },
+      { p: "Sent \u2192 Acknowledged, once the receiving facility confirms. Records the facility, its tier (Primary/Secondary/Tertiary/Private), and the reason." },
+      { note: "Facility tier matters for triage \u2014 a referral from a PHC with no diagnostic capacity reads differently from one already worked up at a secondary facility." },
+    ],
+    related: ["register-admit", "alerts"],
+  },
   {
     id: "renal", cat: "clinical", icon: "Droplets",
     title: "Renal & dialysis",

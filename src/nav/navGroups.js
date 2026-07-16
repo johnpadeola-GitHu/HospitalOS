@@ -33,6 +33,7 @@ export const NAV_GROUPS = [
       { id: "oncology", label: "Oncology", path: "/oncology" , icon: "Ribbon" },
       { id: "rehab", label: "Rehabilitation & therapy", path: "/rehab" , icon: "Accessibility" },
       { id: "bookings", label: "Online bookings", path: "/bookings" , icon: "CalendarPlus" },
+      { id: "referrals", label: "Referrals", path: "/referrals" , icon: "ArrowLeftRight" },
       { id: "renal", label: "Renal & dialysis", path: "/renal" , icon: "Droplets" },
     ],
   },
@@ -72,7 +73,7 @@ export const NAV_GROUPS = [
     items: [
       { id: "billing", label: "Billing & invoicing", path: "/finance/billing" , icon: "ReceiptText" },
       { id: "payments", label: "Payments & cashiering", path: "/finance/payments" , icon: "Banknote" },
-      { id: "claims", label: "Insurance & NHIS claims", path: "/finance/claims" , icon: "FileCheck" },
+      { id: "claims", label: "Insurance & NHIA claims", path: "/finance/claims" , icon: "FileCheck" },
       { id: "procurement", label: "Procurement & suppliers", path: "/finance/procurement" , icon: "ShoppingCart" },
       { id: "stores", label: "Stores & assets", path: "/finance/stores" , icon: "Boxes" },
     ],
@@ -138,6 +139,8 @@ export const NAV_GROUPS = [
       { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
       { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
       { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
+      { id: "privacy", label: "Privacy & consent", path: "/system/privacy" , icon: "ShieldCheck" },
+      { id: "fhir", label: "FHIR interoperability", path: "/system/fhir" , icon: "Share2" },
     ],
   },
 ];

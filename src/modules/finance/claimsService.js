@@ -1,11 +1,13 @@
-// Insurance & NHIS claims service.
+// Insurance & NHIA claims service.
+// NHIA: National Health Insurance Authority (formerly NHIS), per the
+// National Health Insurance Authority Act 2022.
 // A claim is raised against a patient's charges to an insurer and moves:
 // submitted -> approved | rejected -> paid (approved only).
 // In-memory now; async API shaped for a later D1 swap.
 
 const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
 
-export const INSURERS = ["NHIS", "Hygeia HMO", "AXA Mansard", "Reliance HMO", "Avon HMO"];
+export const INSURERS = ["NHIA", "Hygeia HMO", "AXA Mansard", "Reliance HMO", "Avon HMO"];
 
 export const CLAIM_STATUSES = ["submitted", "approved", "rejected", "paid"];
 export const STATUS_LABELS = {
@@ -22,7 +24,7 @@ const _claims = [
     ref: "CLM-0901",
     patientName: "Eze, Chibuike",
     hospitalNo: "H001002",
-    insurer: "NHIS",
+    insurer: "NHIA",
     amount: 42000,
     status: "submitted",
     at: new Date(Date.now() - 3 * 86400000).toISOString(),

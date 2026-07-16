@@ -16,6 +16,9 @@ import { listOverdueChemo } from "../oncology/oncologyService";
 import { listOutbreakSignals } from "../public-health/publicHealthService";
 import { listInstrumentIssues } from "../instruments/instrumentsService";
 import { listOverdueDialysis } from "../renal/renalService";
+import { listReferrals } from "../referrals/referralsService";
+import { listOverdueImmunisations } from "../public-health/immunizationService";
+import { listOverdueDsars } from "../privacy/privacyService";
 
 const delay = (ms = 90) => new Promise((r) => setTimeout(r, ms));
 
@@ -213,10 +216,52 @@ function alertFromDialysis(p) {
   };
 }
 
+function alertFromReferral(r) {
+  return {
+    id: `referral:${r.id}`,
+    source: "Referrals",
+    severity: "critical",
+    patientName: r.patientName,
+    hospitalNo: r.patientId || "\u2014",
+    title: "Emergency referral awaiting review",
+    detail: `From ${r.fromFacility} \u00b7 ${r.clinic} \u00b7 ${r.reason}`,
+    reference: r.ref,
+    at: r.receivedAt,
+  };
+}
+
+function alertFromImmunisation(c) {
+  return {
+    id: `immun:${c.id}`,
+    source: "Public health",
+    severity: "warning",
+    patientName: c.childName,
+    hospitalNo: c.hospitalNo,
+    title: "Immunisation overdue",
+    detail: `${c.overdue.length} dose(s) overdue \u2014 ${c.overdue.map((d) => d.antigen).join(", ")}`,
+    reference: c.ref,
+    at: new Date().toISOString(),
+  };
+}
+
+function alertFromDsar(d) {
+  return {
+    id: `dsar:${d.id}`,
+    source: "Privacy",
+    severity: "critical",
+    patientName: d.patientName,
+    hospitalNo: d.hospitalNo,
+    title: "Data-subject request overdue",
+    detail: `${d.type} \u2014 due ${d.dueBy} (30-day statutory window)`,
+    reference: d.ref,
+    at: d.receivedAt,
+  };
+}
+
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis] = await Promise.all([
+  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
     listUrgentStudies(),
@@ -228,6 +273,9 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     listOutbreakSignals(),
     listInstrumentIssues(),
     listOverdueDialysis(),
+    listReferrals({ direction: "inbound", status: "received" }),
+    listOverdueImmunisations(),
+    listOverdueDsars(),
   ]);
 
   const alerts = [
@@ -242,6 +290,9 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     ...outbreaks.map(alertFromOutbreak),
     ...instrumentIssues.map(alertFromInstrument),
     ...overdueDialysis.map(alertFromDialysis),
+    ...pendingReferrals.filter((r) => r.urgency === "Emergency").map(alertFromReferral),
+    ...overdueImmunisations.map(alertFromImmunisation),
+    ...overdueDsars.map(alertFromDsar),
   ];
 
   const rank = { critical: 0, warning: 1 };

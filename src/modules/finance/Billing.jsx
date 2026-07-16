@@ -266,7 +266,7 @@ function PaymentModal({ account, onClose, onDone }) {
               <option>Cash</option>
               <option>Card</option>
               <option>Transfer</option>
-              <option>NHIS</option>
+              <option>NHIA</option>
             </select>
           </Field>
         </div>

@@ -51,7 +51,7 @@ const _docs = [
   { id: "d1", name: "Discharge Summary", category: "Clinical", updated: "2026-06-30" },
   { id: "d2", name: "Referral Letter", category: "Clinical", updated: "2026-06-28" },
   { id: "d3", name: "Consent — Surgery", category: "Consent", updated: "2026-07-02" },
-  { id: "d4", name: "NHIS Claim Form", category: "Finance", updated: "2026-07-05" },
+  { id: "d4", name: "NHIA Claim Form", category: "Finance", updated: "2026-07-05" },
   { id: "d5", name: "Death Certificate", category: "Statutory", updated: "2026-06-20" },
   { id: "d6", name: "Birth Notification", category: "Statutory", updated: "2026-06-20" },
 ];
@@ -62,7 +62,7 @@ const _integrations = [
   { id: "i1", name: "HL7 v2 — Lab analyzers", status: "connected", detail: "3 instruments interfaced" },
   { id: "i2", name: "FHIR API — National eHealth", status: "connected", detail: "R4, patient + encounter" },
   { id: "i3", name: "Paystack — Payments", status: "connected", detail: "Live keys" },
-  { id: "i4", name: "NHIS Claims Gateway", status: "pending", detail: "Awaiting credentials" },
+  { id: "i4", name: "NHIA Claims Gateway", status: "pending", detail: "Awaiting credentials" },
   { id: "i5", name: "SMS Gateway — Reminders", status: "connected", detail: "Termii" },
 ];
 export async function listIntegrations() { await delay(); return [..._integrations]; }

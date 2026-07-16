@@ -34,7 +34,7 @@ function seedFile(name, category, text) {
 let _docs = [
   seedFile("Discharge Summary Template.txt", "Clinical", "Discharge Summary\n\nPatient: \nAdmission date: \nDischarge date: \nDiagnosis: \nSummary of admission: \nMedications on discharge: \nFollow-up plan: \n"),
   seedFile("Consent for Surgery.txt", "Consent", "CONSENT FOR SURGICAL PROCEDURE\n\nI, the undersigned, consent to the procedure described to me by my surgeon...\n"),
-  seedFile("NHIS Claim Form.txt", "Finance", "NHIS CLAIM FORM\n\nProvider: \nEnrollee ID: \nService date: \nDiagnosis code: \nAmount claimed: \n"),
+  seedFile("NHIA Claim Form.txt", "Finance", "NHIA CLAIM FORM\n\nProvider: \nEnrollee ID: \nService date: \nDiagnosis code: \nAmount claimed: \n"),
 ];
 
 export async function listDocuments({ category = "all", query = "" } = {}) {

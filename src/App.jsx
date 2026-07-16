@@ -52,6 +52,9 @@ import Communication from "./modules/communication/Communication";
 import Bookings from "./modules/bookings/Bookings";
 import PricingConfig from "./engines/pricing/PricingConfig";
 import Renal from "./modules/renal/Renal";
+import Referrals from "./modules/referrals/Referrals";
+import Privacy from "./modules/privacy/Privacy";
+import FhirExport from "./engines/fhir/FhirExport";
 import Ultrasound from "./modules/imaging/Ultrasound";
 import CTScan from "./modules/imaging/CTScan";
 import MRIScan from "./modules/imaging/MRIScan";
@@ -114,6 +117,9 @@ const MODULES = {
   "/bookings": Bookings,
   "/system/pricing": PricingConfig,
   "/renal": Renal,
+  "/referrals": Referrals,
+  "/system/privacy": Privacy,
+  "/system/fhir": FhirExport,
   "/ultrasound": Ultrasound,
   "/ct-scan": CTScan,
   "/mri": MRIScan,

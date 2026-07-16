@@ -43,7 +43,7 @@ export default function Settings() {
         <Field label="Timezone">
           <div style={valueText}>{s.timezone}</div>
         </Field>
-        <Toggle label="NHIS integration enabled" on={s.nhisEnabled} onChange={() => patch({ nhisEnabled: !s.nhisEnabled })} />
+        <Toggle label="NHIA integration enabled" on={s.nhisEnabled} onChange={() => patch({ nhisEnabled: !s.nhisEnabled })} />
         <Toggle label="Critical alert sound" on={s.criticalAlertSound} onChange={() => patch({ criticalAlertSound: !s.criticalAlertSound })} />
       </div>
     </div>

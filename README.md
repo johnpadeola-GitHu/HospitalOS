@@ -429,3 +429,38 @@ teaching/tertiary hospital would actually lean on them:
 Suggest tackling these in focused batches (as this session did with
 Instruments + Ethics) rather than all at once, so each gets real workflow
 depth and testing rather than a cosmetic pass.
+
+## This round — the three remaining "nationally acceptable" items
+
+**FHIR interoperability** (src/engines/fhir/) — a standalone engine
+generating HL7 FHIR R4 Bundles per patient: Patient, Condition,
+AllergyIntolerance, DocumentReference, DiagnosticReport, correctly
+cross-referenced and ICD-10 coded. Verified: round-trips as valid JSON,
+correct resource types, correct Patient/{id} references.
+Honest scope: a browser cannot host a live FHIR REST server — same
+limitation as the instruments gateway. The mapping logic (the actual hard
+part) is real and complete; only the transport is simulated via
+file-download instead of a live endpoint. Administration → FHIR
+interoperability.
+
+**NPHCDA immunisation compliance** (src/modules/public-health/immunizationService.js)
+— replaced coverage-bar decoration with the real National Programme on
+Immunization schedule (21 doses across 11 antigen series: BCG, OPV, HepB,
+Penta, PCV, Rotavirus, IPV, Vitamin A, Measles, Yellow Fever, Meningitis A),
+tracked per child from date of birth. A dose is Due once a child reaches the
+recommended age, Overdue past a 14-day grace window (NHMIS's own
+definition). Coverage is reported per-antigen, the figure actually
+submitted to NHMIS, not one blended number. Verified against realistic
+ages: a 100-day-old with nothing recorded correctly shows 11 overdue doses.
+13th alert source. Public health → Immunisation.
+
+**NDPA privacy & consent tooling** (src/modules/privacy/) — consent
+records (purpose, capture method, grant/withdrawal) and data-subject rights
+requests (access/rectification/erasure/restriction/portability) under the
+Nigeria Data Protection Act 2023. Every request gets an automatic 30-day
+statutory response deadline; you cannot mark one Fulfilled or Declined
+without a closing note. An overdue request is the 14th alert source.
+Verified: the 30-day window computes exactly, the no-note guard holds.
+Administration → Privacy & consent.
+
+Total: 67 routes, 41 help articles, 14 alert sources.

@@ -57,7 +57,7 @@ export default function Claims() {
 
   return (
     <div>
-      <PageHeader group="Finance & trade" title={<>Insurance &amp; NHIS claims</>} icon="FileCheck" actions={<><Button variant="primary" onClick={() => setShowNew(true)}>
+      <PageHeader group="Finance & trade" title={<>Insurance &amp; NHIA claims</>} icon="FileCheck" actions={<><Button variant="primary" onClick={() => setShowNew(true)}>
           + New claim
         </Button></>} />
 
@@ -164,7 +164,7 @@ function ClaimStatus({ status }) {
 }
 
 function NewClaimModal({ onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", insurer: "NHIS", amount: "" });
+  const [form, setForm] = useState({ patientName: "", hospitalNo: "", insurer: "NHIA", amount: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
