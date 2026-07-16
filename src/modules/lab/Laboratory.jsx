@@ -213,7 +213,7 @@ export default function Laboratory() {
 function PrintWrapper({ order, onClose }) {
   const [release, setRelease] = useState(null);
   useEffect(() => { releaseStatus("lab", order.id).then(setRelease); }, [order.id]);
-  return <LabReportPrint order={order} release={release} onClose={onClose} />;
+  return <LabReportPrint order={order} release={release} onClose={onClose} actor={useAuth().user} />;
 }
 
 function ReleaseModal({ order, actor, onClose, onDone }) {

@@ -188,6 +188,7 @@ function DetailModal({ account, onClose, onPay }) {
 }
 
 function PaymentModal({ account, onClose, onDone }) {
+  const { user: actor } = useAuth();
   const [amount, setAmount] = useState(String(Math.round(account.balance)));
   const [method, setMethod] = useState("Cash");
   const [busy, setBusy] = useState(false);
@@ -209,7 +210,7 @@ function PaymentModal({ account, onClose, onDone }) {
 
   if (receipt) {
     if (showPrint) {
-      return <ReceiptPrint payment={receipt} account={account} onClose={onDone} />;
+      return <ReceiptPrint payment={receipt} account={account} onClose={onDone} actor={actor} />;
     }
     return (
       <Modal

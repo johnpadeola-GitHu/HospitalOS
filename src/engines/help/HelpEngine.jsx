@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import * as Icons from "lucide-react";
-import { allCategories, articlesIn, getArticle, searchArticles, useHelp } from "./index";
+import { allCategories, allArticles, articlesIn, getArticle, searchArticles, useHelp } from "./index";
 import { PageHeader, Card, inputStyle, EmptyState } from "../../lib/ui";
 import { useEffect } from "react";
 
@@ -202,7 +202,48 @@ function ArticleView({ article, onOpen, CATEGORIES }) {
             </div>
           </div>
         )}
+
+        <PrevNext article={article} onOpen={onOpen} CATEGORIES={CATEGORIES} />
       </Card>
+    </div>
+  );
+}
+
+/**
+ * Sequential Back/Next through every article, in the same order they are
+ * browsed: category order, then article order within each category.
+ */
+function flatArticleOrder(CATEGORIES) {
+  return CATEGORIES.flatMap((c) => articlesIn(c.key));
+}
+
+function PrevNext({ article, onOpen, CATEGORIES }) {
+  const order = useMemo(() => flatArticleOrder(CATEGORIES), [CATEGORIES]);
+  const idx = order.findIndex((a) => a.id === article.id);
+  const prev = idx > 0 ? order[idx - 1] : null;
+  const next = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
+  if (!prev && !next) return null;
+
+  return (
+    <div style={prevNextWrap}>
+      {prev ? (
+        <button style={prevNextBtn} onClick={() => onOpen(prev.id)}>
+          <Icons.ChevronLeft size={15} />
+          <div style={{ textAlign: "left" }}>
+            <div style={prevNextLabel}>Back</div>
+            <div style={prevNextTitle}>{prev.title}</div>
+          </div>
+        </button>
+      ) : <div />}
+      {next ? (
+        <button style={{ ...prevNextBtn, textAlign: "right" }} onClick={() => onOpen(next.id)}>
+          <div style={{ textAlign: "right" }}>
+            <div style={prevNextLabel}>Next</div>
+            <div style={prevNextTitle}>{next.title}</div>
+          </div>
+          <Icons.ChevronRight size={15} />
+        </button>
+      ) : <div />}
     </div>
   );
 }
@@ -291,4 +332,8 @@ const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: 
 const tth = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "8px 11px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.04em" };
 const ttd = { padding: "8px 11px", verticalAlign: "top", lineHeight: 1.5 };
 const relatedWrap = { marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--border)" };
+const prevNextWrap = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 22, paddingTop: 16, borderTop: "1px solid var(--border)" };
+const prevNextBtn = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", cursor: "pointer", font: "inherit" };
+const prevNextLabel = { fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" };
+const prevNextTitle = { fontSize: 12.5, fontWeight: 600, color: "var(--ink-strong)", marginTop: 1 };
 const relPill = { display: "inline-flex", alignItems: "center", gap: 6, font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--ink-strong)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 999, padding: "5px 11px", cursor: "pointer" };

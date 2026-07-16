@@ -8,12 +8,15 @@ export const NAV_GROUPS = [
     id: "overview",
     label: "Overview",
     icon: "LayoutGrid",
+    noCollapse: true, // always expanded — the orientation group should never hide
     items: [
       { id: "dashboard", label: "Dashboard", path: "/" , icon: "LayoutDashboard" },
       { id: "my-patients", label: "My patients", path: "/patients/mine" , icon: "UserRound" },
       { id: "worklist", label: "Worklist", path: "/worklist" , icon: "ListChecks" },
       { id: "alerts", label: "Alerts & critical values", path: "/alerts" , icon: "BellRing" },
       { id: "communication", label: "Communication hub", path: "/communication" , icon: "MessagesSquare" },
+      { id: "bookings", label: "Online bookings", path: "/bookings" , icon: "CalendarPlus" },
+      { id: "referrals", label: "Referrals", path: "/referrals" , icon: "ArrowLeftRight" },
     ],
   },
   {
@@ -32,8 +35,6 @@ export const NAV_GROUPS = [
       { id: "specialties", label: "Specialist clinics", path: "/specialties" , icon: "Stethoscope" },
       { id: "oncology", label: "Oncology", path: "/oncology" , icon: "Ribbon" },
       { id: "rehab", label: "Rehabilitation & therapy", path: "/rehab" , icon: "Accessibility" },
-      { id: "bookings", label: "Online bookings", path: "/bookings" , icon: "CalendarPlus" },
-      { id: "referrals", label: "Referrals", path: "/referrals" , icon: "ArrowLeftRight" },
       { id: "renal", label: "Renal & dialysis", path: "/renal" , icon: "Droplets" },
     ],
   },

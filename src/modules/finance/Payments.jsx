@@ -3,6 +3,7 @@ import { listPayments, billingSummary } from "./billingService";
 import { PageHeader, Button } from "../../lib/ui";
 import { getAccount } from "./billingService";
 import ReceiptPrint from "./ReceiptPrint";
+import { useAuth } from "../../auth/AuthContext";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -99,7 +100,7 @@ export default function Payments() {
 function PaymentPrintWrapper({ payment, onClose }) {
   const [account, setAccount] = useState(null);
   useEffect(() => { getAccount(payment.patientId).then(setAccount); }, [payment.patientId]);
-  return <ReceiptPrint payment={payment} account={account} onClose={onClose} />;
+  return <ReceiptPrint payment={payment} account={account} onClose={onClose} actor={useAuth().user} />;
 }
 
 function Stat({ label, value, accent }) {

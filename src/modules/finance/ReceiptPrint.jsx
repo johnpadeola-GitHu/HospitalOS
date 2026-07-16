@@ -2,11 +2,11 @@ import { useLetterhead, Letterhead, PrintableOverlay, DocFooterNote } from "../.
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
-export default function ReceiptPrint({ payment, account, onClose }) {
+export default function ReceiptPrint({ payment, account, onClose, actor }) {
   const settings = useLetterhead();
 
   return (
-    <PrintableOverlay title={`Receipt — ${payment.receipt}`} onClose={onClose}>
+    <PrintableOverlay title={`Receipt — ${payment.receipt}`} onClose={onClose} actor={actor} docType="receipt" docRef={payment.receipt} patientName={payment.patientName}>
       <Letterhead settings={settings} />
 
       <div style={docTitle}>PAYMENT RECEIPT</div>

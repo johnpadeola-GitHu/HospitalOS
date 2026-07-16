@@ -3,12 +3,12 @@ import { useLetterhead, Letterhead, PrintableOverlay, DocFooterNote } from "../.
 
 const FLAG_COLOR = { low: "#1E5A8A", high: "#A35A2E", critical: "#B0281F", normal: "#22272B" };
 
-export default function LabReportPrint({ order, release, onClose }) {
+export default function LabReportPrint({ order, release, onClose, actor }) {
   const settings = useLetterhead();
   const test = getTest(order.testCode);
 
   return (
-    <PrintableOverlay title={`Lab report — ${order.testName}`} onClose={onClose}>
+    <PrintableOverlay title={`Lab report — ${order.testName}`} onClose={onClose} actor={actor} docType="lab report" docRef={order.accession} patientName={order.patientName}>
       <Letterhead settings={settings} />
 
       <div style={docTitle}>LABORATORY REPORT</div>

@@ -31,12 +31,15 @@ export default function Sidebar() {
 
   const [open, setOpen] = useState(() => {
     const initial = {};
-    for (const g of visibleGroups) initial[g.id] = groupContainsPath(g, pathname);
+    for (const g of visibleGroups) initial[g.id] = g.noCollapse || groupContainsPath(g, pathname);
     if (!Object.values(initial).some(Boolean)) initial.overview = true;
     return initial;
   });
 
-  const toggle = (id) => setOpen((o) => ({ ...o, [id]: !o[id] }));
+  const toggle = (id, noCollapse) => {
+    if (noCollapse) return; // always-expanded groups ignore the toggle
+    setOpen((o) => ({ ...o, [id]: !o[id] }));
+  };
 
   return (
     <aside style={S.aside} className="no-print">
@@ -55,7 +58,12 @@ export default function Sidebar() {
           const isOpen = open[g.id];
           return (
             <div key={g.id} style={{ marginBottom: 3 }}>
-              <button style={S.groupHeader} onClick={() => toggle(g.id)} aria-expanded={isOpen}>
+              <button
+                style={{ ...S.groupHeader, ...(g.noCollapse ? S.groupHeaderStatic : null) }}
+                onClick={() => toggle(g.id, g.noCollapse)}
+                aria-expanded={isOpen}
+                disabled={g.noCollapse}
+              >
                 <Icon name={g.icon} size={15} style={{ color: "var(--charcoal)", flexShrink: 0 }} />
                 <span style={S.groupLabel}>{g.label}</span>
                 {g.comingSoon ? (
@@ -63,13 +71,15 @@ export default function Sidebar() {
                 ) : (
                   <span style={S.count}>{g.items.length}</span>
                 )}
-                <Icons.ChevronRight
-                  size={13}
-                  style={{
-                    color: "var(--muted)", flexShrink: 0,
-                    transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .15s",
-                  }}
-                />
+                {!g.noCollapse && (
+                  <Icons.ChevronRight
+                    size={13}
+                    style={{
+                      color: "var(--muted)", flexShrink: 0,
+                      transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .15s",
+                    }}
+                  />
+                )}
               </button>
 
               {isOpen && (
@@ -153,6 +163,9 @@ const S = {
     width: "100%", display: "flex", alignItems: "center", gap: 9,
     padding: "8px 8px", background: "none", border: "none", cursor: "pointer",
     font: "inherit", color: "var(--charcoal)", borderRadius: 8,
+  },
+  groupHeaderStatic: {
+    cursor: "default", opacity: 1,
   },
   groupLabel: {
     flex: 1, textAlign: "left", fontSize: 11, fontWeight: 700,

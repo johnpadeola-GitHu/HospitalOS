@@ -1,10 +1,10 @@
 import { useLetterhead, Letterhead, PrintableOverlay, DocFooterNote } from "../../lib/printable";
 
-export default function ImagingReportPrint({ study, release, onClose }) {
+export default function ImagingReportPrint({ study, release, onClose, actor }) {
   const settings = useLetterhead();
 
   return (
-    <PrintableOverlay title={`Imaging report — ${study.name}`} onClose={onClose}>
+    <PrintableOverlay title={`Imaging report — ${study.name}`} onClose={onClose} actor={actor} docType="imaging report" docRef={study.accession} patientName={study.patientName}>
       <Letterhead settings={settings} />
 
       <div style={docTitle}>{study.modality.toUpperCase()} REPORT</div>

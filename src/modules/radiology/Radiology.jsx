@@ -185,7 +185,7 @@ export default function Radiology() {
 function ImagingPrintWrapper({ study, onClose }) {
   const [release, setRelease] = useState(null);
   useEffect(() => { releaseStatus("imaging", study.id).then(setRelease); }, [study.id]);
-  return <ImagingReportPrint study={study} release={release} onClose={onClose} />;
+  return <ImagingReportPrint study={study} release={release} onClose={onClose} actor={useAuth().user} />;
 }
 
 function ReleaseModal({ study, actor, onClose, onDone }) {
