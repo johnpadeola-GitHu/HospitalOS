@@ -11,7 +11,7 @@
 //      question mark next to a control can open the exact article explaining it.
 //   3. A search index across every registered article, including table contents.
 
-import { createContext, useContext, useState, useCallback, useMemo } from "react";
+import { createContext, useContext, useState, useMemo } from "react";
 import { CATEGORIES as BASE_CATEGORIES, ARTICLES as BASE_ARTICLES } from "./content";
 
 /* ------------------------------------------------------------------ */

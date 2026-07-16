@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
-  ACCESS_TYPES, CKD_STAGES, stageForEgfr,
-  listDialysisPatients, enrolDialysis, recordSession, listSessions,
+  ACCESS_TYPES, stageForEgfr,
+  listDialysisPatients, enrolDialysis, recordSession,
   listCkdRegistry, addCkdEntry, renalSummary,
 } from "./renalService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
@@ -10,7 +10,7 @@ import { useAuth } from "../../auth/AuthContext";
 const STAGE_TONE = { "1": "good", "2": "good", "3a": "warn", "3b": "warn", "4": "bad", "5": "bad" };
 
 export default function Renal() {
-  const { user, may } = useAuth();
+  const { user } = useAuth();
   const [tab, setTab] = useState("dialysis");
   const [patients, setPatients] = useState([]);
   const [ckd, setCkd] = useState([]);
@@ -22,9 +22,12 @@ export default function Renal() {
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
-    setLoading(true);
-    const [p, c, s] = await Promise.all([listDialysisPatients(), listCkdRegistry(), renalSummary()]);
-    setPatients(p); setCkd(c); setSummary(s); setLoading(false);
+    setLoading(true); setErr("");
+    try {
+      const [p, c, s] = await Promise.all([listDialysisPatients(), listCkdRegistry(), renalSummary()]);
+      setPatients(p); setCkd(c); setSummary(s);
+    } catch (e) { setErr(e.message || "Failed to load renal data."); }
+    setLoading(false);
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

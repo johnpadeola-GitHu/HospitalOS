@@ -43,13 +43,7 @@ export default function Platform() {
   if (!data) {
     return (
       <div>
-        <PageHeader group="Platform" title="Platform admin" icon="ShieldCheck"
-          actions={
-            <a href="/guides/HospitalOS-Platform-Admin-Guide.pdf" download style={guideLink}>
-              <Icons.FileDown size={14} />
-              Platform Admin Guide (PDF)
-            </a>
-          } />
+        <PageHeader group="Platform" title="Platform admin" icon="ShieldCheck" />
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading platform…</div>
       </div>
     );
@@ -64,7 +58,17 @@ export default function Platform() {
         title="Platform admin"
         icon="ShieldCheck"
         subtitle="Tenant management and platform health across all HospitalOS deployments"
-        actions={<Pill tone="accent">support@agorox.africa</Pill>}
+        actions={
+          <>
+            <a href="/guides/HospitalOS-Platform-Admin-Guide.pdf" download style={guideLink}>
+              <Icons.FileDown size={14} /> Platform Admin Guide
+            </a>
+            <a href="/guides/HospitalOS-Production-Readiness-Plan.pdf" download style={guideLink}>
+              <Icons.FileDown size={14} /> Readiness Plan
+            </a>
+            <Pill tone="accent">support@agorox.africa</Pill>
+          </>
+        }
       />
 
       <div style={tabs}>

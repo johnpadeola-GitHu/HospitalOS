@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { VITALS, listCriticalCare, updateVitals, flagVital } from "./criticalCareService";
-import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { Button, Modal, inputStyle, PageHeader } from "../../lib/ui";
 
 const FLAG_COLOR = {
   critical: "#B0281F",

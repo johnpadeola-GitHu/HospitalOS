@@ -3,9 +3,11 @@ import {
   MODALITIES, TECH_FIELDS, STATUS_LABELS,
   listStudies, createStudy, scheduleStudy, markPerformed, fileReport, modalitiesIn,
 } from "../radiology/radiologyService";
-import { listPatients } from "../patients/patientService";
+import { listPatients, getPatient } from "../patients/patientService";
 import { PageHeader, StatCard, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { priceFor } from "../../engines/pricing";
+import { releaseResult, isReleased } from "../../engines/results";
+import { useAuth } from "../../auth/AuthContext";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -21,13 +23,21 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
   const [showRequest, setShowRequest] = useState(false);
   const [performFor, setPerformFor] = useState(null);
   const [reportFor, setReportFor] = useState(null);
+  const [releaseFor, setReleaseFor] = useState(null);
+  const [releasedIds, setReleasedIds] = useState({});
   const modalityCodes = modalitiesIn(modalityGroup);
   const techFields = TECH_FIELDS[modalityGroup] || [];
+  const { user } = useAuth();
 
   const refresh = useCallback(async () => {
     setLoading(true);
     const all = await listStudies({ status: "all" });
-    setStudies(all.filter((s) => s.modality === modalityGroup));
+    const mine = all.filter((s) => s.modality === modalityGroup);
+    setStudies(mine);
+    const reportedOnes = mine.filter((s) => s.status === "reported");
+    const flags = {};
+    await Promise.all(reportedOnes.map(async (s) => { flags[s.id] = await isReleased("imaging", s.id); }));
+    setReleasedIds((prev) => ({ ...prev, ...flags }));
     setLoading(false);
   }, [modalityGroup]);
 
@@ -87,7 +97,12 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
                   <span style={{ color: "var(--muted)" }}> — {s.name}</span>
                   {s.urgentFinding && <Pill tone="bad">Urgent finding</Pill>}
                 </div>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--muted)" }}>{s.accession}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--muted)", marginRight: 10 }}>{s.accession}</span>
+                {releasedIds[s.id] ? (
+                  <span style={releasedBadge}>Released ✓</span>
+                ) : (
+                  <Button variant="primary" onClick={() => setReleaseFor(s)}>Release result</Button>
+                )}
               </div>
             ))}
           </div>
@@ -106,7 +121,57 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
         <ReportModal study={reportFor} onClose={() => setReportFor(null)}
           onDone={async () => { setReportFor(null); await refresh(); }} />
       )}
+      {releaseFor && (
+        <ReleaseModal study={releaseFor} actor={user} onClose={() => setReleaseFor(null)}
+          onDone={async () => { setReleaseFor(null); await refresh(); }} />
+      )}
     </div>
+  );
+}
+
+function ReleaseModal({ study, actor, onClose, onDone }) {
+  const [orderingClinician, setOrderingClinician] = useState(actor?.name || "");
+  const [notifyPatient, setNotifyPatient] = useState(true);
+  const [patientPhone, setPatientPhone] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    if (study.patientId) getPatient(study.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); });
+    return () => { alive = false; };
+  }, [study.patientId]);
+
+  const submit = async () => {
+    setBusy(true); setErr("");
+    try {
+      await releaseResult({
+        kind: "imaging", id: study.id, patientName: study.patientName, patientPhone,
+        hospitalNo: study.hospitalNo, testName: study.name, orderingClinician,
+        urgent: study.urgentFinding, notifyPatient: notifyPatient && !!patientPhone, actor,
+      });
+      await onDone();
+    } catch (e) { setErr(e.message); setBusy(false); }
+  };
+
+  return (
+    <Modal title={`Release result — ${study.name}`} onClose={onClose} footer={<>
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Releasing…" : "Release"}</Button>
+    </>}>
+      {err && <div style={errBox}>{err}</div>}
+      <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 14 }}>{study.patientName} &middot; {study.accession}</div>
+      {study.urgentFinding && (
+        <div style={urgentNote}>This report has an urgent finding. The clinician notification is flagged urgent.</div>
+      )}
+      <Field label="Ordering clinician (notified in-app)">
+        <input style={inputStyle} value={orderingClinician} onChange={(e) => setOrderingClinician(e.target.value)} />
+      </Field>
+      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: patientPhone ? "var(--ink)" : "var(--muted)", cursor: patientPhone ? "pointer" : "not-allowed" }}>
+        <input type="checkbox" checked={notifyPatient} disabled={!patientPhone} onChange={(e) => setNotifyPatient(e.target.checked)} />
+        {patientPhone ? `Also notify the patient by SMS (${patientPhone})` : "No phone number on file \u2014 patient cannot be SMS'd"}
+      </label>
+    </Modal>
   );
 }
 
@@ -277,6 +342,8 @@ const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minma
 const sectionTitle = { fontSize: 13, fontWeight: 700, color: "var(--ink-strong)", margin: "6px 0 10px" };
 const row = { display: "flex", gap: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "13px 16px", boxShadow: "var(--shadow-sm)" };
 const reportedRow = { display: "flex", alignItems: "center", gap: 10, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "9px 13px", fontSize: 12.5 };
+const releasedBadge = { fontSize: 11, fontWeight: 600, color: "var(--good)", background: "var(--good-bg)", padding: "5px 10px", borderRadius: 7 };
+const urgentNote = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
 const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 8, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };

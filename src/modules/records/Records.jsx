@@ -7,6 +7,8 @@ import {
 } from "./recordsService";
 import { listPatients, ageFromDob } from "../patients/patientService";
 import { listOrders } from "../lab/labService";
+import { listStudies } from "../radiology/radiologyService";
+import { isReleased } from "../../engines/results";
 import { PageHeader, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -38,10 +40,18 @@ export default function Records() {
 
   const loadChart = useCallback(async (p) => {
     if (!p) return setChart(null);
-    const [notes, diagnoses, allergies, summary, labs] = await Promise.all([
-      listNotes(p.id), listDiagnoses(p.id), listAllergies(p.id), recordSummary(p.id), listOrders({ status: "all" }),
+    const [notes, diagnoses, allergies, summary, labs, studies] = await Promise.all([
+      listNotes(p.id), listDiagnoses(p.id), listAllergies(p.id), recordSummary(p.id),
+      listOrders({ status: "all" }), listStudies({ status: "all" }),
     ]);
-    setChart({ notes, diagnoses, allergies, summary, labs: labs.filter((l) => l.patientId === p.id) });
+    const myLabs = labs.filter((l) => l.patientId === p.id);
+    const myImaging = studies.filter((s) => s.patientId === p.id && s.status === "reported");
+    const [labReleased, imagingReleased] = await Promise.all([
+      Promise.all(myLabs.filter((l) => l.status === "verified").map(async (l) => [l.id, await isReleased("lab", l.id)])),
+      Promise.all(myImaging.map(async (s) => [s.id, await isReleased("imaging", s.id)])),
+    ]);
+    const releaseMap = Object.fromEntries([...labReleased, ...imagingReleased]);
+    setChart({ notes, diagnoses, allergies, summary, labs: myLabs, imaging: myImaging, releaseMap });
   }, []);
 
   useEffect(() => { loadChart(selected); }, [selected, loadChart]);
@@ -113,7 +123,7 @@ export default function Records() {
               </div>
 
               <div style={tabs}>
-                {[["notes", `Notes (${chart.summary.notes})`], ["dx", `Problem list (${chart.summary.activeDiagnoses})`], ["allergy", `Allergies (${chart.summary.allergies})`], ["labs", `Results (${chart.labs.length})`]].map(([id, label]) => (
+                {[["notes", `Notes (${chart.summary.notes})`], ["dx", `Problem list (${chart.summary.activeDiagnoses})`], ["allergy", `Allergies (${chart.summary.allergies})`], ["labs", `Lab results (${chart.labs.length})`], ["imaging", `Imaging (${chart.imaging.length})`]].map(([id, label]) => (
                   <button key={id} onClick={() => setTab(id)} style={{ ...tabBtn, ...(tab === id ? tabActive : null) }}>{label}</button>
                 ))}
               </div>
@@ -204,12 +214,12 @@ export default function Records() {
               )}
 
               {tab === "labs" && (
-                <Card title="Results history" pad={false}>
+                <Card title="Lab results history" pad={false}>
                   {chart.labs.length === 0 ? (
                     <div style={{ padding: 22 }}><EmptyState icon="TestTube" title="No investigations" /></div>
                   ) : (
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead><tr>{["Accession", "Test", "Status", "Ordered"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                      <thead><tr>{["Accession", "Test", "Status", "Ordered", "Release"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
                       <tbody>
                         {chart.labs.map((l) => (
                           <tr key={l.id} style={{ borderTop: "1px solid var(--border)" }}>
@@ -217,11 +227,49 @@ export default function Records() {
                             <td style={{ ...td, fontWeight: 600, color: "var(--ink-strong)" }}>{l.testName}</td>
                             <td style={td}><Pill tone={l.status === "verified" ? "good" : "info"}>{l.status}</Pill></td>
                             <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>{new Date(l.orderedAt).toLocaleDateString()}</td>
+                            <td style={td}>
+                              {l.status !== "verified" ? <span style={{ color: "var(--muted)", fontSize: 11.5 }}>Not yet verified</span>
+                                : chart.releaseMap[l.id] ? <Pill tone="good">Released</Pill>
+                                : <span style={{ color: "var(--muted)", fontSize: 11.5 }}>Verified, not released</span>}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   )}
+                </Card>
+              )}
+
+              {tab === "imaging" && (
+                <Card title="Imaging reports" pad={false}>
+                  {chart.imaging.length === 0 ? (
+                    <div style={{ padding: 22 }}><EmptyState icon="ScanLine" title="No reported imaging studies" /></div>
+                  ) : (
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <thead><tr>{["Accession", "Study", "Modality", "Reported", "Release"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        {chart.imaging.map((s) => (
+                          <tr key={s.id} style={{ borderTop: "1px solid var(--border)" }}>
+                            <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{s.accession}</td>
+                            <td style={{ ...td, fontWeight: 600, color: "var(--ink-strong)" }}>
+                              {s.name}
+                              {s.urgentFinding && <Pill tone="bad">Urgent finding</Pill>}
+                            </td>
+                            <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>{s.modality}</td>
+                            <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>{new Date(s.requestedAt).toLocaleDateString()}</td>
+                            <td style={td}>
+                              {chart.releaseMap[s.id] ? <Pill tone="good">Released</Pill>
+                                : <span style={{ color: "var(--muted)", fontSize: 11.5 }}>Reported, not released</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                  <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, lineHeight: 1.5 }}>
+                    Report text is filed and released from Diagnostics \u2014 Radiology, Ultrasound, CT, or MRI. Release
+                    notifies the ordering clinician and, if a phone number is on file, the patient.
+                  </div>
                 </Card>
               )}
             </>

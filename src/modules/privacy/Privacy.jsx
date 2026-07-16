@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import {
-  CONSENT_PURPOSES, DSAR_TYPES, DSAR_STATUS, DSAR_TONE,
+  CONSENT_PURPOSES, DSAR_TYPES, DSAR_TONE,
   listConsents, recordConsent, withdrawConsent,
   listDsars, fileDsar, updateDsar, privacySummary,
 } from "./privacyService";

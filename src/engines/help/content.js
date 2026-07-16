@@ -210,6 +210,21 @@ export const ARTICLES = [
     related: ["instruments", "alerts"],
   },
   {
+    id: "result-release", cat: "diagnostics", icon: "Send",
+    title: "Releasing and sharing results",
+    lead: "Verifying a lab result or filing an imaging report does not tell anyone \u2014 releasing it does.",
+    body: [
+      { p: "Finalising a result is a separate step from sharing it, and HospitalOS keeps them separate deliberately. Entering results and verifying them (lab) or filing a report (imaging) records the clinical finding. It does not notify anyone by itself." },
+      { h: "Releasing a result" },
+      { p: "Once a lab order is Verified or an imaging study is Reported, a Release result button appears. Releasing does three things: notifies the ordering clinician in-app immediately, optionally sends the patient an SMS if a phone number is on file, and marks the result Released so the whole team can see it has actually been communicated, not just finalised." },
+      { warn: "A result flagged with a critical value or an urgent finding is marked urgent in the release notification, on top of the hospital-wide alert that already fired the moment the value or finding was saved. Release is the follow-up that closes the loop with a named clinician \u2014 it does not replace the Alerts feed." },
+      { h: "Where released results show up" },
+      { p: "A patient's medical record (Patient care \u2192 Medical records) has a Lab results tab and a separate Imaging tab, each showing every result and whether it has been released yet. This applies uniformly \u2014 diagnostic lab tests, clinical chemistry, and every imaging modality all go through the same release mechanism." },
+      { note: "You cannot release the same result twice \u2014 once released, the action becomes a Released badge instead of a button." },
+    ],
+    related: ["lab", "communication", "alerts"],
+  },
+  {
     id: "instruments", cat: "diagnostics", icon: "Cable",
     title: "Instruments & devices gateway",
     lead: "One interoperability hub for analyzers, imaging equipment, radiotherapy systems, and printers \u2014 old and modern alike.",

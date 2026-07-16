@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import Login from "./auth/Login";
-import Platform from "./modules/platform/Platform";
 import AppLayout from "./layout/AppLayout";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import NoAccess from "./pages/NoAccess";

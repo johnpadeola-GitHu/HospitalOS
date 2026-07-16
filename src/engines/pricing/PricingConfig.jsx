@@ -6,7 +6,7 @@ import { listDrugs } from "../../modules/pharmacy/pharmacyService";
 import { MODALITIES } from "../../modules/radiology/radiologyService";
 import { PROCEDURES } from "../../modules/theatre/theatreService";
 import { TIER_LIST } from "../../modules/wards/bedService";
-import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
+import { PageHeader, StatCard, Card, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();

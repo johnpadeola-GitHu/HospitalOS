@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 import { buildPatientBundle, bundleResourceCounts, FHIR_INFO } from "./index";
 import { listPatients } from "../../modules/patients/patientService";
-import { PageHeader, Card, Pill, Button, inputStyle, EmptyState } from "../../lib/ui";
+import { PageHeader, Card, Button, inputStyle, EmptyState } from "../../lib/ui";
 
 export default function FhirExport() {
   const [query, setQuery] = useState("");

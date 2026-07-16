@@ -15,6 +15,7 @@ import { listPatients } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 import { record, AUDIT_ACTIONS } from "../../lib/audit";
+import { releaseResult, isReleased } from "../../engines/results";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -39,10 +40,17 @@ export default function Laboratory() {
   const [status, setStatus] = useState("all");
   const [showOrder, setShowOrder] = useState(false);
   const [resultFor, setResultFor] = useState(null);
+  const [releaseFor, setReleaseFor] = useState(null);
+  const [releasedIds, setReleasedIds] = useState({});
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setOrders(await listOrders({ query, status }));
+    const rows = await listOrders({ query, status });
+    setOrders(rows);
+    const verified = rows.filter((o) => o.status === "verified");
+    const flags = {};
+    await Promise.all(verified.map(async (o) => { flags[o.id] = await isReleased("lab", o.id); }));
+    setReleasedIds((prev) => ({ ...prev, ...flags }));
     setLoading(false);
   }, [query, status]);
 
@@ -142,6 +150,13 @@ export default function Laboratory() {
                         {o.status === "resulted" && may("diagnostics:verify") && (
                           <Button onClick={() => act(verifyOrder, o.id)}>Verify</Button>
                         )}
+                        {o.status === "verified" && (
+                          releasedIds[o.id] ? (
+                            <span style={releasedBadge}>Released ✓</span>
+                          ) : (
+                            <Button variant="primary" onClick={() => setReleaseFor(o)}>Release result</Button>
+                          )
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -172,7 +187,70 @@ export default function Laboratory() {
           }}
         />
       )}
+
+      {releaseFor && (
+        <ReleaseModal
+          order={releaseFor}
+          actor={user}
+          onClose={() => setReleaseFor(null)}
+          onDone={async () => {
+            setReleaseFor(null);
+            await refresh();
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+function ReleaseModal({ order, actor, onClose, onDone }) {
+  const [orderingClinician, setOrderingClinician] = useState(actor?.name || "");
+  const [notifyPatient, setNotifyPatient] = useState(true);
+  const [patientPhone, setPatientPhone] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const urgent = orderHasCritical(order);
+
+  useEffect(() => {
+    let alive = true;
+    if (order.patientId) {
+      import("../patients/patientService").then(({ getPatient }) =>
+        getPatient(order.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); })
+      );
+    }
+    return () => { alive = false; };
+  }, [order.patientId]);
+
+  const submit = async () => {
+    setBusy(true); setErr("");
+    try {
+      await releaseResult({
+        kind: "lab", id: order.id, patientName: order.patientName, patientPhone,
+        hospitalNo: order.hospitalNo, testName: order.testName, orderingClinician,
+        urgent, notifyPatient: notifyPatient && !!patientPhone, actor,
+      });
+      await onDone();
+    } catch (e) { setErr(e.message); setBusy(false); }
+  };
+
+  return (
+    <Modal title={`Release result — ${order.testName}`} onClose={onClose} footer={<>
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Releasing…" : "Release"}</Button>
+    </>}>
+      {err && <div style={errBox}>{err}</div>}
+      <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 14 }}>{order.patientName} &middot; {order.accession}</div>
+      {urgent && (
+        <div style={urgentNote}>This result contains a critical value. The clinician notification is flagged urgent.</div>
+      )}
+      <Field label="Ordering clinician (notified in-app)">
+        <input style={inputStyle} value={orderingClinician} onChange={(e) => setOrderingClinician(e.target.value)} />
+      </Field>
+      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: patientPhone ? "var(--ink)" : "var(--muted)", cursor: patientPhone ? "pointer" : "not-allowed" }}>
+        <input type="checkbox" checked={notifyPatient} disabled={!patientPhone} onChange={(e) => setNotifyPatient(e.target.checked)} />
+        {patientPhone ? `Also notify the patient by SMS (${patientPhone})` : "No phone number on file \u2014 patient cannot be SMS'd"}
+      </label>
+    </Modal>
   );
 }
 
@@ -456,6 +534,8 @@ const analyteRow = {
   padding: "8px 0",
   borderTop: "1px solid var(--border)",
 };
+const releasedBadge = { fontSize: 11, fontWeight: 600, color: "var(--good)", background: "var(--good-bg)", padding: "5px 10px", borderRadius: 7 };
+const urgentNote = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
 const errBox = {
   background: "#F7E9E9",
   color: "#7A2E2E",
