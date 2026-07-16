@@ -221,8 +221,11 @@ export const ARTICLES = [
       { h: "Where released results show up" },
       { p: "A patient's medical record (Patient care \u2192 Medical records) has a Lab results tab and a separate Imaging tab, each showing every result and whether it has been released yet. This applies uniformly \u2014 diagnostic lab tests, clinical chemistry, and every imaging modality all go through the same release mechanism." },
       { note: "You cannot release the same result twice \u2014 once released, the action becomes a Released badge instead of a button." },
+      { h: "Printed documents carry your hospital's identity" },
+      { p: "Once released, a Print report button appears alongside the Released badge \u2014 for both lab results and imaging reports, and for receipts in Finance \u2192 Billing and Payments. Every printed document opens as a full-page letterhead document: your hospital's name, logo, address, phone and email, read live from Administration \u2192 Settings, not hardcoded." },
+      { note: "Set your hospital's address, phone and email under Administration \u2192 Settings once \u2014 every result, report and receipt generated from that point on carries it automatically." },
     ],
-    related: ["lab", "communication", "alerts"],
+    related: ["lab", "communication", "alerts", "tenant-branding"],
   },
   {
     id: "instruments", cat: "diagnostics", icon: "Cable",
@@ -633,12 +636,15 @@ export const ARTICLES = [
   {
     id: "tenant-branding", cat: "platform", icon: "Image",
     title: "Your hospital's branding",
-    lead: "Your logo and name, shown on every screen \u2014 distinct from the HospitalOS product branding.",
+    lead: "Your name, logo, address and contact details \u2014 on every screen, and on every document you generate.",
     body: [
-      { p: "Administration \u2192 Settings has a Hospital name field and a Logo URL field. Once set, both appear top-right on every screen in the application, in a badge separate from the HospitalOS/AgoroX branding in the sidebar." },
+      { p: "Administration \u2192 Settings holds your hospital's identity: name, logo URL, address, phone, and email. Name and logo appear top-right on every screen, in a badge separate from the HospitalOS/AgoroX product branding in the sidebar." },
       { p: "If no logo is set, a badge showing your hospital's initials is used instead, so the space is never empty." },
-      { note: "This is genuinely live: change the name or logo in Settings and it updates everywhere within a few seconds, with no reload needed." },
+      { h: "It also carries onto every generated document" },
+      { p: "Address, phone and email do not appear in the topbar \u2014 they exist for a more important reason: every released lab result, released imaging report, and payment receipt opens as a printable, letterhead-branded document showing your full identity, read live from these fields." },
+      { note: "This is genuinely live: change any of these fields in Settings and it updates everywhere \u2014 the topbar badge and every newly printed document \u2014 within a few seconds, with no reload needed." },
     ],
+    related: ["result-release", "billing"],
   },
   {
     id: "communication", cat: "platform", icon: "MessagesSquare",

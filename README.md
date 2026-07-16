@@ -464,3 +464,43 @@ Verified: the 30-day window computes exactly, the no-note guard holds.
 Administration → Privacy & consent.
 
 Total: 67 routes, 41 help articles, 14 alert sources.
+
+## This round — tenant identity on generated documents
+
+**Settings extended** with address, phone, and email — previously only
+hospital name and logo existed, which was enough for the topbar badge but
+not enough to identify a document as genuinely belonging to a hospital.
+
+**Shared letterhead infrastructure** (src/lib/printable.jsx) — a
+`Letterhead` component reading live from Administration -> Settings, and a
+`PrintableOverlay` that renders any document full-page with the app chrome
+hidden. Required adding real print CSS for the first time
+(`@media print { .no-print { display: none } }`) and marking the sidebar,
+topbar, and footer `.no-print` — previously printing anything would have
+captured the whole app shell, not just the document.
+
+**Three real printable documents, all reading the same live settings:**
+- **Lab Result Report** (src/modules/lab/LabReportPrint.jsx) — full
+  analyte table with reference ranges and flags, release info, letterhead.
+  A "Print report" button appears next to "Released ✓" once a result is
+  released.
+- **Imaging Report** (src/modules/radiology/ImagingReportPrint.jsx) —
+  shared across the generic Radiology screen AND Ultrasound/CT/MRI (all via
+  ModalityWorkspace.jsx), so one component change covers every modality.
+- **Payment Receipt** (src/modules/finance/ReceiptPrint.jsx) — available
+  immediately after taking a payment in Billing, and reprintable any time
+  from the Payments ledger.
+
+Verified the actual mechanism: updated tenant settings (name, address,
+phone, email) and confirmed the change is real and live — every document
+reads through the identical `getSettings()` call the topbar badge uses, so
+there is exactly one source of truth for a hospital's identity, not three
+separately hardcoded copies.
+
+**Housekeeping while in here:** fixed three more pre-existing unused
+imports/variables in Billing.jsx found during this round's lint pass.
+Warnings down to 38 (0 errors), from 51 at the start of last round's
+housekeeping pass.
+
+Total: 67 routes, 42 help articles, three PDF guides, three printable
+letterhead document types.

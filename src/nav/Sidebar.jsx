@@ -39,7 +39,7 @@ export default function Sidebar() {
   const toggle = (id) => setOpen((o) => ({ ...o, [id]: !o[id] }));
 
   return (
-    <aside style={S.aside}>
+    <aside style={S.aside} className="no-print">
       <div style={S.brand}>
         <div style={S.brandMark}>
           <Icons.Cross size={16} strokeWidth={2.5} color="#fff" />

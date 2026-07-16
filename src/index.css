@@ -62,3 +62,18 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; border: 3px solid transparent; background-clip: content-box; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* Printing — used by every printable document (lab/imaging reports, receipts).
+   The app chrome (sidebar, topbar, footer, any in-page toolbar) is marked
+   .no-print; a printable document's own content is marked .print-area so
+   only that renders on paper, full-width, with nothing else from the app. */
+@media print {
+  .no-print { display: none !important; }
+  .print-area {
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  body { background: #fff !important; }
+}

@@ -15,7 +15,8 @@ import { listPatients } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 import { record, AUDIT_ACTIONS } from "../../lib/audit";
-import { releaseResult, isReleased } from "../../engines/results";
+import { releaseResult, isReleased, releaseStatus } from "../../engines/results";
+import LabReportPrint from "./LabReportPrint";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -41,6 +42,7 @@ export default function Laboratory() {
   const [showOrder, setShowOrder] = useState(false);
   const [resultFor, setResultFor] = useState(null);
   const [releaseFor, setReleaseFor] = useState(null);
+  const [printFor, setPrintFor] = useState(null);
   const [releasedIds, setReleasedIds] = useState({});
 
   const refresh = useCallback(async () => {
@@ -152,7 +154,10 @@ export default function Laboratory() {
                         )}
                         {o.status === "verified" && (
                           releasedIds[o.id] ? (
-                            <span style={releasedBadge}>Released ✓</span>
+                            <>
+                              <span style={releasedBadge}>Released ✓</span>
+                              <Button onClick={() => setPrintFor(o)}>Print report</Button>
+                            </>
                           ) : (
                             <Button variant="primary" onClick={() => setReleaseFor(o)}>Release result</Button>
                           )
@@ -199,8 +204,16 @@ export default function Laboratory() {
           }}
         />
       )}
+
+      {printFor && <PrintWrapper order={printFor} onClose={() => setPrintFor(null)} />}
     </div>
   );
+}
+
+function PrintWrapper({ order, onClose }) {
+  const [release, setRelease] = useState(null);
+  useEffect(() => { releaseStatus("lab", order.id).then(setRelease); }, [order.id]);
+  return <LabReportPrint order={order} release={release} onClose={onClose} />;
 }
 
 function ReleaseModal({ order, actor, onClose, onDone }) {

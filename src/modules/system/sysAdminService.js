@@ -24,6 +24,9 @@ export async function toggleSite(id) {
 const _settings = {
   hospitalName: "HospitalOS Teaching Hospital",
   logoUrl: "",  // tenant-supplied logo; falls back to initials badge when empty
+  address: "Ring Road, Ibadan, Oyo State, Nigeria",
+  phone: "+234 803 000 0000",
+  email: "info@hospitalos-teaching.ng",
   currency: "NGN (\u20a6)",
   timezone: "Africa/Lagos (WAT)",
   nhisEnabled: true,

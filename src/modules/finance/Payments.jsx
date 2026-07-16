@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { listPayments, billingSummary } from "./billingService";
-import { PageHeader } from "../../lib/ui";
+import { PageHeader, Button } from "../../lib/ui";
+import { getAccount } from "./billingService";
+import ReceiptPrint from "./ReceiptPrint";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -12,6 +14,7 @@ export default function Payments() {
   const [payments, setPayments] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [printFor, setPrintFor] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -42,7 +45,7 @@ export default function Payments() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              {["Receipt", "Patient", "Method", "When", "Amount"].map((h) => (
+              {["Receipt", "Patient", "Method", "When", "Amount", ""].map((h) => (
                 <th key={h} style={{ ...th, textAlign: h === "Amount" ? "right" : "left" }}>
                   {h}
                 </th>
@@ -79,14 +82,24 @@ export default function Payments() {
                   <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)", fontWeight: 600, color: "#4A6329" }}>
                     {naira(p.amount)}
                   </td>
+                  <td style={{ ...td, textAlign: "right" }}>
+                    <Button onClick={() => setPrintFor(p)}>Reprint</Button>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+      {printFor && <PaymentPrintWrapper payment={printFor} onClose={() => setPrintFor(null)} />}
     </div>
   );
+}
+
+function PaymentPrintWrapper({ payment, onClose }) {
+  const [account, setAccount] = useState(null);
+  useEffect(() => { getAccount(payment.patientId).then(setAccount); }, [payment.patientId]);
+  return <ReceiptPrint payment={payment} account={account} onClose={onClose} />;
 }
 
 function Stat({ label, value, accent }) {

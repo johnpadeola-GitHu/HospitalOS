@@ -37,6 +37,21 @@ export default function Settings() {
             )}
           </div>
         </Field>
+
+        <div style={sectionNote}>
+          Address, phone and email appear on every released result and every invoice/receipt
+          this hospital generates — this is what identifies the document as genuinely yours.
+        </div>
+        <Field label="Address">
+          <input style={{ ...inputStyle, maxWidth: 420 }} value={s.address} onChange={(e) => patch({ address: e.target.value })} />
+        </Field>
+        <Field label="Phone">
+          <input style={{ ...inputStyle, maxWidth: 280 }} value={s.phone} onChange={(e) => patch({ phone: e.target.value })} />
+        </Field>
+        <Field label="Email">
+          <input style={{ ...inputStyle, maxWidth: 320 }} value={s.email} onChange={(e) => patch({ email: e.target.value })} />
+        </Field>
+
         <Field label="Currency">
           <div style={valueText}>{s.currency}</div>
         </Field>
@@ -80,5 +95,6 @@ const sheet = { background: "var(--surface-2)", border: "1px solid var(--border)
 const valueText = { fontSize: 13, color: "var(--ink-strong)" };
 const logoPreview = { width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid var(--border)" };
 const logoPreviewFallback = { fontSize: 11.5, color: "var(--muted)" };
+const sectionNote = { fontSize: 11.5, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 11px", margin: "4px 0 14px", lineHeight: 1.5, maxWidth: 420 };
 const track = { width: 40, height: 22, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center" };
 const knob = { width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "transform 0.15s" };

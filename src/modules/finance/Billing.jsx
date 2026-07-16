@@ -2,12 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import { listAccounts, recordPayment, billingSummary } from "./billingService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
-import { record, AUDIT_ACTIONS } from "../../lib/audit";
+import ReceiptPrint from "./ReceiptPrint";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
 export default function Billing() {
-  const { may, user } = useAuth();
+  const { may } = useAuth();
   const [accounts, setAccounts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -193,6 +193,7 @@ function PaymentModal({ account, onClose, onDone }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [receipt, setReceipt] = useState(null);
+  const [showPrint, setShowPrint] = useState(false);
 
   const submit = async () => {
     setBusy(true);
@@ -207,14 +208,20 @@ function PaymentModal({ account, onClose, onDone }) {
   };
 
   if (receipt) {
+    if (showPrint) {
+      return <ReceiptPrint payment={receipt} account={account} onClose={onDone} />;
+    }
     return (
       <Modal
         title="Payment recorded"
         onClose={onDone}
         footer={
-          <Button variant="primary" onClick={onDone}>
-            Done
-          </Button>
+          <>
+            <Button onClick={() => setShowPrint(true)}>Print receipt</Button>
+            <Button variant="primary" onClick={onDone}>
+              Done
+            </Button>
+          </>
         }
       >
         <div style={{ textAlign: "center", padding: "8px 0" }}>

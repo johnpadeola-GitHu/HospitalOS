@@ -27,7 +27,7 @@ export default function AppLayout() {
       {!platformMode && <Sidebar />}
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <header style={topbar}>
+        <header style={topbar} className="no-print">
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
             {platformMode ? (
               <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -83,7 +83,7 @@ export default function AppLayout() {
 
         <main style={main}>
           <div style={container}>{platformMode ? <Platform /> : <Outlet />}</div>
-          <footer style={footer}>
+          <footer style={footer} className="no-print">
             <div style={footerInner}>
               <div>
                 Powered by <b style={{ color: "var(--charcoal)" }}>AgoroX Technologies</b>

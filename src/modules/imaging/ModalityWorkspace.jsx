@@ -6,8 +6,9 @@ import {
 import { listPatients, getPatient } from "../patients/patientService";
 import { PageHeader, StatCard, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { priceFor } from "../../engines/pricing";
-import { releaseResult, isReleased } from "../../engines/results";
+import { releaseResult, isReleased, releaseStatus } from "../../engines/results";
 import { useAuth } from "../../auth/AuthContext";
+import ImagingReportPrint from "../radiology/ImagingReportPrint";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -24,6 +25,7 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
   const [performFor, setPerformFor] = useState(null);
   const [reportFor, setReportFor] = useState(null);
   const [releaseFor, setReleaseFor] = useState(null);
+  const [printFor, setPrintFor] = useState(null);
   const [releasedIds, setReleasedIds] = useState({});
   const modalityCodes = modalitiesIn(modalityGroup);
   const techFields = TECH_FIELDS[modalityGroup] || [];
@@ -99,7 +101,10 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
                 </div>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--muted)", marginRight: 10 }}>{s.accession}</span>
                 {releasedIds[s.id] ? (
-                  <span style={releasedBadge}>Released ✓</span>
+                  <>
+                    <span style={releasedBadge}>Released ✓</span>
+                    <Button onClick={() => setPrintFor(s)}>Print report</Button>
+                  </>
                 ) : (
                   <Button variant="primary" onClick={() => setReleaseFor(s)}>Release result</Button>
                 )}
@@ -125,8 +130,15 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
         <ReleaseModal study={releaseFor} actor={user} onClose={() => setReleaseFor(null)}
           onDone={async () => { setReleaseFor(null); await refresh(); }} />
       )}
+      {printFor && <ImagingPrintWrapper study={printFor} onClose={() => setPrintFor(null)} />}
     </div>
   );
+}
+
+function ImagingPrintWrapper({ study, onClose }) {
+  const [release, setRelease] = useState(null);
+  useEffect(() => { releaseStatus("imaging", study.id).then(setRelease); }, [study.id]);
+  return <ImagingReportPrint study={study} release={release} onClose={onClose} />;
 }
 
 function ReleaseModal({ study, actor, onClose, onDone }) {

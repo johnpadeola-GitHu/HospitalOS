@@ -10,8 +10,9 @@ import {
 } from "./radiologyService";
 import { listPatients, getPatient } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
-import { releaseResult, isReleased } from "../../engines/results";
+import { releaseResult, isReleased, releaseStatus } from "../../engines/results";
 import { useAuth } from "../../auth/AuthContext";
+import ImagingReportPrint from "./ImagingReportPrint";
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -29,6 +30,7 @@ export default function Radiology() {
   const [showRequest, setShowRequest] = useState(false);
   const [reportFor, setReportFor] = useState(null);
   const [releaseFor, setReleaseFor] = useState(null);
+  const [printFor, setPrintFor] = useState(null);
   const [releasedIds, setReleasedIds] = useState({});
   const { user } = useAuth();
 
@@ -134,7 +136,10 @@ export default function Radiology() {
                       )}
                       {s.status === "reported" && (
                         releasedIds[s.id] ? (
-                          <span style={releasedBadge}>Released ✓</span>
+                          <>
+                            <span style={releasedBadge}>Released ✓</span>
+                            <Button onClick={() => setPrintFor(s)}>Print report</Button>
+                          </>
                         ) : (
                           <Button variant="primary" onClick={() => setReleaseFor(s)}>Release result</Button>
                         )
@@ -172,8 +177,15 @@ export default function Radiology() {
         <ReleaseModal study={releaseFor} actor={user} onClose={() => setReleaseFor(null)}
           onDone={async () => { setReleaseFor(null); await refresh(); }} />
       )}
+      {printFor && <ImagingPrintWrapper study={printFor} onClose={() => setPrintFor(null)} />}
     </div>
   );
+}
+
+function ImagingPrintWrapper({ study, onClose }) {
+  const [release, setRelease] = useState(null);
+  useEffect(() => { releaseStatus("imaging", study.id).then(setRelease); }, [study.id]);
+  return <ImagingReportPrint study={study} release={release} onClose={onClose} />;
 }
 
 function ReleaseModal({ study, actor, onClose, onDone }) {
