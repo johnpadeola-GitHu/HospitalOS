@@ -141,6 +141,15 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
           );
         })}
       </div>
+
+      <a href="/guides/HospitalOS-Tenant-Guide.pdf" download style={guideBanner}>
+        <div style={guideIcon}><Icons.FileDown size={18} color="#fff" /></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)" }}>Download the full Tenant Guide (PDF)</div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>Every module, your role's permissions, pricing, branding, and current limitations \u2014 in one document</div>
+        </div>
+        <Icons.Download size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
+      </a>
     </>
   );
 }
@@ -257,6 +266,12 @@ function Block({ b }) {
 const crumb = { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted)", marginBottom: 14, flexWrap: "wrap" };
 const crumbLink = { font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--charcoal)", background: "none", border: "none", cursor: "pointer", padding: 0 };
 const heroRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 };
+const guideBanner = {
+  display: "flex", alignItems: "center", gap: 12, marginTop: 18,
+  background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: "var(--radius)",
+  padding: "13px 16px", textDecoration: "none", boxShadow: "var(--shadow-sm)",
+};
+const guideIcon = { width: 34, height: 34, borderRadius: 9, background: "var(--charcoal)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const heroCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px 16px 18px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const catGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 };
 const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "14px 15px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };

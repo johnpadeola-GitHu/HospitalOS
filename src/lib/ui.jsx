@@ -149,7 +149,7 @@ export function Modal({ title, onClose, children, footer }) {
       <div style={sheet} onClick={(e) => e.stopPropagation()}>
         <div style={sheetHead}>
           <h2 style={{ fontSize: 15.5, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.015em" }}>{title}</h2>
-          <button onClick={onClose} style={closeBtn} aria-label="Close"><Icons.X size={17} /></button>
+          <button onClick={onClose} style={closeBtn} aria-label="Close"><Icons.X size={15} strokeWidth={2.4} /></button>
         </div>
         <div style={{ padding: "18px 20px" }}>{children}</div>
         {footer && <div style={sheetFoot}>{footer}</div>}
@@ -204,6 +204,8 @@ const sheetFoot = {
   padding: "13px 20px", borderTop: "1px solid var(--border)", background: "var(--surface)",
 };
 const closeBtn = {
-  background: "none", border: "none", cursor: "pointer",
-  color: "var(--muted)", display: "flex", padding: 2,
+  background: "var(--bad)", border: "none", cursor: "pointer",
+  color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+  width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+  boxShadow: "0 1px 2px rgba(176,40,31,0.35)",
 };

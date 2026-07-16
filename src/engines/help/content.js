@@ -364,6 +364,34 @@ export const ARTICLES = [
     related: ["audit", "signing-in"],
   },
   {
+    id: "ethics", cat: "admin", icon: "Scale",
+    title: "Ethics committee (IRB) review",
+    lead: "A real submit-review-decide workflow, not a static list \u2014 every decision requires a reasoned comment.",
+    body: [
+      { p: "Academic \u2192 Ethics committee tracks Institutional Review Board submissions from first filing through to a final decision." },
+      { h: "The lifecycle" },
+      { p: "Submitted \u2192 Under review \u2192 one of: Revisions requested, Approved, Rejected. Click a submission to expand it and see the full comment history alongside its current status." },
+      { warn: "You cannot approve, reject, or request revisions without entering a reviewer comment \u2014 the button stays disabled until you do. Ethics review that leaves no reasoning behind is not a real review." },
+      { p: "Once a submission is Approved or Rejected, that decision is final within this screen \u2014 it cannot be silently reopened. A genuinely new decision needs a fresh submission." },
+    ],
+    related: ["roles-explained"],
+  },
+  {
+    id: "documents-upload", cat: "admin", icon: "Files",
+    title: "Uploading your own documents & templates",
+    lead: "Real file upload \u2014 any category you choose, any file type, up to 15MB.",
+    body: [
+      { p: "Administration \u2192 Documents & templates is where your hospital keeps its own forms, policies, and templates \u2014 discharge summary templates, consent forms, NHIS claim forms, statutory notifications, anything you need on hand." },
+      { h: "Uploading" },
+      { steps: [
+        "Drag a file onto the upload area, or click it to browse.",
+        "Choose an existing category, or create a new one by typing its name \u2014 categories are entirely yours to define, there is no fixed list.",
+        "Confirm. The file is immediately downloadable, renameable, and deletable from the list below.",
+      ] },
+      { warn: "Files are held in your browser session, not on a server yet \u2014 they do not survive a page reload. Do not use this as your only copy of anything important until server-side storage lands." },
+    ],
+  },
+  {
     id: "audit", cat: "admin", icon: "ShieldCheck",
     title: "The audit trail",
     lead: "Append-only and hash-chained \u2014 history cannot be quietly rewritten.",

@@ -134,10 +134,10 @@ export const NAV_GROUPS = [
       { id: "users", label: "Users & roles", path: "/system/users" , icon: "UsersRound" },
       { id: "facilities", label: "Facilities & sites", path: "/system/facilities" , icon: "Hospital" },
       { id: "integration", label: "Instruments gateway", path: "/instruments" , icon: "Cable" },
-      { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
-      { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
-      { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
       { id: "pricing", label: "Pricing", path: "/system/pricing" , icon: "Tags" },
+      { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
+      { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
+      { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
     ],
   },
 ];

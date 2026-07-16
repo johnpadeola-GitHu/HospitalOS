@@ -43,7 +43,13 @@ export default function Platform() {
   if (!data) {
     return (
       <div>
-        <PageHeader group="Platform" title="Platform admin" icon="ShieldCheck" />
+        <PageHeader group="Platform" title="Platform admin" icon="ShieldCheck"
+          actions={
+            <a href="/guides/HospitalOS-Platform-Admin-Guide.pdf" download style={guideLink}>
+              <Icons.FileDown size={14} />
+              Platform Admin Guide (PDF)
+            </a>
+          } />
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading platform…</div>
       </div>
     );
@@ -169,6 +175,12 @@ export default function Platform() {
 }
 
 const tabs = { display: "flex", gap: 6, marginBottom: 16 };
+const guideLink = {
+  display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
+  fontSize: 12, fontWeight: 600, color: "var(--charcoal-strong)",
+  background: "var(--surface-2)", border: "1px solid var(--border-strong)",
+  borderRadius: 8, padding: "7px 12px",
+};
 const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
