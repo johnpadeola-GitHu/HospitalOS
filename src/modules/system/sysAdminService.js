@@ -23,6 +23,7 @@ export async function toggleSite(id) {
 /* -------- Settings -------- */
 const _settings = {
   hospitalName: "HospitalOS Teaching Hospital",
+  logoUrl: "",  // tenant-supplied logo; falls back to initials badge when empty
   currency: "NGN (\u20a6)",
   timezone: "Africa/Lagos (WAT)",
   nhisEnabled: true,

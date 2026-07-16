@@ -8,6 +8,7 @@ import { listPatients } from "../patients/patientService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 import { checkAllergy } from "../records/recordsService";
+import { priceFor } from "../../engines/pricing";
 
 const STOCK_TINT = {
   ok: { bg: "#E6EFDF", fg: "#4A6329", label: "In stock" },
@@ -96,7 +97,7 @@ export default function Dispensing() {
                       {d.stock.toLocaleString()}
                     </td>
                     <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 13 }}>
-                      &#8358;{d.price}
+                      &#8358;{priceFor("pharmacy", d.id, d.price)}
                     </td>
                     <td style={td}>
                       <span
@@ -194,7 +195,8 @@ function DispenseModal({ drug, onClose, onDone }) {
 
   const n = parseInt(qty, 10) || 0;
   const overStock = n > drug.stock;
-  const total = n > 0 ? n * drug.price : 0;
+  const effectivePrice = priceFor("pharmacy", drug.id, drug.price);
+  const total = n > 0 ? n * effectivePrice : 0;
 
   const submit = async () => {
     if (!selected) {

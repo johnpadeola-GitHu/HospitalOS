@@ -13,7 +13,6 @@ export const NAV_GROUPS = [
       { id: "my-patients", label: "My patients", path: "/patients/mine" , icon: "UserRound" },
       { id: "worklist", label: "Worklist", path: "/worklist" , icon: "ListChecks" },
       { id: "alerts", label: "Alerts & critical values", path: "/alerts" , icon: "BellRing" },
-      { id: "help", label: "Help & documentation", path: "/help" , icon: "BookOpen" },
       { id: "communication", label: "Communication hub", path: "/communication" , icon: "MessagesSquare" },
     ],
   },
@@ -34,6 +33,7 @@ export const NAV_GROUPS = [
       { id: "oncology", label: "Oncology", path: "/oncology" , icon: "Ribbon" },
       { id: "rehab", label: "Rehabilitation & therapy", path: "/rehab" , icon: "Accessibility" },
       { id: "bookings", label: "Online bookings", path: "/bookings" , icon: "CalendarPlus" },
+      { id: "renal", label: "Renal & dialysis", path: "/renal" , icon: "Droplets" },
     ],
   },
   {
@@ -136,6 +136,7 @@ export const NAV_GROUPS = [
       { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
       { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
       { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
+      { id: "pricing", label: "Pricing", path: "/system/pricing" , icon: "Tags" },
     ],
   },
 ];

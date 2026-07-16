@@ -1,3 +1,4 @@
+import { priceFor } from "../../engines/pricing";
 // Bed registry.
 // Source of truth for wards, beds, and occupancy. Both the bed board and the
 // ADT admit/transfer flows read and write here, so a bed cannot be assigned to
@@ -132,6 +133,7 @@ export async function listBillableBedNights() {
     .map((b) => {
       const nights = Math.max(1, Math.ceil((Date.now() - new Date(b.since)) / 86400000));
       const tier = TIERS[b.tier];
+      const nightlyRate = priceFor("accommodation", b.tier, tier.rate);
       return {
         patientId: b.occupantId,
         patientName: b.occupantName,
@@ -139,7 +141,7 @@ export async function listBillableBedNights() {
         source: "Accommodation",
         description: `${tier.label} — ${b.ward} ${b.id} (${nights} night${nights > 1 ? "s" : ""})`,
         reference: b.id,
-        amount: tier.rate * nights,
+        amount: nightlyRate * nights,
         at: b.since,
       };
     });

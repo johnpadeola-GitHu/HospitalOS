@@ -106,6 +106,19 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Pinned, always visible — Help is a standalone engine, not a
+          workflow-group item, so it lives outside the scrollable list. */}
+      <div style={S.pinnedFooter}>
+        <NavLink
+          to="/help"
+          style={({ isActive }) => ({ ...S.pinnedLink, ...(isActive ? S.pinnedLinkActive : null) })}
+        >
+          <Icon name="BookOpen" size={15} style={{ color: "var(--accent)", flexShrink: 0 }} />
+          <span style={{ flex: 1 }}>Help &amp; documentation</span>
+          <Icons.ChevronRight size={13} style={{ color: "var(--muted)" }} />
+        </NavLink>
+      </div>
     </aside>
   );
 }
@@ -114,12 +127,12 @@ const S = {
   aside: {
     width: 250, minWidth: 250, height: "100vh",
     background: "var(--sidebar)", borderRight: "1px solid var(--border)",
-    display: "flex", flexDirection: "column", overflowY: "auto",
+    display: "flex", flexDirection: "column", overflow: "hidden",
   },
   brand: {
     display: "flex", alignItems: "center", gap: 10, padding: "14px 16px",
-    borderBottom: "1px solid var(--border)", position: "sticky", top: 0,
-    background: "var(--sidebar)", zIndex: 2,
+    borderBottom: "1px solid var(--border)", flexShrink: 0,
+    background: "var(--sidebar)",
   },
   brandMark: {
     width: 30, height: 30, borderRadius: 8,
@@ -129,7 +142,13 @@ const S = {
   },
   brandText: { fontSize: 14, fontWeight: 700, color: "var(--charcoal-strong)", letterSpacing: "-0.02em" },
   brandSub: { fontSize: 10, color: "var(--muted)" },
-  nav: { padding: "8px 10px 20px" },
+  nav: { padding: "8px 10px 12px", flex: 1, overflowY: "auto" },
+  pinnedFooter: { flexShrink: 0, borderTop: "1px solid var(--border)", padding: "8px", background: "var(--sidebar)" },
+  pinnedLink: {
+    display: "flex", alignItems: "center", gap: 9, padding: "8px 9px",
+    borderRadius: 8, fontSize: 12.5, fontWeight: 600, color: "var(--ink)",
+  },
+  pinnedLinkActive: { background: "var(--accent-bg)", color: "var(--accent)" },
   groupHeader: {
     width: "100%", display: "flex", alignItems: "center", gap: 9,
     padding: "8px 8px", background: "none", border: "none", cursor: "pointer",

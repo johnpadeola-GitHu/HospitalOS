@@ -1,3 +1,4 @@
+import { priceFor } from "../../engines/pricing";
 // Pharmacy service.
 // Holds the drug inventory (stock, reorder level, NAFDAC no.) and the dispense
 // flow: dispensing to a patient decrements stock and records the event.
@@ -55,6 +56,7 @@ export async function dispense({ drugId, patientId, patientName, hospitalNo, qua
   if (!qty || qty < 1) throw new Error("Enter a quantity of at least 1.");
   if (qty > drug.stock) throw new Error(`Only ${drug.stock} ${drug.unit}(s) in stock.`);
 
+  const chargePrice = priceFor("pharmacy", drugId, drug.price);
   drug.stock -= qty;
   _dispenseSeq += 1;
   const record = {
@@ -67,7 +69,7 @@ export async function dispense({ drugId, patientId, patientName, hospitalNo, qua
     hospitalNo,
     quantity: qty,
     unit: drug.unit,
-    total: qty * drug.price,
+    total: qty * chargePrice,
     at: new Date().toISOString(),
   };
   _dispenses.unshift(record);

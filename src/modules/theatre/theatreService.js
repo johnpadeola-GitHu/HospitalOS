@@ -1,3 +1,4 @@
+import { priceFor } from "../../engines/pricing";
 // Theatre & day surgery service.
 // A surgical case moves: scheduled -> in-theatre -> recovery -> completed.
 // Each procedure is priced, so completed (or in-progress) cases are billable.
@@ -111,7 +112,7 @@ export async function listBillableProcedures() {
         source: "Theatre",
         description: c.procName,
         reference: c.ref,
-        amount: proc ? proc.price : 0,
+        amount: proc ? priceFor("theatre", c.procCode, proc.price) : 0,
         at: c.at,
       };
     });

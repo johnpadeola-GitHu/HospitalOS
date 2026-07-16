@@ -51,6 +51,8 @@ import Biobank from "./modules/biobank/Biobank";
 import DiagnosticIntel from "./modules/diagnostic-intel/DiagnosticIntel";
 import Communication from "./modules/communication/Communication";
 import Bookings from "./modules/bookings/Bookings";
+import PricingConfig from "./engines/pricing/PricingConfig";
+import Renal from "./modules/renal/Renal";
 import Ultrasound from "./modules/imaging/Ultrasound";
 import CTScan from "./modules/imaging/CTScan";
 import MRIScan from "./modules/imaging/MRIScan";
@@ -112,6 +114,8 @@ const MODULES = {
   "/diagnostic-intel": DiagnosticIntel,
   "/communication": Communication,
   "/bookings": Bookings,
+  "/system/pricing": PricingConfig,
+  "/renal": Renal,
   "/ultrasound": Ultrasound,
   "/ct-scan": CTScan,
   "/mri": MRIScan,

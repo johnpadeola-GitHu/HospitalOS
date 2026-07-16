@@ -5,6 +5,7 @@ import {
 } from "../radiology/radiologyService";
 import { listPatients } from "../patients/patientService";
 import { PageHeader, StatCard, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
+import { priceFor } from "../../engines/pricing";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
@@ -121,7 +122,7 @@ function StudyRow({ s, techFields, onSchedule, onPerform, onReport }) {
         </div>
         <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 3 }}>
           {s.patientName} · <span style={{ fontFamily: "var(--font-mono)" }}>{s.accession}</span>
-          {m && <> · {naira(m.price)}</>}
+          {m && <> · {naira(priceFor("radiology", s.code, m.price))}</>}
         </div>
         {Object.keys(s.tech || {}).length > 0 && (
           <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
@@ -186,7 +187,7 @@ function RequestModal({ modalityCodes, onClose, onDone }) {
         <div style={{ flex: 1 }}>
           <Field label="Protocol">
             <select style={inputStyle} value={code} onChange={(e) => setCode(e.target.value)}>
-              {modalityCodes.map((m) => <option key={m.code} value={m.code}>{m.name} — {naira(m.price)}</option>)}
+              {modalityCodes.map((m) => <option key={m.code} value={m.code}>{m.name} — {naira(priceFor("radiology", m.code, m.price))}</option>)}
             </select>
           </Field>
         </div>

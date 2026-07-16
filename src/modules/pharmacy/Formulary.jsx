@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listDrugs } from "./pharmacyService";
+import { priceFor } from "../../engines/pricing";
 import { PageHeader } from "../../lib/ui";
 
 export default function Formulary() {
@@ -27,7 +28,7 @@ export default function Formulary() {
                   <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{d.name}</td>
                   <td style={{ ...td, color: "var(--muted)" }}>{d.form}</td>
                   <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 12 }}>{d.nafdac}</td>
-                  <td style={{ ...td, fontFamily: "var(--font-mono)" }}>₦{d.price}</td>
+                  <td style={{ ...td, fontFamily: "var(--font-mono)" }}>₦{priceFor("pharmacy", d.id, d.price)}</td>
                 </tr>
               ))}
           </tbody>

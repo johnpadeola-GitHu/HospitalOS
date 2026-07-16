@@ -13,6 +13,7 @@ export const CATEGORIES = [
   { key: "finance", label: "Finance", icon: "Wallet", blurb: "Billing, payments, claims, and accommodation charges." },
   { key: "safety", label: "Safety & alerts", icon: "BellRing", blurb: "What raises an alert and how alerts clear." },
   { key: "admin", label: "Administration", icon: "SlidersHorizontal", blurb: "Users, roles, permissions, and the audit trail." },
+  { key: "platform", label: "Platform & configuration", icon: "Settings2", blurb: "Pricing, tenant branding, communication, bookings, and the vendor view." },
   { key: "reference", label: "Reference", icon: "BookMarked", blurb: "Shortcuts, glossary, and current limitations." },
 ];
 
@@ -305,7 +306,7 @@ export const ARTICLES = [
   {
     id: "alerts", cat: "safety", icon: "BellRing",
     title: "The alert system",
-    lead: "Ten sources, one feed, and most alerts clear themselves.",
+    lead: "Eleven sources, one feed, and most alerts clear themselves.",
     body: [
       { p: "Overview \u2192 Alerts is a single feed for the whole hospital. The red badge on the sidebar refreshes every few seconds, so a critical result reaches you wherever you are working." },
       { h: "What raises an alert" },
@@ -322,6 +323,7 @@ export const ARTICLES = [
           ["Operations", "Equipment under repair, vehicle out of service", "Warning"],
           ["Oncology", "Chemotherapy cycle overdue", "Warning"],
           ["Public health", "Notifiable disease trending up", "Warning"],
+          ["Renal", "Dialysis session overdue", "Critical"],
         ],
       } },
       { h: "How alerts clear" },
@@ -428,6 +430,174 @@ export const ARTICLES = [
       { p: "Hash-chaining detects tampering. It cannot prevent it client-side. Its value is in migrating unchanged to the server, where append-only storage makes it a genuine control." },
       { h: "The instruments gateway simulates" },
       { p: "Analyzer registry and monitoring are real. Live MLLP listening needs a server socket, which a browser cannot open. 'Receive result' runs the same code path a real listener would call." },
+    ],
+  },
+
+  {
+    id: "imaging-modalities", cat: "diagnostics", icon: "Waves",
+    title: "Ultrasound, CT and MRI",
+    lead: "Three dedicated worklists reading the same records as the generic Radiology screen — not a parallel system.",
+    body: [
+      { p: "Diagnostics has three modality-specific screens \u2014 Ultrasound, CT, MRI \u2014 alongside the general Radiology & imaging worklist. They are filtered views of the exact same study records: request a study from any of them and it appears immediately in all the others, with the same accession number and lifecycle." },
+      { h: "Technical parameters" },
+      { p: "Each modality captures parameters relevant to it when a study is marked performed \u2014 not generic filler fields:" },
+      { table: { head: ["Modality", "Captured"], rows: [
+        ["Ultrasound", "Probe type, Doppler use"],
+        ["CT", "Contrast (none/oral/IV), slice thickness"],
+        ["MRI", "Sequence protocol, field strength (1.5T/3T)"],
+      ] } },
+      { p: "27 protocols are offered across the modalities \u2014 including echocardiogram, FAST trauma scan, CT angiography, KUB stone protocol, and MRCP \u2014 the range a tertiary imaging department actually runs, not a token X-ray/CT/MRI/USG each." },
+    ],
+    related: ["lab"],
+  },
+  {
+    id: "biobanking", cat: "diagnostics", icon: "Archive",
+    title: "Biobanking",
+    lead: "Long-term specimen storage, distinct from the active lab worklist.",
+    body: [
+      { p: "Diagnostics \u2192 Biobanking is a separate concern from the Laboratory worklist: it is for specimens retained after routine testing \u2014 for research, future clinical use, or medico-legal purposes \u2014 not samples awaiting a result today." },
+      { h: "What is tracked" },
+      { list: [
+        "Storage location across four units (two freezers, a liquid-nitrogen vault, a room-temperature archive), each with a capacity the system will not let you exceed.",
+        "Specimen type and volume.",
+        "Consent basis \u2014 research use, future clinical use only, or no further use.",
+        "Associated study, where relevant.",
+      ] },
+      { note: "Banking a specimen checks the destination unit's capacity before accepting it \u2014 a full freezer refuses new specimens rather than silently overfilling." },
+    ],
+  },
+  {
+    id: "lab-utilities-scope", cat: "diagnostics", icon: "Calculator",
+    title: "Lab utilities \u2014 what they are and are not",
+    lead: "Bench-side calculators and reference material, not a clinical department.",
+    body: [
+      { p: "Diagnostics \u2192 Lab utilities holds seven clinical calculators (eGFR, creatinine clearance, BMI, BSA, maintenance fluids, anion gap, corrected calcium), nine unit converters, a critical-value quick-reference card, and a specimen tube guide." },
+      { p: "These sit in Diagnostics deliberately \u2014 a lab scientist reaching for a creatinine-clearance figure while validating a result is exactly the audience. They are pure calculators: no patient record is created or touched, nothing here is saved." },
+      { warn: "A calculator is not a department. If you need to actually manage patients on a renal pathway \u2014 dialysis sessions, vascular access, CKD staging over time \u2014 that is Patient care \u2192 Renal & dialysis, a full clinical module in its own right." },
+    ],
+    related: ["renal"],
+  },
+  {
+    id: "diagnostic-intel", cat: "diagnostics", icon: "Brain",
+    title: "Diagnostic intelligence",
+    lead: "Read-only analytics across Laboratory, Radiology, and Blood Bank.",
+    body: [
+      { p: "Diagnostics \u2192 Diagnostic intelligence owns no data of its own \u2014 it reads across the other diagnostic modules and surfaces patterns no single one shows alone." },
+      { table: { head: ["Metric", "What it tells you"], rows: [
+        ["Lab completion %", "How much of the ordered workload has reached Verified"],
+        ["Most-ordered tests", "Where lab demand concentrates"],
+        ["Orders by department", "Chemistry vs Haematology vs Microbiology load"],
+        ["Declared vs actual turnaround", "Whether stated TAT promises are being met"],
+        ["Positivity rate", "For qualitative screens \u2014 HIV, malaria, etc."],
+      ] } },
+      { note: "Turnaround is computed from real timestamps \u2014 order time to result time \u2014 against each test's declared TAT in the catalogue, not an estimate." },
+    ],
+    related: ["lab"],
+  },
+
+  {
+    id: "renal", cat: "clinical", icon: "Droplets",
+    title: "Renal & dialysis",
+    lead: "A haemodialysis programme and a CKD staging registry.",
+    body: [
+      { p: "Patient care \u2192 Renal & dialysis has two tabs." },
+      { h: "Dialysis programme" },
+      { p: "Enrol a patient with their vascular access type (fistula, graft, or catheter), schedule, and dry weight. Logging a session records pre- and post-dialysis weight, blood pressure, duration, and complications \u2014 fluid removed is calculated automatically from the weight difference." },
+      { warn: "A patient who misses their scheduled session shows Overdue on the programme list and raises a critical hospital-wide alert. Dialysis is not something that can quietly slip." },
+      { h: "CKD registry" },
+      { p: "For patients being followed for chronic kidney disease who are not (yet) on dialysis. Enter an eGFR and the system stages it automatically against the standard six-stage classification, from Stage 1 (normal/high with damage) to Stage 5 (kidney failure)." },
+    ],
+    related: ["lab-utilities-scope", "alerts"],
+  },
+
+  {
+    id: "pricing", cat: "platform", icon: "Tags",
+    title: "Configuring your own prices",
+    lead: "Every price is a catalogue default until you override it \u2014 then it is what your hospital actually charges.",
+    body: [
+      { p: "Administration \u2192 Pricing is where a hospital sets its own prices for lab tests, drugs, imaging studies, theatre procedures, and ward accommodation per night. HospitalOS ships with sensible catalogue defaults, but nothing about them is fixed \u2014 they exist so the system works out of the box, not as a ceiling." },
+      { h: "How it actually works" },
+      { p: "Every screen that shows a price, and every billing calculation, reads through one function: an override if you have set one, the catalogue default otherwise. There is no second place prices live \u2014 setting a price here changes what is billed immediately, for every new charge from that point on." },
+      { steps: [
+        "Choose a category (tests, drugs, imaging, procedures, or accommodation).",
+        "Search for the item.",
+        "Click Edit, enter your price, save.",
+        "The new price applies to every future charge and every screen showing that item, instantly.",
+        "Reset removes your override and the item returns to its catalogue default.",
+      ] },
+      { note: "Past charges are not rewritten. A patient dispensed medication before you changed the price keeps their historical total \u2014 only new transactions use the new price. This is standard practice: you do not retroactively re-bill someone for a price change." },
+      { warn: "This screen requires the 'Change settings' permission. Every price change is written to the audit trail, naming who changed what and when." },
+    ],
+    related: ["audit", "billing"],
+  },
+  {
+    id: "tenant-branding", cat: "platform", icon: "Image",
+    title: "Your hospital's branding",
+    lead: "Your logo and name, shown on every screen \u2014 distinct from the HospitalOS product branding.",
+    body: [
+      { p: "Administration \u2192 Settings has a Hospital name field and a Logo URL field. Once set, both appear top-right on every screen in the application, in a badge separate from the HospitalOS/AgoroX branding in the sidebar." },
+      { p: "If no logo is set, a badge showing your hospital's initials is used instead, so the space is never empty." },
+      { note: "This is genuinely live: change the name or logo in Settings and it updates everywhere within a few seconds, with no reload needed." },
+    ],
+  },
+  {
+    id: "communication", cat: "platform", icon: "MessagesSquare",
+    title: "Communication hub",
+    lead: "SMS, WhatsApp, email and in-app delivery in one queue.",
+    body: [
+      { p: "Overview \u2192 Communication hub is the delivery log for outbound messages \u2014 appointment reminders, result-ready notices, payment receipts, discharge summaries \u2014 across four channels." },
+      { p: "Compose lets you send a templated or custom message on any channel. Delivery status moves from Queued to Delivered (or Failed) as messages process, visible live without refreshing the page." },
+    ],
+  },
+  {
+    id: "bookings", cat: "platform", icon: "CalendarPlus",
+    title: "Online bookings",
+    lead: "Appointment requests from your website, and how they become real visits.",
+    body: [
+      { p: "Patient care \u2192 Online bookings holds appointment requests arriving from the hospital's public website \u2014 name, phone, desired clinic, and reason." },
+      { h: "How a booking becomes a visit" },
+      { p: "Confirming a booking, then checking it in, calls the exact same function the Outpatient module uses when staff check a patient in directly. This is a real integration, not two lists that happen to look similar \u2014 a checked-in booking genuinely appears on the Outpatient queue." },
+      { warn: "Checking in requires a matched patient record. A booking from someone not yet registered shows 'Unmatched patient' and must be registered in Registration & ADT before it can be checked in." },
+      { note: "See also: the notification bell (topbar) surfaces every unreviewed booking request and does not let you forget one \u2014 it only clears once you confirm or decline." },
+    ],
+    related: ["register-admit"],
+  },
+  {
+    id: "notifications", cat: "platform", icon: "BellRing",
+    title: "The notification bell",
+    lead: "A queue of unhandled work, not a feed you dismiss.",
+    body: [
+      { p: "The bell icon in the topbar currently surfaces booking requests awaiting review. Its badge count is the number of bookings still in the 'requested' state." },
+      { h: "Why it does not disappear on its own" },
+      { p: "Nothing here times out and nothing is dismissible from the bell itself. A booking leaves this list only when someone actually treats it \u2014 confirms it, declines it, or (from the Bookings screen) checks the patient in. The bell exists so a request cannot be silently forgotten; making it swipeable would defeat that." },
+      { p: "Confirm or decline directly from the bell's dropdown, or click through to the full Online bookings screen." },
+    ],
+    related: ["bookings"],
+  },
+  {
+    id: "settlement", cat: "platform", icon: "Landmark",
+    title: "Settlement centre (platform view)",
+    lead: "How AgoroX's platform fee is calculated and paid out \u2014 visible only to the platform admin.",
+    body: [
+      { p: "Signed in as the platform admin (support@agorox.africa), the topbar shows a Hospital / Platform toggle. Switching to Platform reveals the vendor-side view, which hospital staff never see." },
+      { h: "Settlement" },
+      { p: "AgoroX takes a 3.25% platform fee on total hospital collections, calculated per monthly cycle. Each cycle moves Pending \u2192 Processing \u2192 Settled, with a payout to a configured bank account. The fee and the net amount to the hospital always sum back to the gross collected \u2014 nothing is lost in the arithmetic." },
+      { h: "Usage analytics" },
+      { p: "Per-tenant metering \u2014 seats, active users, encounters, lab orders, storage, API calls \u2014 the evidence behind an invoice. Seat under-utilisation (a tenant paying for seats it is not using) is flagged explicitly as a churn risk worth a conversation before renewal." },
+    ],
+  },
+  {
+    id: "global-search", cat: "reference", icon: "Search",
+    title: "Global search",
+    lead: "Ctrl+K searches screens, patients, and documentation at once.",
+    body: [
+      { p: "The search bar in the topbar is a real command palette, not a decoration. Press Ctrl+K (or Cmd+K on Mac) from anywhere to open it." },
+      { list: [
+        "Screens \u2014 filtered to what your role can actually reach; you will never see a result you cannot open.",
+        "Patients \u2014 by name or hospital number.",
+        "Documentation \u2014 full-text across every help article, with an excerpt showing why it matched.",
+      ] },
+      { note: "Arrow keys move between results, Enter opens the highlighted one, Escape closes the palette." },
     ],
   },
 ];

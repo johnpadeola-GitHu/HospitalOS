@@ -144,6 +144,8 @@ export async function listCriticalOrders() {
 }
 
 // Feed for Billing: every order as a priced charge.
+import { priceFor } from "../../engines/pricing";
+
 export async function listBillableOrders() {
   await delay(60);
   return _orders.map((o) => {
@@ -155,7 +157,7 @@ export async function listBillableOrders() {
       source: "Laboratory",
       description: o.testName,
       reference: o.accession,
-      amount: test ? test.price : 0,
+      amount: test ? priceFor("lab", o.testCode, test.price) : 0,
       at: o.orderedAt,
     };
   });

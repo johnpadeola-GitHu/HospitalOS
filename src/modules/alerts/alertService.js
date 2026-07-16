@@ -15,6 +15,7 @@ import { listNeonatalAlerts } from "../maternity/maternityService";
 import { listOverdueChemo } from "../oncology/oncologyService";
 import { listOutbreakSignals } from "../public-health/publicHealthService";
 import { listInstrumentIssues } from "../instruments/instrumentsService";
+import { listOverdueDialysis } from "../renal/renalService";
 
 const delay = (ms = 90) => new Promise((r) => setTimeout(r, ms));
 
@@ -198,10 +199,24 @@ function alertFromInstrument(i) {
   };
 }
 
+function alertFromDialysis(p) {
+  return {
+    id: `renal:${p.id}`,
+    source: "Renal",
+    severity: "critical",
+    patientName: p.patientName,
+    hospitalNo: p.hospitalNo,
+    title: "Dialysis session overdue",
+    detail: `${p.access} · scheduled ${p.schedule} · due ${p.nextDue}`,
+    reference: p.hospitalNo,
+    at: new Date().toISOString(),
+  };
+}
+
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues] = await Promise.all([
+  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
     listUrgentStudies(),
@@ -212,6 +227,7 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     listOverdueChemo(),
     listOutbreakSignals(),
     listInstrumentIssues(),
+    listOverdueDialysis(),
   ]);
 
   const alerts = [
@@ -225,6 +241,7 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     ...overdueChemo.map(alertFromChemo),
     ...outbreaks.map(alertFromOutbreak),
     ...instrumentIssues.map(alertFromInstrument),
+    ...overdueDialysis.map(alertFromDialysis),
   ];
 
   const rank = { critical: 0, warning: 1 };

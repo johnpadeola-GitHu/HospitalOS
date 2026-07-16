@@ -5,6 +5,8 @@ import { ALL_ROUTES } from "../nav/navGroups";
 import { useAuth } from "../auth/AuthContext";
 import Platform from "../modules/platform/Platform";
 import GlobalSearch from "./GlobalSearch";
+import TenantBrand from "./TenantBrand";
+import NotificationBell from "./NotificationBell";
 
 function useCrumb() {
   const { pathname } = useLocation();
@@ -62,7 +64,7 @@ export default function AppLayout() {
             )}
 
             <span style={pill}><span style={dot} /> Online</span>
-            <Icons.Bell size={16} style={{ color: "var(--muted)" }} />
+            <NotificationBell />
 
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ textAlign: "right", lineHeight: 1.25 }}>
@@ -74,6 +76,7 @@ export default function AppLayout() {
                 <Icons.LogOut size={15} />
               </button>
             </div>
+            {!platformMode && <TenantBrand />}
           </div>
         </header>
 

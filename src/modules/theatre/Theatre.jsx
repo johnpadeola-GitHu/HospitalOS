@@ -11,6 +11,7 @@ import {
   getProcedure,
 } from "./theatreService";
 import { listPatients } from "../patients/patientService";
+import { priceFor } from "../../engines/pricing";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
@@ -77,7 +78,7 @@ export default function Theatre() {
                   <div style={{ fontSize: 12, color: "var(--ink)" }}>{c.patientName}</div>
                   <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
                     <span style={{ fontFamily: "var(--font-mono)" }}>{c.ref}</span> · {c.surgeon} ·{" "}
-                    {proc ? naira(proc.price) : ""}
+                    {proc ? naira(priceFor("theatre", c.procCode, proc.price)) : ""}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -207,7 +208,7 @@ function ScheduleModal({ onClose, onDone }) {
         <select style={inputStyle} value={procCode} onChange={(e) => setProcCode(e.target.value)}>
           {PROCEDURES.map((p) => (
             <option key={p.code} value={p.code}>
-              {p.name} — {naira(p.price)}
+              {p.name} — {naira(priceFor("theatre", p.code, p.price))}
             </option>
           ))}
         </select>

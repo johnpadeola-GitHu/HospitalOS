@@ -24,8 +24,18 @@ export default function Settings() {
     <div>
       <Head />
       <div style={sheet}>
-        <Field label="Hospital name">
+        <Field label="Hospital name — shown top-right on every screen">
           <input style={{ ...inputStyle, maxWidth: 320 }} value={s.hospitalName} onChange={(e) => patch({ hospitalName: e.target.value })} />
+        </Field>
+        <Field label="Logo URL — shown beside the hospital name">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input style={{ ...inputStyle, maxWidth: 320 }} value={s.logoUrl} onChange={(e) => patch({ logoUrl: e.target.value })} placeholder="https://…/logo.png" />
+            {s.logoUrl ? (
+              <img src={s.logoUrl} alt="" style={logoPreview} onError={(e) => { e.target.style.display = "none"; }} />
+            ) : (
+              <div style={logoPreviewFallback}>No logo set — initials shown instead</div>
+            )}
+          </div>
         </Field>
         <Field label="Currency">
           <div style={valueText}>{s.currency}</div>
@@ -68,5 +78,7 @@ function Toggle({ label, on, onChange }) {
 
 const sheet = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "6px 20px 16px", maxWidth: 520 };
 const valueText = { fontSize: 13, color: "var(--ink-strong)" };
+const logoPreview = { width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid var(--border)" };
+const logoPreviewFallback = { fontSize: 11.5, color: "var(--muted)" };
 const track = { width: 40, height: 22, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center" };
 const knob = { width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "transform 0.15s" };

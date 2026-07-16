@@ -1,3 +1,4 @@
+import { priceFor } from "../../engines/pricing";
 // Radiology service.
 // Lifecycle: requested -> scheduled -> performed -> reported.
 // A report can be flagged with an urgent finding, which feeds the Alerts screen.
@@ -232,7 +233,7 @@ export async function listBillableStudies() {
         source: "Radiology",
         description: s.name,
         reference: s.accession,
-        amount: m ? m.price : 0,
+        amount: m ? priceFor("radiology", s.code, m.price) : 0,
         at: s.requestedAt,
       };
     });

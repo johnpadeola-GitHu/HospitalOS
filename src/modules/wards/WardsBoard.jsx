@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { listWards } from "./bedService";
+import { priceFor } from "../../engines/pricing";
 import { PageHeader } from "../../lib/ui";
 
 export default function WardsBoard() {
@@ -51,7 +52,7 @@ export default function WardsBoard() {
                   {w.name}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={tierPill}>{w.tierLabel} · ₦{w.rate.toLocaleString()}/night</span>
+                  <span style={tierPill}>{w.tierLabel} · ₦{priceFor("accommodation", w.tier, w.rate).toLocaleString()}/night</span>
                   <span style={{ fontSize: 12, color: "var(--muted)" }}>
                     {w.occupied}/{w.total} occupied · {w.free} free
                   </span>

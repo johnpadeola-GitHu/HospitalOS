@@ -318,3 +318,46 @@ the eventual report — informational, not separately billed.
 Shared workspace component: src/modules/imaging/ModalityWorkspace.jsx. Adding
 a fourth modality (e.g. Nuclear Medicine) is a new MODALITIES entries + one
 thin wrapper screen, not a rebuild.
+
+## This session's changes
+
+**Favicon** — replaced the generic Vite starter icon with a red cross +
+stethoscope on white (public/favicon.svg).
+
+**Pricing engine** (src/engines/pricing/) — a real ENGINE like Help: owns its
+own override store, imported BY every billing-relevant module. `priceFor(category,
+code, defaultPrice)` is the seam every billing calculation and price-display now
+reads through — override if the hospital has set one, catalogue default
+otherwise. Wired into all five billing sources (lab, pharmacy, radiology,
+theatre, accommodation) AND their display screens (Dispensing, Formulary,
+Ward board, Theatre schedule, imaging request pickers).
+Verified: overriding FBC's price changes what a NEW lab order actually bills
+(2500 -> 3200), and resets cleanly. Pharmacy dispense charges at time-of-
+transaction using the current effective price, so historical totals are never
+rewritten retroactively.
+Admin screen: Administration -> Pricing (src/engines/pricing/PricingConfig.jsx),
+gated on the `system:configure` permission, every change audited.
+
+**Notification bell** (src/layout/NotificationBell.jsx) — previously
+decorative. Now sourced from booking requests: badge count = bookings still
+"requested". Verified it does NOT auto-dismiss — only confirming or declining
+a booking clears it from the bell.
+
+**Tenant branding** (src/layout/TenantBrand.jsx) — each hospital's own logo +
+name, top-right on every screen, distinct from the HospitalOS/AgoroX sidebar
+branding. Reads live from Administration -> Settings (new logoUrl field);
+falls back to an initials badge when no logo is set.
+
+**Renal & dialysis** (src/modules/renal/) — new clinical module: haemodialysis
+programme (vascular access, schedule, dry weight, per-session fluid-removal
+calculation) and a CKD registry (eGFR-based staging, Stage 1–5). Overdue
+dialysis sessions are the alert system's 11th source.
+
+**Help engine restructured** — moved out of the Overview nav group entirely;
+now a pinned, always-visible link at the bottom of the sidebar (outside the
+scrollable workflow groups), reinforcing that it is a standalone engine, not a
+workflow-group item. Content expanded from 23 to 35 articles across 9
+categories (added "Platform & configuration"), covering every module built
+this session: imaging sub-modules, biobanking, lab utilities scope, diagnostic
+intelligence, renal, pricing, tenant branding, communication hub, bookings,
+notifications, settlement, global search.
