@@ -361,3 +361,71 @@ categories (added "Platform & configuration"), covering every module built
 this session: imaging sub-modules, biobanking, lab utilities scope, diagnostic
 intelligence, renal, pricing, tenant branding, communication hub, bookings,
 notifications, settlement, global search.
+
+## This round's fixes and enrichment
+
+**Bug fix: /help routing** — moving Help to the sidebar's pinned footer had
+deleted its entry from NAV_GROUPS entirely, and since App.jsx generates routes
+from ALL_ROUTES (derived from NAV_GROUPS), /help had no <Route> and fell
+through to the catch-all placeholder. Fixed properly: /help is now an explicit,
+ungated route in App.jsx, independent of the workflow-group nav data —
+correct architecturally, since Help is documentation, not a permission-gated
+work area. The topbar breadcrumb got a matching fix.
+
+**Instruments gateway consolidated and massively expanded**
+(src/modules/instruments/instrumentsService.js) — previously lab-analyzers
+only. Now FOUR device categories, each on its real protocol:
+- Laboratory analyzers — HL7 v2 / MLLP (unchanged, still posts into Lab)
+- Imaging modalities — DICOM 3.0 C-STORE, posts into Radiology (moves a study
+  to Performed with a series/image count)
+- Radiotherapy systems — DICOM-RT, confirms fraction delivery into
+  Radiotherapy directly
+- Printers — IPP / raw socket / serial, confirms print jobs
+
+18 devices spanning 2001–2023 purchase dates — legacy equipment (a 2001
+dot-matrix ward printer, a 2007 CR reader, a manual Cobalt-60 unit, a 2009
+chemistry analyzer) sits alongside modern equipment deliberately, because a
+gateway that only speaks to new machines is not a working gateway for a real
+hospital fleet. All four seams tested: DICOM correctly refuses a mismatched
+modality, a wristband printer refuses a receipt job, radiotherapy fraction
+counts increment correctly, errored/offline devices across all categories
+still feed the Alerts system.
+
+Removed the redundant thin "Administration -> Integrations (HL7/FHIR)" static
+list screen; that nav entry now points at the same robust gateway (reachable
+from both Diagnostics and Administration, since both audiences need it).
+
+**Favicon redesigned** — rebuilt with precise rounded-rect geometry (was
+hand-drawn paths with imprecise curves) and simplified the stethoscope to a
+single continuous stroke, since fine detail turns to mud at actual favicon
+render sizes (16–32px). White background kept as requested.
+
+**Ethics committee deepened** (src/modules/academic/) — was a static list.
+Now a real IRB workflow: Submitted → Under review → (Revisions | Approved |
+Rejected), with a REQUIRED reviewer comment on every decision (you cannot
+approve/reject/request-revisions with no reasoning recorded), full comment
+history per submission, and a guard against reopening a finalised decision.
+Verified: empty-comment decisions blocked, lifecycle transitions correct,
+reopening blocked.
+
+## On "beef up all modules" (item 4)
+
+Read literally, this is a multi-session initiative — this build has 64 routes,
+built incrementally across many rounds. Attempting a shallow pass over all of
+them in one turn would produce filler, not enrichment, and risks bugs across
+screens that currently work correctly.
+
+This round's concrete installment: the Instruments Gateway (above) and Ethics
+Committee (above) were taken from thin/static to genuinely robust, tested
+workflows — that is the standard of "beefed up" being applied.
+
+**Remaining thin modules**, roughly ranked by how much a UCH-Ibadan-scale
+teaching/tertiary hospital would actually lean on them:
+- Academic: Training, Logbooks, CME, Research (Ethics now done)
+- Public health: Surveillance, Immunisation, Outreach, Reporting
+- Operations: Scheduling, Facility, Support, Visitor
+- Administration: Documents, Facilities
+
+Suggest tackling these in focused batches (as this session did with
+Instruments + Ethics) rather than all at once, so each gets real workflow
+depth and testing rather than a cosmetic pass.

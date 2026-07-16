@@ -10,6 +10,7 @@ import NotificationBell from "./NotificationBell";
 
 function useCrumb() {
   const { pathname } = useLocation();
+  if (pathname === "/help") return { group: "Help", label: "Help & documentation" };
   const match = ALL_ROUTES.find((r) => r.path === pathname);
   if (!match) return { group: "", label: "Not found" };
   return { group: match.groupLabel, label: match.label };

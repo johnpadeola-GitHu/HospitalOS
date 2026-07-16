@@ -32,7 +32,6 @@ import Facilities from "./modules/system/Facilities";
 import Settings from "./modules/system/Settings";
 import Security from "./modules/system/Security";
 import SysDocuments from "./modules/system/Documents";
-import Integration from "./modules/system/Integration";
 import Training from "./modules/academic/Training";
 import Logbooks from "./modules/academic/Logbooks";
 import CME from "./modules/academic/CME";
@@ -95,7 +94,6 @@ const MODULES = {
   "/system/settings": Settings,
   "/system/security": Security,
   "/system/documents": SysDocuments,
-  "/system/integration": Integration,
   "/academic/training": Training,
   "/academic/logbooks": Logbooks,
   "/academic/cme": CME,
@@ -157,6 +155,11 @@ function Shell() {
     <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
+            {/* Help is a standalone engine, not a workflow-group screen — it
+                lives outside NAV_GROUPS entirely (see Sidebar's pinned footer
+                link) and is never permission-gated. Every signed-in role can
+                read the documentation regardless of which areas they can reach. */}
+            <Route path="/help" element={<Help />} />
             {ALL_ROUTES.map((r) => (
               <Route key={r.id} path={r.path} element={<Guarded route={r} />} />
             ))}

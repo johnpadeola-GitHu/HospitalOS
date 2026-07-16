@@ -46,16 +46,90 @@ const _research = [
 ];
 export async function listResearch() { await delay(); return [..._research]; }
 
-/* -------- Ethics submissions -------- */
-const _ethics = [
-  { id: "et1", ref: "IRB-0042", title: "Malaria RDT accuracy study", status: "approved", submitted: "2026-05-10" },
-  { id: "et2", ref: "IRB-0051", title: "Hypertension control trial", status: "under-review", submitted: "2026-07-01" },
-  { id: "et3", ref: "IRB-0053", title: "SSI audit protocol", status: "revisions", submitted: "2026-06-22" },
-];
+/* -------- Ethics committee: real submit -> review -> decision lifecycle -------- */
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
+
+export const ETHICS_STATUSES = ["submitted", "under-review", "revisions", "approved", "rejected"];
 export const ETHICS_TINT = {
-  approved: { bg: "#E6EFDF", fg: "#4A6329", label: "Approved" },
-  "under-review": { bg: "#E3ECF7", fg: "#3A5170", label: "Under review" },
+  submitted: { bg: "#E3ECF7", fg: "#3A5170", label: "Submitted" },
+  "under-review": { bg: "#EDE7F5", fg: "#553A80", label: "Under review" },
   revisions: { bg: "#FBF0DC", fg: "#8A5A17", label: "Revisions requested" },
+  approved: { bg: "#E6EFDF", fg: "#4A6329", label: "Approved" },
   rejected: { bg: "#F7E4E2", fg: "#B0281F", label: "Rejected" },
 };
-export async function listEthics() { await delay(); return [..._ethics].sort((a, b) => b.submitted.localeCompare(a.submitted)); }
+
+export const STUDY_TYPES = ["Observational", "Interventional", "Retrospective chart review", "Survey/Questionnaire", "Clinical trial"];
+
+let _ethicsSeq = 53;
+const _ethics = [
+  {
+    id: "et1", ref: "IRB-0042", title: "Malaria RDT accuracy study", type: "Observational",
+    pi: "Dr. Ngozi Umeh", dept: "Paediatrics", status: "approved", submitted: "2026-05-10",
+    comments: [
+      { by: "Prof. Adeyemi (Chair)", at: "2026-05-14", note: "Protocol sound. Approved for 12 months, renewable." },
+    ],
+  },
+  {
+    id: "et2", ref: "IRB-0051", title: "Hypertension control trial", type: "Interventional",
+    pi: "Prof. Adeyemi", dept: "Internal Medicine", status: "under-review", submitted: "2026-07-01",
+    comments: [
+      { by: "Dr. Bello (Reviewer)", at: "2026-07-05", note: "Consent form under review by two committee members." },
+    ],
+  },
+  {
+    id: "et3", ref: "IRB-0053", title: "SSI audit protocol", type: "Retrospective chart review",
+    pi: "Mr. Okonkwo", dept: "Surgery", status: "revisions", submitted: "2026-06-22",
+    comments: [
+      { by: "Prof. Adeyemi (Chair)", at: "2026-06-28", note: "Please clarify data anonymisation approach before resubmission." },
+    ],
+  },
+];
+
+function ethicsRef() { _ethicsSeq += 1; return "IRB-" + String(_ethicsSeq).padStart(4, "0"); }
+
+export async function listEthics({ status = "all" } = {}) {
+  await delay();
+  return _ethics
+    .filter((e) => (status === "all" ? true : e.status === status))
+    .sort((a, b) => b.submitted.localeCompare(a.submitted))
+    .map((e) => ({ ...e }));
+}
+
+export async function submitEthics({ title, type, pi, dept, actor }) {
+  await delay();
+  if (!title || !title.trim()) throw new Error("Enter the study title.");
+  if (!STUDY_TYPES.includes(type)) throw new Error("Choose a study type.");
+  if (!pi || !pi.trim()) throw new Error("Enter the principal investigator.");
+  const e = {
+    id: "et" + Date.now(), ref: ethicsRef(), title: title.trim(), type,
+    pi: pi.trim(), dept: dept || "\u2014", status: "submitted",
+    submitted: new Date().toISOString().slice(0, 10), comments: [],
+  };
+  _ethics.unshift(e);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "ethics-submission", entityId: e.ref, detail: `Submitted: ${e.title}`, severity: "info" });
+  return e;
+}
+
+/**
+ * Move a submission through the review lifecycle. A decision (approved,
+ * rejected, revisions) requires a reviewer comment \u2014 a bare status flip
+ * with no reasoning is not how ethics review actually works.
+ */
+export async function decideEthics(id, { status, comment, actor }) {
+  await delay();
+  const e = _ethics.find((x) => x.id === id);
+  if (!e) throw new Error("Submission not found");
+  if (!ETHICS_STATUSES.includes(status)) throw new Error("Unknown status");
+  if (["approved", "rejected", "revisions"].includes(status) && (!comment || !comment.trim())) {
+    throw new Error("A reviewer comment is required for this decision.");
+  }
+  if (e.status === "approved" || e.status === "rejected") {
+    throw new Error("This submission already has a final decision and cannot be reopened here.");
+  }
+  e.status = status;
+  if (comment && comment.trim()) {
+    e.comments.push({ by: actor?.name || "Reviewer", at: new Date().toISOString().slice(0, 10), note: comment.trim() });
+  }
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "ethics-submission", entityId: e.ref, detail: `${status} \u2014 ${e.title}`, severity: "info" });
+  return e;
+}

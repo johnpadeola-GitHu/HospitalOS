@@ -52,6 +52,7 @@ export const NAV_GROUPS = [
       { id: "lab-utilities", label: "Lab utilities", path: "/lab-utilities" , icon: "Calculator" },
       { id: "biobank", label: "Biobanking", path: "/biobank" , icon: "Archive" },
       { id: "diagnostic-intel", label: "Diagnostic intelligence", path: "/diagnostic-intel" , icon: "Brain" },
+      { id: "instruments", label: "Instruments & devices gateway", path: "/instruments" , icon: "Cable" },
     ],
   },
   {
@@ -132,7 +133,7 @@ export const NAV_GROUPS = [
     items: [
       { id: "users", label: "Users & roles", path: "/system/users" , icon: "UsersRound" },
       { id: "facilities", label: "Facilities & sites", path: "/system/facilities" , icon: "Hospital" },
-      { id: "integration", label: "Integrations (HL7/FHIR)", path: "/system/integration" , icon: "Network" },
+      { id: "integration", label: "Instruments gateway", path: "/instruments" , icon: "Cable" },
       { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
       { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
       { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
