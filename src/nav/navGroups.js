@@ -158,6 +158,7 @@ export const NAV_GROUPS = [
       { id: "privacy", label: "Privacy & consent", path: "/system/privacy" , icon: "ShieldCheck" },
       { id: "fhir", label: "FHIR interoperability", path: "/system/fhir" , icon: "Share2" },
       { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
+      { id: "data-import", label: "Data import", path: "/system/data-import" , icon: "UploadCloud" },
       { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
     ],
   },

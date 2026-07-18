@@ -7,6 +7,7 @@ import Platform from "../modules/platform/Platform";
 import GlobalSearch from "./GlobalSearch";
 import TenantBrand from "./TenantBrand";
 import NotificationBell from "./NotificationBell";
+import DemoBanner from "./DemoBanner";
 
 function useCrumb() {
   const { pathname } = useLocation();
@@ -80,6 +81,8 @@ export default function AppLayout() {
             {!platformMode && <TenantBrand />}
           </div>
         </header>
+
+        <DemoBanner />
 
         <main style={main}>
           <div style={container}>{platformMode ? <Platform /> : <Outlet />}</div>

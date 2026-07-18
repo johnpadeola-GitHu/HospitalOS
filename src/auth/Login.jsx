@@ -2,9 +2,11 @@ import { useState } from "react";
 import * as Icons from "lucide-react";
 import { useAuth } from "./AuthContext";
 import { inputStyle } from "../lib/ui";
+import { SignUpForm, DemoForm } from "./SignUp";
 
 export default function Login() {
   const { signIn, demoAccounts } = useAuth();
+  const [mode, setMode] = useState("signin"); // "signin" | "signup" | "demo"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,6 +24,32 @@ export default function Login() {
       setBusy(false);
     }
   };
+
+  const afterOnboarding = (createdEmail) => {
+    setEmail(createdEmail);
+    setPassword("");
+    setMode("signin");
+  };
+
+  if (mode === "signup") {
+    return (
+      <div style={wrap}>
+        <div style={panel}>
+          <SignUpForm onBack={() => setMode("signin")} onDone={afterOnboarding} />
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "demo") {
+    return (
+      <div style={wrap}>
+        <div style={panel}>
+          <DemoForm onBack={() => setMode("signin")} onDone={afterOnboarding} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={wrap}>
@@ -47,7 +75,7 @@ export default function Login() {
 
         {err && (
           <div style={errBox}>
-            <Icons.AlertCircle size={14} style={{ flexShrink: 0 }} />
+            <Icons.AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
             {err}
           </div>
         )}
@@ -78,6 +106,15 @@ export default function Login() {
             {!busy && <Icons.ArrowRight size={15} strokeWidth={2.2} />}
           </button>
         </form>
+
+        <div style={ctaRow}>
+          <button style={ctaBtn} onClick={() => setMode("signup")}>
+            <Icons.Building2 size={14} /> Register your hospital
+          </button>
+          <button style={ctaBtn} onClick={() => setMode("demo")}>
+            <Icons.Sparkles size={14} /> Try free for 30 days
+          </button>
+        </div>
 
         <button style={hintToggle} onClick={() => setShowHint((v) => !v)}>
           {showHint ? "Hide" : "Show"} demo accounts
@@ -142,6 +179,12 @@ const signInBtn = {
   width: "100%", font: "inherit", fontSize: 13.5, fontWeight: 600, padding: "11px 14px",
   borderRadius: 9, cursor: "pointer", border: "none", background: "var(--accent)", color: "#fff",
   display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+};
+const ctaRow = { display: "flex", gap: 8, marginTop: 14, marginBottom: 4 };
+const ctaBtn = {
+  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+  fontSize: 12, fontWeight: 600, color: "var(--charcoal)", background: "var(--surface)",
+  border: "1px solid var(--border-strong)", borderRadius: 9, padding: "9px 0", cursor: "pointer", font: "inherit",
 };
 const hintToggle = {
   font: "inherit", fontSize: 11.5, fontWeight: 600, color: "var(--accent)",

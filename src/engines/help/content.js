@@ -1008,6 +1008,45 @@ export const ARTICLES = [
     ],
     related: ["beds-tiers", "pricing"],
   },
+  {
+    id: "onboarding", cat: "platform", icon: "Building2",
+    title: "Registering a hospital, and the free demo",
+    lead: "Sign-up is fail-safe: validation runs first, and either everything is created or nothing is.",
+    body: [
+      { p: "From the sign-in screen, a new hospital can register directly (\u201cRegister your hospital\u201d) or start a 30-day free demo (\u201cTry free for 30 days\u201d) without any commitment." },
+      { h: "What sign-up collects" },
+      { p: "Hospital name, address, email, phone, logo (optional \u2014 can be added later in Settings), registration number, and a contact person. All of it is validated before anything is written; if any required field fails validation, no tenant and no account are created \u2014 a genuine all-or-nothing step, not a partially-created record." },
+      { h: "Choosing a plan" },
+      { table: { head: ["Plan", "Cost", "Best for"], rows: [
+        ["Starter", "2.75% commission, no upfront cost", "Small hospitals & clinics, up to 49 beds"],
+        ["Growth", "2.25% commission, no upfront cost", "Medium hospitals, 50\u2013149 beds"],
+        ["Scale", "1.75% commission, no upfront cost", "Large hospitals, 150+ beds"],
+        ["Enterprise", "\\u20a64,500,000 per year, flat", "Hospitals that would rather pay a fixed price and keep 100% of collections"],
+      ] } },
+      { p: "Entering an approximate bed count suggests a tier, but any tier can be chosen regardless \\u2014 the suggestion is a starting point, not a restriction." },
+      { warn: "Enterprise signups are created with status \\u201cpending payment\\u201d \\u2014 there is no live payment gateway wired yet, so an AgoroX platform admin confirms payment manually from Platform \\u2192 Tenants before full access unlocks. Starter/Growth/Scale activate immediately since there is nothing to pay upfront." },
+      { h: "The 30-day demo" },
+      { p: "A much shorter form \\u2014 organisation name, your name, your email \\u2014 creates a fully working account immediately, with a hard 30-day expiry. Signing in after expiry is refused outright with a clear message; the account is not deleted, but it will not authenticate again until converted to a real plan." },
+      { note: "Demo data does not carry over into a full account afterward \\u2014 it exists to let someone evaluate the system, not to be a free extended trial of production use." },
+      { p: "Every signup and every demo appears immediately in Platform \\u2192 Tenants, visible only to the AgoroX platform admin, with its billing type, commission rate (or flat plan), and days remaining if it is a demo." },
+    ],
+    related: ["signing-in", "pricing", "settlement"],
+  },
+  {
+    id: "data-import", cat: "admin", icon: "UploadCloud",
+    title: "Importing patient data from an existing system",
+    lead: "A real, working CSV import \\u2014 with an honest limit on what happens to the data afterward.",
+    body: [
+      { p: "Administration \\u2192 Data import brings patient records in from a CSV export of an existing EMR or paper-register spreadsheet, in three steps: upload, map columns, review and import." },
+      { h: "Column mapping" },
+      { p: "Common header names \\u2014 Surname, First Name, Gender, DOB, Mobile, MRN, and similar variants \\u2014 are recognised and mapped automatically. Any column can be remapped by hand before proceeding, and nothing imports until every required field (first name, last name, sex, date of birth) is mapped to something." },
+      { h: "Validation before import, always" },
+      { p: "Every row is checked \\u2014 date formats (YYYY-MM-DD, DD/MM/YYYY, and MM/DD/YYYY are all recognised), a valid sex value, both name fields present \\u2014 and shown in a preview table before a single record is written. Rows that fail validation are shown with the specific reason and are not imported; they do not block the rows that did pass." },
+      { warn: "Is this ready for a real production migration? The mapping and validation logic is genuinely real and works today \\u2014 that is usually the hard part of a migration. What is not yet real is persistent storage on the receiving end: imported patients land in the same in-memory list every other patient in this preview build lives in, and reset when the page reloads, exactly like everything else in this build. A production migration wires this same mapper to Cloudflare D1 instead of the in-memory array \\u2014 the column-matching and validation rules do not change when the storage does." },
+      { p: "Each imported patient gets a real HospitalOS hospital number and appears immediately in Patient care \\u2192 Registration & ADT, indistinguishable from a patient registered directly in the app." },
+    ],
+    related: ["register-admit", "limitations"],
+  },
 ];
 
 export function articlesIn(cat) {

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { canAccessArea, canDo, roleLabel as rbacRoleLabel, areasFor } from "../lib/rbac";
 import { record, AUDIT_ACTIONS } from "../lib/audit";
+import { findAccount, demoAccountsPublicList } from "./accountsStore";
 
 // Auth context — email/password sign-in, session state, and (for the platform
 // admin) a Platform/Tenant view switch.
@@ -16,24 +17,12 @@ const AuthContext = createContext(null);
 // Platform admin — the only account that can see the platform view.
 const PLATFORM_ADMIN_EMAIL = "support@agorox.africa";
 
-// Account directory. Password is demo-only; real hashing happens server-side.
-const ACCOUNTS = [
-  { id: "u0", email: PLATFORM_ADMIN_EMAIL, password: "agorox", name: "AgoroX Support", role: "super-admin", platformAdmin: true },
-  { id: "u1", email: "a.ogun@hospitalos.ng", password: "demo", name: "Dr. Adewale Ogun", role: "super-admin" },
-  { id: "u2", email: "n.umeh@hospitalos.ng", password: "demo", name: "Dr. Ngozi Umeh", role: "doctor" },
-  { id: "u3", email: "b.ade@hospitalos.ng", password: "demo", name: "Sr. Blessing Ade", role: "nurse" },
-  { id: "u5", email: "t.bello@hospitalos.ng", password: "demo", name: "Tunde Bello", role: "pharmacist" },
-  { id: "u6", email: "a.nwosu@hospitalos.ng", password: "demo", name: "Amaka Nwosu", role: "cashier" },
-];
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [view, setView] = useState("tenant"); // "tenant" | "platform"
 
   const signIn = useCallback(async (email, password) => {
-    const found = ACCOUNTS.find(
-      (a) => a.email.toLowerCase() === String(email).trim().toLowerCase()
-    );
+    const found = findAccount(email);
     if (!found || found.password !== password) {
       record({
         actor: { email: String(email).trim().toLowerCase() || "unknown", name: "Unknown", role: "none" },
@@ -41,6 +30,15 @@ export function AuthProvider({ children }) {
         detail: "Failed sign-in attempt", severity: "warn",
       });
       throw new Error("Incorrect email or password.");
+    }
+    if (found.demoExpiresAt && new Date(found.demoExpiresAt) < new Date()) {
+      record({
+        actor: found, action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
+        detail: "Blocked sign-in — demo period expired", severity: "warn",
+      });
+      const err = new Error("Your 30-day demo has ended. Sign up for a full account to keep going — your data will not carry over from the demo.");
+      err.demoExpired = true;
+      throw err;
     }
     const { password: _pw, ...safe } = found;
     setUser(safe);
@@ -92,7 +90,7 @@ export function AuthProvider({ children }) {
       if (v === "platform" && !isPlatformAdmin) return;
       setView(v);
     },
-    demoAccounts: ACCOUNTS.map(({ password: _p, ...a }) => a),
+    demoAccounts: demoAccountsPublicList(),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

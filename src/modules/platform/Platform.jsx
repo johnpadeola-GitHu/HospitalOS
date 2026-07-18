@@ -4,6 +4,7 @@ import {
   PLAN_TONE, SERVICE_TONE, listTenants, setTenantStatus, platformSummary,
   listServices, listFlags, toggleFlag, listDeployments,
 } from "./platformService";
+import { daysRemaining } from "../../engines/onboarding";
 import { PageHeader, StatCard, Card, Pill, Button } from "../../lib/ui";
 import Settlement from "./Settlement";
 
@@ -95,7 +96,7 @@ export default function Platform() {
         <Card title="Tenants" pad={false}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr>{["Hospital", "Subdomain", "Plan", "Seats", "Active", "MRR", "Status", ""].map((h) => (
+              <tr>{["Hospital", "Plan", "Billing", "Seats", "Active", "MRR", "Status", ""].map((h) => (
                 <th key={h} style={{ ...th, textAlign: ["Seats", "Active", "MRR"].includes(h) ? "right" : "left" }}>{h}</th>
               ))}</tr>
             </thead>
@@ -104,18 +105,33 @@ export default function Platform() {
                 <tr key={t.id} style={{ borderTop: "1px solid var(--border)" }}>
                   <td style={{ ...td, fontWeight: 600, color: "var(--ink-strong)" }}>
                     {t.name}
-                    <div style={{ fontSize: 11, color: "var(--muted)", fontWeight: 400 }}>since {t.since} · seen {ago(t.lastSeen)}</div>
+                    <div style={{ fontSize: 11, color: "var(--muted)", fontWeight: 400 }}>
+                      {t.subdomain} &middot; since {t.since} &middot; seen {ago(t.lastSeen)}
+                    </div>
                   </td>
-                  <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--muted)" }}>{t.subdomain}</td>
                   <td style={td}><Pill tone={PLAN_TONE[t.plan]}>{t.plan}</Pill></td>
+                  <td style={{ ...td, fontSize: 12 }}>
+                    {t.billingType === "flat" ? (
+                      <span style={{ color: "var(--accent)", fontWeight: 600 }}>Flat annual</span>
+                    ) : (
+                      <span>{t.commissionPct}% commission</span>
+                    )}
+                    {t.demoExpiresAt && (
+                      <div style={{ fontSize: 10.5, color: daysRemaining(t.demoExpiresAt) <= 5 ? "var(--bad)" : "var(--muted)" }}>
+                        {daysRemaining(t.demoExpiresAt) > 0 ? `${daysRemaining(t.demoExpiresAt)}d left` : "Expired"}
+                      </div>
+                    )}
+                  </td>
                   <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)" }}>{t.seats}</td>
                   <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)" }}>{t.activeUsers}</td>
                   <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)" }}>{t.mrr ? naira(t.mrr) : "\u2014"}</td>
                   <td style={td}>
-                    <Pill tone={t.status === "active" ? "good" : t.status === "trial" ? "warn" : "bad"}>{t.status}</Pill>
+                    <Pill tone={STATUS_TONE[t.status] || "muted"}>{t.status}</Pill>
                   </td>
                   <td style={{ ...td, textAlign: "right" }}>
-                    <Button onClick={() => cycleTenant(t)}>Change</Button>
+                    <Button onClick={() => cycleTenant(t)}>
+                      {t.status === "pending-payment" ? "Confirm payment" : "Change"}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -179,6 +195,7 @@ export default function Platform() {
 }
 
 const tabs = { display: "flex", gap: 6, marginBottom: 16 };
+const STATUS_TONE = { active: "good", trial: "warn", demo: "info", "pending-payment": "warn", suspended: "bad" };
 const guideLink = {
   display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
   fontSize: 12, fontWeight: 600, color: "var(--charcoal-strong)",
