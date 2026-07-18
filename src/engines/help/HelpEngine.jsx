@@ -11,6 +11,7 @@ function Ico({ name, size = 16, color = "var(--muted)" }) {
 
 export default function Help() {
   const CATEGORIES = allCategories();
+  const totalArticles = allArticles().length;
   const { requestedId, clearRequest } = useHelp();
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState(null);
@@ -19,6 +20,7 @@ export default function Help() {
   const results = useMemo(() => searchArticles(query), [query]);
   const article = openId ? getArticle(openId) : null;
   const searching = query.trim().length > 0;
+  const isLanding = !article && !openCat && !searching;
 
   const open = (id) => { setOpenId(id); setQuery(""); };
 
@@ -30,25 +32,29 @@ export default function Help() {
 
   return (
     <div>
-      <PageHeader
-        group="Help"
-        title="Help &amp; documentation"
-        icon="BookOpen"
-        subtitle="How HospitalOS works, and why it works that way"
-      />
-
-      {/* Search */}
-      <div style={{ marginBottom: 18, maxWidth: 440 }}>
-        <div style={{ position: "relative" }}>
-          <Icons.Search size={15} style={{ position: "absolute", left: 12, top: 11, color: "var(--muted)" }} />
-          <input
-            style={{ ...inputStyle, paddingLeft: 34, paddingTop: 10, paddingBottom: 10 }}
-            placeholder="Search the documentation…"
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setOpenId(null); }}
+      {isLanding ? (
+        <HelpHero query={query} setQuery={setQuery} setOpenId={setOpenId} totalArticles={totalArticles} totalCategories={CATEGORIES.length} />
+      ) : (
+        <>
+          <PageHeader
+            group="Help"
+            title="Help &amp; documentation"
+            icon="BookOpen"
+            subtitle="How HospitalOS works, and why it works that way"
           />
-        </div>
-      </div>
+          <div style={{ marginBottom: 18, maxWidth: 440 }}>
+            <div style={{ position: "relative" }}>
+              <Icons.Search size={15} style={{ position: "absolute", left: 12, top: 11, color: "var(--muted)" }} />
+              <input
+                style={{ ...inputStyle, paddingLeft: 34, paddingTop: 10, paddingBottom: 10 }}
+                placeholder="Search the documentation…"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setOpenId(null); }}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Breadcrumb */}
       {(openId || openCat) && !searching && (
@@ -102,6 +108,33 @@ export default function Help() {
   );
 }
 
+// The LabOS-style hero: a dark banner with a centred headline, a live
+// article/category count, and the search box embedded directly in the
+// banner rather than sitting separately above the page. Only shown on the
+// true landing state — once searching, browsing a category, or reading an
+// article, the compact header takes over so the hero doesn't compete with
+// actual content.
+function HelpHero({ query, setQuery, setOpenId, totalArticles, totalCategories }) {
+  return (
+    <div style={hero}>
+      <div style={heroKicker}>Help &amp; documentation</div>
+      <h1 style={heroTitle}>How can we help?</h1>
+      <p style={heroSubtitle}>
+        Search across {totalArticles} articles in {totalCategories} categories, or browse by topic below.
+      </p>
+      <div style={heroSearchWrap}>
+        <Icons.Search size={16} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--muted)" }} />
+        <input
+          style={heroSearchInput}
+          placeholder="Search for articles, e.g. ‘releasing a lab result’"
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setOpenId(null); }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function Landing({ onCat, onOpen, CATEGORIES }) {
   return (
     <>
@@ -119,16 +152,15 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
         ))}
       </div>
 
-      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)", margin: "22px 0 10px" }}>
-        Browse by topic
-      </div>
+      <div style={sectionLabel}>Browse by category</div>
       <div style={catGrid}>
-        {CATEGORIES.map((c) => {
+        {CATEGORIES.map((c, i) => {
           const n = articlesIn(c.key).length;
+          const palette = CAT_COLORS[i % CAT_COLORS.length];
           return (
             <button key={c.key} style={catCard} onClick={() => onCat(c.key)}>
-              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                <div style={catIcon}><Ico name={c.icon} size={16} color="var(--charcoal)" /></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ ...catIcon, background: palette.bg }}><Ico name={c.icon} size={16} color={palette.fg} /></div>
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", flex: 1, textAlign: "left" }}>
                   {c.label}
                 </span>
@@ -306,7 +338,42 @@ function Block({ b }) {
 
 const crumb = { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted)", marginBottom: 14, flexWrap: "wrap" };
 const crumbLink = { font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--charcoal)", background: "none", border: "none", cursor: "pointer", padding: 0 };
-const heroRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 };
+
+// Hero banner — the LabOS-style "How can we help?" treatment: a dark
+// gradient using HospitalOS's own charcoal tokens (not LabOS's blue, to
+// stay on-brand) with the search box embedded directly in the banner.
+const hero = {
+  background: "linear-gradient(135deg, var(--charcoal-strong) 0%, var(--charcoal) 100%)",
+  borderRadius: 16, padding: "40px 32px 34px", textAlign: "center", marginBottom: 24,
+};
+const heroKicker = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 };
+const heroTitle = { fontSize: 30, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 10px" };
+const heroSubtitle = { fontSize: 13.5, color: "rgba(255,255,255,0.72)", maxWidth: 480, margin: "0 auto 22px", lineHeight: 1.6 };
+const heroSearchWrap = { position: "relative", maxWidth: 520, margin: "0 auto" };
+const heroSearchInput = {
+  width: "100%", boxSizing: "border-box", border: "none", borderRadius: 12,
+  padding: "13px 16px 13px 42px", fontSize: 13.5, font: "inherit", background: "#fff",
+  color: "var(--ink-strong)", boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+};
+
+// Distinct icon colours per category, rotated by index, matching the varied
+// palette in the reference design rather than every card using one colour.
+const CAT_COLORS = [
+  { bg: "#E8EFFB", fg: "#1E5AA8" }, // blue
+  { bg: "#EAF6EC", fg: "#1D7A4C" }, // green
+  { bg: "#F5EAFB", fg: "#7A3EC2" }, // purple
+  { bg: "#FDEFE3", fg: "#B0651F" }, // orange
+  { bg: "#FBEAEE", fg: "#B0281F" }, // red
+  { bg: "#E7F6F7", fg: "#0F7A85" }, // teal
+  { bg: "#F6F0E3", fg: "#8A6A1F" }, // amber
+  { bg: "#EFEAFB", fg: "#5546C4" }, // indigo
+  { bg: "#FBEAF3", fg: "#B02472" }, // pink
+  { bg: "#EAF2EF", fg: "#2C7A63" }, // sage
+  { bg: "#F0EEEA", fg: "#5A6472" }, // slate
+];
+
+const sectionLabel = { fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "4px 0 12px" };
+const heroRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 24 };
 const guideBanner = {
   display: "flex", alignItems: "center", gap: 12, marginTop: 18,
   background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: "var(--radius)",

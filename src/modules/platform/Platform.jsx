@@ -7,6 +7,7 @@ import {
 import { daysRemaining } from "../../engines/onboarding";
 import { PageHeader, StatCard, Card, Pill, Button } from "../../lib/ui";
 import Settlement from "./Settlement";
+import ActivationCodes from "./ActivationCodes";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 const ago = (iso) => {
@@ -73,12 +74,13 @@ export default function Platform() {
       />
 
       <div style={tabs}>
-        {[["overview", "Overview"], ["settlement", "Settlement & usage"]].map(([id, label]) => (
+        {[["overview", "Overview"], ["settlement", "Settlement & usage"], ["codes", "Activation codes"]].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ ...tabBtn, ...(tab === id ? tabActive : null) }}>{label}</button>
         ))}
       </div>
 
       {tab === "settlement" && <Settlement />}
+      {tab === "codes" && <ActivationCodes />}
 
       {tab === "overview" && <>
       {err && <div style={errBanner}>{err}</div>}

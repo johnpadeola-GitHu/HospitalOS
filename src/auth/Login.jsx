@@ -2,7 +2,8 @@ import { useState } from "react";
 import * as Icons from "lucide-react";
 import { useAuth } from "./AuthContext";
 import { inputStyle } from "../lib/ui";
-import { SignUpForm, DemoForm } from "./SignUp";
+import { DemoForm } from "./SignUp";
+import OnboardingWizard from "./OnboardingWizard";
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -34,7 +35,7 @@ export default function Login() {
     return (
       <div style={wrap}>
         <div style={panel}>
-          <SignUpForm onBack={() => setMode("signin")} onDone={afterOnboarding} />
+          <OnboardingWizard onBack={() => setMode("signin")} onDone={afterOnboarding} />
         </div>
       </div>
     );
@@ -108,7 +109,7 @@ export default function Login() {
 
         <div style={ctaRow}>
           <button style={ctaBtn} onClick={() => setMode("signup")}>
-            <Icons.Building2 size={14} /> Register your hospital
+            <Icons.KeyRound size={14} /> Have an activation code?
           </button>
           <button style={ctaBtn} onClick={() => setMode("demo")}>
             <Icons.Sparkles size={14} /> Try free for 7 days

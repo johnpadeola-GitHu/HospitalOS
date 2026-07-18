@@ -66,67 +66,6 @@ export function suggestTier(bedCount) {
 export function getTier(key) {
   return ALL_TIERS.find((t) => t.key === key) || null;
 }
-
-function validateHospitalDetails({ hospitalName, address, email, phone, registrationNumber }) {
-  if (!hospitalName || !hospitalName.trim()) throw new Error("Enter the hospital's name.");
-  if (!address || !address.trim()) throw new Error("Enter the hospital's address.");
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error("Enter a valid email address.");
-  if (!phone || !phone.trim()) throw new Error("Enter a phone number.");
-  if (!registrationNumber || !registrationNumber.trim()) throw new Error("Enter the hospital's registration number (e.g. CAC or state ministry of health number).");
-  if (emailTaken(email)) throw new Error("An account with this email already exists. Sign in instead, or use a different email.");
-}
-
-/**
- * Full hospital signup. Creates a tenant (visible to the platform admin
- * immediately) and a real sign-in account for the hospital's own
- * administrator, in one step — the fail-safe part: either both are created,
- * or neither is (validation runs before anything is written).
- */
-export async function registerHospital({
-  hospitalName, address, email, phone, logoUrl, registrationNumber,
-  contactPersonName, bedCount, tierKey, actor,
-}) {
-  await delay();
-  validateHospitalDetails({ hospitalName, address, email, phone, registrationNumber });
-  if (!contactPersonName || !contactPersonName.trim()) throw new Error("Enter the name of the person we should contact.");
-  const tier = getTier(tierKey);
-  if (!tier) throw new Error("Choose a plan.");
-
-  const isEnterprise = tier.key === "enterprise";
-  const billingType = isEnterprise ? "flat" : "commission";
-  const status = isEnterprise ? "pending-payment" : "active";
-
-  const tenant = await addTenant({
-    name: hospitalName.trim(),
-    plan: tier.label,
-    billingType,
-    commissionPct: isEnterprise ? null : tier.commissionPct,
-    status,
-    address: address.trim(), phone: phone.trim(), email: email.trim().toLowerCase(),
-    logoUrl: logoUrl || "", registrationNumber: registrationNumber.trim(),
-    seats: bedCount ? Math.max(10, Math.round(parseInt(bedCount, 10) * 1.5)) : 20,
-    demoExpiresAt: null,
-  });
-
-  const account = addAccount({
-    email: email.trim().toLowerCase(), password: generateTempPassword(),
-    name: contactPersonName.trim(), role: "super-admin", tenantId: tenant.id,
-  });
-
-  record({
-    actor: actor || account, action: AUDIT_ACTIONS.CREATE, entity: "tenant-signup", entityId: tenant.id,
-    detail: `${hospitalName.trim()} signed up \u2014 ${tier.label}${isEnterprise ? " (pending payment)" : ` (${tier.commissionPct}% commission)`}`,
-    severity: "info",
-  });
-
-  return { tenant, account, tier, requiresPayment: isEnterprise };
-}
-
-/**
- * Start a 7-day demo. Deliberately lighter than a full signup — no
- * registration number, no tier choice, no billing commitment — because the
- * entire point is letting someone kick the tyres before deciding anything.
- */
 export async function startDemo({ hospitalName, contactName, contactEmail, actor }) {
   await delay();
   if (!hospitalName || !hospitalName.trim()) throw new Error("Enter the hospital or organisation's name.");
