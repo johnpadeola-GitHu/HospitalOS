@@ -784,3 +784,26 @@ centred, version/copyright on the right, stacking cleanly under 900px.
 | Activation-code + demo flow regression | Both verified still working after all layout changes |
 
 Total: 78 routes, 67 help articles, 38 lint warnings (0 errors).
+
+## This round — restored the app's original light colour scheme
+
+Reverted the Help & documentation hero banner from a dark charcoal
+gradient (white text, drop-shadowed search bar) back to a light theme
+consistent with every other surface in HospitalOS — white/light card
+background, `var(--ink-strong)` heading, `var(--muted)` subtitle, bordered
+search input. This was the actual off-brand element from mirroring LabOS's
+dark-hero pattern: HospitalOS's design language everywhere else is light
+and clean, and a single large dark surface stood out as inconsistent.
+
+Kept everything structural from that round — live article/category
+counts, the embedded search, the category grid, the "Browse by category"
+label — only the colour treatment changed.
+
+Audited the rest of the app for similar issues: confirmed the footer's red
+cross mark is correct (matches the established favicon/PDF letterhead
+brand colour, not a regression), and confirmed every other gradient/dark
+element in the codebase (login background, avatar badges, sidebar brand
+mark) is a small, pre-existing, appropriately-scoped decorative element,
+not a large-surface colour deviation like the hero banner was.
+
+Total: 78 routes, 38 lint warnings (0 errors), clean build.
