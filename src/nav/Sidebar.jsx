@@ -14,7 +14,7 @@ function groupContainsPath(group, pathname) {
   return group.items.some((it) => it.path === pathname);
 }
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onNavigate }) {
   const { pathname } = useLocation();
   const { can } = useAuth();
   const [alerts, setAlerts] = useState(0);
@@ -42,7 +42,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside style={S.aside} className="no-print">
+    <aside style={S.aside} className={`no-print app-sidebar${isOpen ? " is-open" : ""}`}>
       <div style={S.brand}>
         <div style={S.brandMark}>
           <Icons.Cross size={16} strokeWidth={2.5} color="#fff" />
@@ -89,6 +89,7 @@ export default function Sidebar() {
                         key={it.id}
                         to={it.path}
                         end={it.path === "/"}
+                        onClick={onNavigate}
                         style={({ isActive }) => ({ ...S.item, ...(isActive ? S.itemActive : null) })}
                       >
                         {({ isActive }) => (
@@ -119,6 +120,7 @@ export default function Sidebar() {
       <div style={S.pinnedFooter}>
         <NavLink
           to="/help"
+          onClick={onNavigate}
           style={({ isActive }) => ({ ...S.pinnedLink, ...(isActive ? S.pinnedLinkActive : null) })}
         >
           <Icon name="BookOpen" size={15} style={{ color: "var(--accent)", flexShrink: 0 }} />

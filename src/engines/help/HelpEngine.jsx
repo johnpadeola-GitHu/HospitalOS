@@ -154,13 +154,12 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
 
       <div style={sectionLabel}>Browse by category</div>
       <div style={catGrid}>
-        {CATEGORIES.map((c, i) => {
+        {CATEGORIES.map((c) => {
           const n = articlesIn(c.key).length;
-          const palette = CAT_COLORS[i % CAT_COLORS.length];
           return (
             <button key={c.key} style={catCard} onClick={() => onCat(c.key)}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ ...catIcon, background: palette.bg }}><Ico name={c.icon} size={16} color={palette.fg} /></div>
+                <div style={catIcon}><Ico name={c.icon} size={16} color="var(--charcoal)" /></div>
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", flex: 1, textAlign: "left" }}>
                   {c.label}
                 </span>
@@ -355,22 +354,6 @@ const heroSearchInput = {
   padding: "13px 16px 13px 42px", fontSize: 13.5, font: "inherit", background: "#fff",
   color: "var(--ink-strong)", boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
 };
-
-// Distinct icon colours per category, rotated by index, matching the varied
-// palette in the reference design rather than every card using one colour.
-const CAT_COLORS = [
-  { bg: "#E8EFFB", fg: "#1E5AA8" }, // blue
-  { bg: "#EAF6EC", fg: "#1D7A4C" }, // green
-  { bg: "#F5EAFB", fg: "#7A3EC2" }, // purple
-  { bg: "#FDEFE3", fg: "#B0651F" }, // orange
-  { bg: "#FBEAEE", fg: "#B0281F" }, // red
-  { bg: "#E7F6F7", fg: "#0F7A85" }, // teal
-  { bg: "#F6F0E3", fg: "#8A6A1F" }, // amber
-  { bg: "#EFEAFB", fg: "#5546C4" }, // indigo
-  { bg: "#FBEAF3", fg: "#B02472" }, // pink
-  { bg: "#EAF2EF", fg: "#2C7A63" }, // sage
-  { bg: "#F0EEEA", fg: "#5A6472" }, // slate
-];
 
 const sectionLabel = { fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "4px 0 12px" };
 const heroRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 24 };

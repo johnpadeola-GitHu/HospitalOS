@@ -214,7 +214,7 @@ const clearBanner = {
   borderRadius: 10,
   marginBottom: 14,
 };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
 const th = {
   textAlign: "left",
   fontSize: 11,

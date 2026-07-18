@@ -92,12 +92,12 @@ export default function GlobalSearch() {
   return (
     <>
       {/* Trigger — a real button, not a decorative div */}
-      <button style={trigger} onClick={() => setOpen(true)} aria-label="Search">
+      <button style={trigger} className="app-search-trigger" onClick={() => setOpen(true)} aria-label="Search">
         <Icons.Search size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
-        <span style={{ fontSize: 12.5, color: "var(--muted)", flex: 1, textAlign: "left" }}>
+        <span className="app-search-label" style={{ fontSize: 12.5, color: "var(--muted)", flex: 1, textAlign: "left" }}>
           Search patients, screens, help…
         </span>
-        <kbd style={kbd}>Ctrl K</kbd>
+        <kbd className="app-search-label" style={kbd}>Ctrl K</kbd>
       </button>
 
       {open && (
@@ -202,7 +202,7 @@ const kbdInline = { fontFamily: "var(--font-mono)", color: "var(--charcoal)" };
 const overlay = {
   position: "fixed", inset: 0, background: "rgba(22,35,59,0.32)",
   display: "flex", alignItems: "flex-start", justifyContent: "center",
-  paddingTop: "12vh", zIndex: 100, backdropFilter: "blur(2px)",
+  padding: "12vh 16px 16px", zIndex: 100, backdropFilter: "blur(2px)",
 };
 const palette = {
   width: "100%", maxWidth: 560, background: "var(--surface-2)",

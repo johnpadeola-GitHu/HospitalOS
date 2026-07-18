@@ -151,7 +151,7 @@ export function Modal({ title, onClose, children, footer }) {
           <h2 style={{ fontSize: 15.5, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.015em" }}>{title}</h2>
           <button onClick={onClose} style={closeBtn} aria-label="Close"><Icons.X size={15} strokeWidth={2.4} /></button>
         </div>
-        <div style={{ padding: "18px 20px" }}>{children}</div>
+        <div style={sheetBody}>{children}</div>
         {footer && <div style={sheetFoot}>{footer}</div>}
       </div>
     </div>
@@ -191,17 +191,18 @@ const overlay = {
   padding: 20, zIndex: 50, backdropFilter: "blur(2px)",
 };
 const sheet = {
-  width: "100%", maxWidth: 460, background: "var(--surface-2)",
+  width: "100%", maxWidth: 460, maxHeight: "88vh", background: "var(--surface-2)",
   borderRadius: 14, border: "1px solid var(--border)", overflow: "hidden",
-  boxShadow: "0 12px 40px rgba(22,35,59,0.18)",
+  boxShadow: "0 12px 40px rgba(22,35,59,0.18)", display: "flex", flexDirection: "column",
 };
+const sheetBody = { padding: "18px 20px", overflowY: "auto", flex: "1 1 auto", WebkitOverflowScrolling: "touch" };
 const sheetHead = {
   display: "flex", alignItems: "center", justifyContent: "space-between",
-  padding: "14px 20px", borderBottom: "1px solid var(--border)",
+  padding: "14px 20px", borderBottom: "1px solid var(--border)", flexShrink: 0,
 };
 const sheetFoot = {
   display: "flex", justifyContent: "flex-end", gap: 8,
-  padding: "13px 20px", borderTop: "1px solid var(--border)", background: "var(--surface)",
+  padding: "13px 20px", borderTop: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0,
 };
 const closeBtn = {
   background: "var(--bad)", border: "none", cursor: "pointer",

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import * as Icons from "lucide-react";
 import Sidebar from "../nav/Sidebar";
@@ -18,17 +19,32 @@ function useCrumb() {
 }
 export default function AppLayout() {
   const crumb = useCrumb();
+  const { pathname } = useLocation();
   const { user, roleLabel, signOut, isPlatformAdmin, view, setView } = useAuth();
   const initials = user.name.split(" ").map((p) => p[0]).slice(-2).join("");
   const platformMode = view === "platform";
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // A tap on any nav link, or a route change from anywhere else, closes the
+  // mobile drawer automatically — no one wants to navigate and then have to
+  // separately dismiss the menu that got them there.
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      {!platformMode && <Sidebar />}
+      {!platformMode && <Sidebar isOpen={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />}
+      {!platformMode && sidebarOpen && (
+        <div className="app-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <header style={topbar} className="no-print">
+        <header style={topbar} className="no-print app-topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+            {!platformMode && (
+              <button className="app-hamburger" style={hamburgerBtn} onClick={() => setSidebarOpen((v) => !v)} aria-label="Open menu">
+                <Icons.Menu size={19} />
+              </button>
+            )}
             {platformMode ? (
               <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={platformMark}><Icons.ShieldCheck size={15} color="#fff" strokeWidth={2.2} /></div>
@@ -37,7 +53,7 @@ export default function AppLayout() {
             ) : (
               <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <TenantBrand />
-                <span style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <span className="app-topbar-crumb" style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {crumb.group ? <>&rsaquo; {crumb.group}</> : null} &rsaquo;{" "}
                   <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
                 </span>
@@ -86,25 +102,21 @@ export default function AppLayout() {
         <DemoBanner />
 
         <main style={main}>
-          <div style={container}>{platformMode ? <Platform /> : <Outlet />}</div>
+          <div style={container} className="app-content-container">{platformMode ? <Platform /> : <Outlet />}</div>
           <footer style={footer} className="no-print">
-            <div style={footerInner}>
-              <div>
-                Powered by <b style={{ color: "var(--charcoal)" }}>HospitalOS</b>
-                <span style={dotSep}>·</span>
-                <b style={{ color: "var(--charcoal)" }}>AgoroX Africa</b>
-                <span style={dotSep}>·</span>v1.0.0
-                <span style={dotSep}>·</span>&copy; 2026. All Rights Reserved.
+            <div style={footerInner} className="app-footer-inner">
+              <div style={footerBrandRow}>
+                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#fff" /></div>
+                <span style={footerBrand}>HospitalOS</span>
+                <span style={footerBy}>by AgoroX Africa</span>
               </div>
-              <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>
+              <nav style={footerLinks}>
                 <a href="#" style={footLink}>Privacy Policy</a>
-                <span style={dotSep}>·</span>
                 <a href="#" style={footLink}>EULA</a>
-                <span style={dotSep}>·</span>
                 <a href="#" style={footLink}>IP Policy</a>
-                <span style={dotSep}>·</span>
                 <a href="#" style={footLink}>Contact Support</a>
-              </div>
+              </nav>
+              <div style={footerMeta}>v1.0.0 &nbsp;&middot;&nbsp; &copy; 2026 AgoroX Africa. All rights reserved.</div>
             </div>
           </footer>
         </main>
@@ -118,13 +130,26 @@ const topbar = {
   justifyContent: "space-between", gap: 16, padding: "0 24px",
   background: "var(--surface-2)", borderBottom: "1px solid var(--border)",
 };
+const hamburgerBtn = {
+  display: "none", alignItems: "center", justifyContent: "center",
+  width: 34, height: 34, borderRadius: 8, border: "1px solid var(--border-strong)",
+  background: "var(--surface)", color: "var(--charcoal-strong)", cursor: "pointer", flexShrink: 0,
+};
 // Generous padding on all four sides, with a max width so content breathes.
 const main = { flex: 1, overflowY: "auto", background: "var(--bg)", padding: "28px 32px 0", display: "flex", flexDirection: "column" };
 const container = { maxWidth: 1320, margin: "0 auto", width: "100%", flex: 1, paddingBottom: 36 };
-const footer = { maxWidth: 1320, margin: "0 auto", width: "100%", borderTop: "1px solid var(--border)", padding: "16px 0 22px" };
-const footerInner = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)" };
-const footLink = { color: "var(--muted)", fontWeight: 500 };
-const dotSep = { margin: "0 7px", color: "var(--border-strong)" };
+const footer = { maxWidth: 1320, margin: "0 auto", width: "100%", borderTop: "1px solid var(--border)", padding: "18px 0 22px" };
+const footerInner = {
+  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+  flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)",
+};
+const footerBrandRow = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
+const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "var(--bad)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const footerBrand = { fontSize: 12.5, fontWeight: 700, color: "var(--charcoal-strong)" };
+const footerBy = { fontSize: 11, color: "var(--muted)" };
+const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
+const footLink = { color: "var(--muted)", fontWeight: 500, whiteSpace: "nowrap" };
+const footerMeta = { fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap", flexShrink: 0 };
 const searchBox = {
   display: "flex", alignItems: "center", gap: 8, flex: "0 1 380px",
   background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 10px",

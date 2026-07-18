@@ -504,3 +504,283 @@ housekeeping pass.
 
 Total: 67 routes, 42 help articles, three PDF guides, three printable
 letterhead document types.
+
+## This round — ten new departments
+
+Answering directly: Private Suite existed only as a billing tier (fixed);
+Geriatrics existed only as an outpatient clinic tag (fixed); Nutrition &
+Dietetics was genuinely absent (built). Full sweep of everything else
+checked against a UCH-Ibadan-scale department list turned up seven more
+real gaps — all ten built this round, all tested end-to-end.
+
+**New nav group: Specialty services** (src/nav/navGroups.js) — added to
+AREAS in rbac.js and granted to doctor and nurse roles (verified: pharmacist
+correctly cannot see it). Houses:
+- **Nutrition & dietetics** — referral-driven from Renal/Oncology/ICU/
+  Geriatrics, BMI auto-calculated, therapeutic diet types including renal-
+  restricted and enteral/parenteral.
+- **Sickle cell centre** — genotype registry, crisis log across 6 crisis
+  types, hydroxyurea and transfusion-programme tracking. A severe active
+  crisis is a new critical alert source — verified end-to-end.
+- **Dental & oral health** — clinic queue + procedure log, 8 priced
+  procedures.
+- **Infection Prevention & Control** — distinct from Public Health's
+  community disease surveillance: hospital-acquired infection cases and
+  isolation precautions. Outbreak threshold (3+ same-type open cases)
+  verified to trigger correctly and raises a critical alert.
+- **Medical social services** — discharge planning and indigent patient
+  support case tracking.
+- **Occupational health** — staff (not patient) fitness-to-work and
+  workplace injury log.
+- **Chaplaincy & pastoral care** — visit request queue.
+
+**Three additions to Patient care:**
+- **Geriatric unit** — a real admitting ward with a Comprehensive
+  Geriatric Assessment (falls risk score, medication count, cognitive
+  screen, frailty level) on admission, distinct from the Geriatrics
+  outpatient clinic tag. High falls risk or polypharmacy (5+ meds) is a
+  new alert source — verified.
+- **Mental health unit** — a real psychiatric ward with admission status
+  (voluntary/involuntary), a changeable observation level, and toggleable
+  risk flags, distinct from the Psychiatry outpatient clinic tag. Constant
+  observation or any risk flag is a new critical alert source — verified.
+- **VIP services** — the actual care differentiation Private/VIP/
+  Executive Suite patients get beyond the room: consultant of choice,
+  concierge contact, dietary preference, and a real privacy flag.
+
+Alert sources: 14 → 18. One genuine bug caught and fixed during
+integration: a naming collision (`alertFromOutbreak`) with the existing
+Public Health outbreak mapper, resolved by renaming the new IPC-specific
+one — caught by the build failing, not silently.
+
+Housekeeping: found and fixed the same "dead top-level error banner"
+pattern from last round's Renal.jsx fix, this time in SocialWork.jsx and
+Geriatric.jsx — wired both `refresh()` calls to actually populate the
+error state on failure instead of leaving it permanently empty.
+
+**Help & documentation updated per-instruction:** 54 → 64 articles, all 10
+new modules covered, plus corrected two facts that had drifted out of date
+— the alerts article's source table (was showing 11, actually 18) and the
+orientation article's sidebar group count (was ten, now eleven).
+
+Total: 77 routes, 64 help articles, 18 alert sources, 0 lint errors.
+
+## This round — onboarding, demo, and data migration
+
+**1. Fail-safe onboarding** (src/engines/onboarding/) — a new engine, same
+pattern as Help/Pricing/FHIR/Results. Sign-up and demo start are both
+all-or-nothing: full validation runs before a single record is written, so
+a failed signup leaves no orphaned tenant or account behind — verified
+directly (a rejected signup leaves the tenant count unchanged).
+
+**Renamed the three free tiers**: Starter (2.75% commission, <50 beds),
+Growth (2.25%, 50–149 beds), Scale (1.75%, 150+ beds) — lower commission
+for larger volume is the standard SaaS curve and reads immediately.
+Enterprise is the flat \u20a64,500,000/year tier, created as
+status "pending-payment" since no live payment gateway exists yet — a
+platform admin confirms it manually from Platform → Tenants, reusing the
+existing tenant-status-cycle action rather than a new one.
+
+**The 30-day demo is a real, enforced expiry**, not decorative: verified
+that signing in with an expired demo account is refused outright with a
+clear message, while a non-expired demo signs in normally. A demo banner
+shows days remaining once signed in.
+
+**Refactored account storage** (src/auth/accountsStore.js) out of
+AuthContext into its own module so the onboarding engine can create real,
+sign-in-capable accounts — the same "plain module, mutated by whoever
+needs to" pattern as every other engine.
+
+Every signup and demo appears immediately in Platform → Tenants (billing
+type, commission rate or flat plan, days remaining if a demo), visible only
+to the platform admin, exactly as asked.
+
+**2. Data import** (src/modules/data-import/) — a genuine, tested answer
+to "can we migrate in": CSV upload → auto-mapped columns (recognises
+Surname/First Name/Gender/DOB/Mobile/MRN and common variants) → validation
+preview → import. Verified against a deliberately messy test file: mixed
+date formats (YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY) all normalised correctly,
+and bad rows (missing name, unrecognised sex/date) were correctly flagged
+and excluded — only the valid rows were written, and the patient list grew
+by exactly that count, not more.
+
+Honest answer stated directly in the app: the mapping/validation logic is
+real and works today — usually the hard part of a migration. What is not
+yet real is persistent storage on the receiving end; imported patients live
+in the same in-memory list as everything else in this preview build and
+reset on reload. Production migration wires the same mapper to D1 instead;
+nothing about the column-matching or validation changes.
+
+Total: 78 routes, 66 help articles, 39 lint warnings (0 errors).
+
+## This round — topbar cleanup, branding rename, demo hardening
+
+**1. Topbar de-cluttered.** There were genuinely three separate, partly
+inconsistent hospital-identity labels: the sidebar showed a hardcoded
+"Ibadan Teaching Hospital" subtitle that never changed regardless of which
+tenant was actually signed in; the topbar breadcrumb repeated "HospitalOS"
+as a prefix; and a separate TenantBrand badge on the far right duplicated
+the tenant name a third time. Collapsed into one unified element on the
+topbar's left: **[logo] HospitalOS (Tenant Name)**, reading live from
+Administration → Settings, followed by the breadcrumb path. Sidebar brand
+block now just shows "HospitalOS" — no more hardcoded, wrong tenant name.
+Default seed hospital name corrected from the generic "HospitalOS Teaching
+Hospital" to "Ibadan Teaching Hospital", matching the actual reference
+tenant. Footer now reads "Powered by HospitalOS · AgoroX Africa".
+
+**Company renamed AgoroX Technologies → AgoroX Africa**, globally —
+source code (settlement bank account name, footer), and all three PDF
+guides regenerated and verified to contain zero remaining old-name
+references.
+
+**2. Demo hardened, not just shortened.**
+- Duration: 30 days → 7 days, everywhere — the engine constant, every
+  screen's copy, the expiry error message, the help article. Swept and
+  verified none were missed.
+- The static "AgoroX Demo" seeded tenant removed — redundant now that
+  anyone can self-serve a real demo through the sign-in screen.
+- **Removed the "Show demo accounts" hint list from the public sign-in
+  screen.** This is the more consequential fix: that list auto-filled the
+  platform admin's password with one click, directly on the public login
+  page — a real problem now that the platform password is being
+  hardened. Removed entirely, along with its now-dead styles.
+- **Platform admin password changed** from "agorox" to a strong password,
+  verified character-for-character including the literal trailing quote in
+  the requested password. Old password confirmed no longer works. Account
+  flagged `license: "perpetual"` — explicit now, not just implied by the
+  absence of an expiry field.
+
+**Found and fixed a real, separate bug while in the help content**: 27
+instances across several past rounds' insertions had double-escaped
+unicode (`\\u2014` instead of `\u2014`), meaning users would have seen the
+literal text "\u2014" instead of an em-dash, and similar for curly quotes.
+Verified fixed — real em-dash characters now render, not escape-sequence
+text.
+
+Total: 78 routes, 66 help articles, 39 lint warnings (0 errors).
+
+## This round — invite-only registration (LabOS pattern, adapted to Cloudflare)
+
+**Architectural note stated plainly**: HospitalOS runs on Cloudflare Pages
+with no backend yet, not Supabase. What was built is the same PATTERN
+LabOS uses — activation-code gating, atomic redemption, an 8-step wizard
+— adapted to HospitalOS's actual in-memory architecture rather than
+faking a Supabase connection that doesn't exist here. Every field in the
+activation-codes schema maps 1:1 onto what a future Postgres/D1 table would
+hold, documented directly in the code.
+
+**src/engines/onboarding/activationCodes.js** — the schema (code, status,
+tenant_name, plan_tier, issued_by/at, redeemed_at/by, expires_at), plus
+generate/validate/redeem/revoke. "Expired" is computed live from
+expires_at, never stored, so it can't drift out of sync with a stored flag.
+
+**Atomicity, actually verified, not just claimed**: fired two genuinely
+concurrent redemption attempts at the same code via `Promise.allSettled` —
+exactly one succeeded, one failed with "already been used," zero
+double-provisioning. Also verified the failure path is correct: a bad
+password during redemption does NOT burn the code — validation (code
+validity, admin name/email/password) all happens inside the same
+non-yielding critical section as the redeemed-marking, so nothing gets
+consumed on a failed attempt.
+
+**8-step wizard** (src/auth/OnboardingWizard.jsx): activation code →
+hospital identity → admin account → facility details (beds, centres,
+departments) → staff roles → branding → plan confirmation (read-only,
+set by the code) → review & confirm. State persists to localStorage on
+every change under a per-session key — a refresh mid-wizard resumes
+exactly where you left off, with a visible "Resumed — start over instead"
+notice rather than silently vanishing progress. Nothing touches the
+tenant/account stores until Step 8's submit.
+
+**Removed the old self-serve registration entirely** — not just hid it.
+`registerHospital()` and `SignUpForm` are deleted, not dead code sitting
+next to the new flow; the only way to a full account is now genuinely an
+activation code. The 7-day demo stays self-serve, since it was never real
+tenant registration to begin with.
+
+**Platform → Activation codes** (new third tab, src/modules/platform/ActivationCodes.jsx)
+— generate a code (tenant name, plan tier, optional expiry), see every
+code's status (unredeemed/redeemed/revoked/expired) and who issued it, and
+revoke any unredeemed code.
+
+Total: 78 routes, 67 help articles, 39 lint warnings (0 errors).
+
+## This round — Help & Documentation mirrors the LabOS landing page
+
+Rebuilt the Help & documentation landing page (src/engines/help/HelpEngine.jsx)
+to match the LabOS "How can we help?" hero-banner pattern shown in the
+reference screenshot, adapted to HospitalOS's own charcoal brand palette
+rather than copying LabOS's blue:
+
+- **Dark gradient hero banner** with a centred "How can we help?" headline
+  and a subtitle showing **live, computed counts** — "Search across 67
+  articles in 11 categories" — not hardcoded numbers that would drift out
+  of date as articles get added.
+- **Search box embedded directly in the hero**, not a separate element
+  above the page — verified the counts pull from the same registry every
+  other part of the engine already uses.
+- **"Browse by category"** section label, then a 2-column grid where each
+  category gets a **distinct icon colour** from an 11-colour rotating
+  palette (blue, green, purple, orange, red, teal, amber, indigo, pink,
+  sage, slate) instead of every card using the same charcoal icon —
+  matching the varied, colour-coded look in the reference design.
+- The hero only appears on the true landing state; searching, browsing a
+  category, or reading an article switches to the existing compact header
+  so the banner doesn't compete with actual content — the same
+  hero-only-on-home pattern real help centres use.
+- Kept the existing "New here? / What can I do? / Before you rely on it"
+  quick-start tiles and the Tenant Guide download banner, both genuinely
+  useful content that predates this round.
+
+Total: 78 routes, 67 help articles across 11 categories, 38 lint warnings
+(0 errors).
+
+## This round — icon cleanup, footer, responsive optimization, comprehensive audit
+
+**1. Reverted the rainbow category icons** in Help & documentation — back
+to one consistent neutral treatment, matching the rest of the app's
+restrained visual language instead of a colour-per-category palette that
+read as unprofessional.
+
+**2. Footer redesigned** — replaced a cramped, dot-separated single line
+with a clear three-zone layout: brand mark + name on the left, policy links
+centred, version/copyright on the right, stacking cleanly under 900px.
+
+**3. Responsive optimisation — iOS, Android, tablets, desktop:**
+- Sidebar is now a genuine off-canvas drawer below 900px, with a hamburger
+  toggle, backdrop, and auto-close on navigation — previously a fixed
+  250px sidebar would have eaten most of a phone screen.
+- iOS safe-area insets added for notches and home indicators; input font
+  size forced to 16px on mobile to prevent Safari's auto-zoom-on-focus.
+- Topbar breadcrumb text and the global search label collapse on mobile so
+  the tight header space doesn't overflow.
+- **Modal component fixed** — a real, universal bug: modals had no
+  max-height or scroll handling, so a tall form on a short mobile viewport
+  (keyboard open) could have been cut off with the submit button
+  unreachable. Fixed once, in the shared component, so it applies across
+  all ~78 screens simultaneously rather than needing 78 individual fixes.
+- **Tables fixed globally, not per-screen**: found that 40+ screens use raw
+  `<table>` elements with no horizontal-scroll protection for narrow
+  viewports. Rather than hand-fix 40+ files, added one global CSS rule
+  making every table a horizontally-scrollable block below 900px.
+- **Found and fixed a more serious variant of the same bug**: 26 screens
+  share an identical `tableWrap` container using `overflow: hidden` —
+  which wouldn't just fail to scroll, it would silently **clip data**
+  invisibly off-screen with no indication anything was missing. Bulk-fixed
+  all 26 (23 single-line + 3 multi-line-formatted variants) to
+  `overflow: auto`, verified none remain across every table-using screen.
+
+**4. Comprehensive audit — results:**
+| Check | Result |
+|---|---|
+| Full build | Clean |
+| Lint | 38 warnings, 0 errors |
+| Nav ↔ route consistency | Perfect match, both directions |
+| RBAC areas ↔ nav groups | Perfect match |
+| RBAC role area references | All 8 roles reference valid areas |
+| Help content integrity | 67 articles, 0 orphans, 0 broken links, 0 empty categories |
+| Alert source count vs. docs | Article's 18-row table matches the 18 real alert mapper functions exactly |
+| Double-escaped unicode regression | None found (past bug stayed fixed) |
+| Activation-code + demo flow regression | Both verified still working after all layout changes |
+
+Total: 78 routes, 67 help articles, 38 lint warnings (0 errors).
