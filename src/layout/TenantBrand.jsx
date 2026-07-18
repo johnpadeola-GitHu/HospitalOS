@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { getSettings } from "../modules/system/sysAdminService";
 
-// Tenant branding — each hospital's own logo and name, distinct from the
-// HospitalOS/AgoroX product branding in the sidebar. Reads live from
-// Administration -> Settings, so a tenant admin changing it updates every
-// screen immediately, with no rebuild.
+// The single, unified brand element for the topbar: this tenant's own logo,
+// plus "HospitalOS (Tenant Name)" \u2014 product and tenant identity in one
+// compact unit instead of three separate, redundant labels scattered across
+// the sidebar and topbar (a real inconsistency this replaces: the sidebar
+// used to show a hardcoded, wrong tenant name; the topbar repeated
+// "HospitalOS" again in the breadcrumb; and this component duplicated the
+// tenant name a third time on the far right). Reads live from
+// Administration -> Settings, so a tenant admin changing it updates
+// immediately, no reload needed.
 export default function TenantBrand() {
   const [settings, setSettings] = useState(null);
 
@@ -12,8 +17,6 @@ export default function TenantBrand() {
     let alive = true;
     const load = () => getSettings().then((s) => alive && setSettings(s));
     load();
-    // Settings can change from another tab/screen; poll lightly so the badge
-    // stays current without needing a global settings context.
     const t = setInterval(load, 4000);
     return () => { alive = false; clearInterval(t); };
   }, []);
@@ -34,15 +37,18 @@ export default function TenantBrand() {
       ) : (
         <div style={logoFallback}>{initials}</div>
       )}
-      <span style={name}>{settings.hospitalName}</span>
+      <span style={name}>
+        HospitalOS<span style={tenantPart}> ({settings.hospitalName})</span>
+      </span>
     </div>
   );
 }
 
-const wrap = { display: "flex", alignItems: "center", gap: 8, paddingLeft: 12, marginLeft: 4, borderLeft: "1px solid var(--border)" };
-const logoImg = { width: 26, height: 26, borderRadius: 7, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
+const wrap = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
+const logoImg = { width: 22, height: 22, borderRadius: 6, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
 const logoFallback = {
-  width: 26, height: 26, borderRadius: 7, background: "var(--accent-bg)", color: "var(--accent)",
-  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 700, flexShrink: 0,
+  width: 22, height: 22, borderRadius: 6, background: "var(--accent-bg)", color: "var(--accent)",
+  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, fontWeight: 700, flexShrink: 0,
 };
-const name = { fontSize: 12, fontWeight: 700, color: "var(--ink-strong)", whiteSpace: "nowrap", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" };
+const name = { fontSize: 12.5, fontWeight: 700, color: "var(--ink-strong)", whiteSpace: "nowrap" };
+const tenantPart = { fontWeight: 500, color: "var(--muted)" };

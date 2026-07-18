@@ -3,7 +3,7 @@ import { useAuth } from "../auth/AuthContext";
 import { daysRemaining } from "../engines/onboarding";
 
 // Shown to any signed-in account with a demoExpiresAt — a constant, honest
-// reminder of how much runway is left, rather than letting the 30-day limit
+// reminder of how much runway is left, rather than letting the 7-day limit
 // arrive as a surprise the day sign-in stops working.
 export default function DemoBanner() {
   const { user } = useAuth();

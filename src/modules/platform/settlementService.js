@@ -70,7 +70,7 @@ export async function settlementSummary() {
 
 const _payout = {
   bank: "Guaranty Trust Bank",
-  accountName: "AgoroX Technologies Ltd",
+  accountName: "AgoroX Africa Ltd",
   accountNumber: "0123456789",
   schedule: "Monthly, 2nd working day",
   processor: "Paystack",

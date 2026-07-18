@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
         actor: found, action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
         detail: "Blocked sign-in — demo period expired", severity: "warn",
       });
-      const err = new Error("Your 30-day demo has ended. Sign up for a full account to keep going — your data will not carry over from the demo.");
+      const err = new Error("Your 7-day demo has ended. Sign up for a full account to keep going — your data will not carry over from the demo.");
       err.demoExpired = true;
       throw err;
     }

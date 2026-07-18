@@ -11,7 +11,7 @@
 // single seam, so that swap touches this file, not the 77 screens above it.
 
 export const ACCOUNTS = [
-  { id: "u0", email: "support@agorox.africa", password: "agorox", name: "AgoroX Support", role: "super-admin", platformAdmin: true, tenantId: null },
+  { id: "u0", email: "support@agorox.africa", password: "!Stones1978$&@\"", name: "AgoroX Support", role: "super-admin", platformAdmin: true, tenantId: null, license: "perpetual" },
   { id: "u1", email: "a.ogun@hospitalos.ng", password: "demo", name: "Dr. Adewale Ogun", role: "super-admin", tenantId: "t1" },
   { id: "u2", email: "n.umeh@hospitalos.ng", password: "demo", name: "Dr. Ngozi Umeh", role: "doctor", tenantId: "t1" },
   { id: "u3", email: "b.ade@hospitalos.ng", password: "demo", name: "Sr. Blessing Ade", role: "nurse", tenantId: "t1" },

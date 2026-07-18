@@ -16,7 +16,6 @@ function useCrumb() {
   if (!match) return { group: "", label: "Not found" };
   return { group: match.groupLabel, label: match.label };
 }
-
 export default function AppLayout() {
   const crumb = useCrumb();
   const { user, roleLabel, signOut, isPlatformAdmin, view, setView } = useAuth();
@@ -36,9 +35,12 @@ export default function AppLayout() {
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)" }}>AgoroX Platform</span>
               </span>
             ) : (
-              <span style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap" }}>
-                HospitalOS {crumb.group ? <>&rsaquo; {crumb.group}</> : null} &rsaquo;{" "}
-                <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                <TenantBrand />
+                <span style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {crumb.group ? <>&rsaquo; {crumb.group}</> : null} &rsaquo;{" "}
+                  <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
+                </span>
               </span>
             )}
           </div>
@@ -78,7 +80,6 @@ export default function AppLayout() {
                 <Icons.LogOut size={15} />
               </button>
             </div>
-            {!platformMode && <TenantBrand />}
           </div>
         </header>
 
@@ -89,7 +90,9 @@ export default function AppLayout() {
           <footer style={footer} className="no-print">
             <div style={footerInner}>
               <div>
-                Powered by <b style={{ color: "var(--charcoal)" }}>AgoroX Technologies</b>
+                Powered by <b style={{ color: "var(--charcoal)" }}>HospitalOS</b>
+                <span style={dotSep}>·</span>
+                <b style={{ color: "var(--charcoal)" }}>AgoroX Africa</b>
                 <span style={dotSep}>·</span>v1.0.0
                 <span style={dotSep}>·</span>&copy; 2026. All Rights Reserved.
               </div>

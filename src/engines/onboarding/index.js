@@ -1,4 +1,4 @@
-// Onboarding engine — sign-up, tier selection, and the 30-day demo.
+// Onboarding engine — sign-up, tier selection, and the 7-day demo.
 //
 // An ENGINE like Help/Pricing/FHIR/Results: owns its own logic, is imported
 // BY the SignUp screen and Login screen, and writes into two other stores —
@@ -27,7 +27,7 @@ import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms));
 
-export const DEMO_DURATION_DAYS = 30;
+export const DEMO_DURATION_DAYS = 7;
 
 export const FREE_TIERS = [
   {
@@ -123,7 +123,7 @@ export async function registerHospital({
 }
 
 /**
- * Start a 30-day demo. Deliberately lighter than a full signup — no
+ * Start a 7-day demo. Deliberately lighter than a full signup — no
  * registration number, no tier choice, no billing commitment — because the
  * entire point is letting someone kick the tyres before deciding anything.
  */

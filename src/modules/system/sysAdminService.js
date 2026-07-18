@@ -22,7 +22,7 @@ export async function toggleSite(id) {
 
 /* -------- Settings -------- */
 const _settings = {
-  hospitalName: "HospitalOS Teaching Hospital",
+  hospitalName: "Ibadan Teaching Hospital",
   logoUrl: "",  // tenant-supplied logo; falls back to initials badge when empty
   address: "Ring Road, Ibadan, Oyo State, Nigeria",
   phone: "+234 803 000 0000",

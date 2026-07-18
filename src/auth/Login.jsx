@@ -5,13 +5,12 @@ import { inputStyle } from "../lib/ui";
 import { SignUpForm, DemoForm } from "./SignUp";
 
 export default function Login() {
-  const { signIn, demoAccounts } = useAuth();
+  const { signIn } = useAuth();
   const [mode, setMode] = useState("signin"); // "signin" | "signup" | "demo"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [showHint, setShowHint] = useState(false);
 
   const submit = async (e) => {
     e?.preventDefault();
@@ -112,46 +111,14 @@ export default function Login() {
             <Icons.Building2 size={14} /> Register your hospital
           </button>
           <button style={ctaBtn} onClick={() => setMode("demo")}>
-            <Icons.Sparkles size={14} /> Try free for 30 days
+            <Icons.Sparkles size={14} /> Try free for 7 days
           </button>
         </div>
-
-        <button style={hintToggle} onClick={() => setShowHint((v) => !v)}>
-          {showHint ? "Hide" : "Show"} demo accounts
-        </button>
-
-        {showHint && (
-          <div style={hintBox}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
-              Demo accounts
-            </div>
-            {demoAccounts.map((a) => (
-              <button
-                key={a.id}
-                style={hintRow}
-                onClick={() => {
-                  setEmail(a.email);
-                  setPassword(a.platformAdmin ? "agorox" : "demo");
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-strong)" }}>{a.name}</div>
-                  <div style={{ fontSize: 11, color: "var(--muted)", fontFamily: "var(--font-mono)" }}>{a.email}</div>
-                </div>
-                {a.platformAdmin && <span style={platformTag}>Platform</span>}
-              </button>
-            ))}
-            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 }}>
-              Passwords: <code style={code}>demo</code> for hospital staff,{" "}
-              <code style={code}>agorox</code> for platform support.
-            </div>
-          </div>
-        )}
 
         <div style={footNote}>
           <Icons.ShieldAlert size={13} style={{ flexShrink: 0, marginTop: 1 }} />
           <span>
-            Demo authentication runs in-browser and is not secure. Production sign-in
+            Sign-in runs in-browser for this preview and is not secure. Production sign-in
             verifies credentials server-side.
           </span>
         </div>
@@ -185,26 +152,6 @@ const ctaBtn = {
   flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
   fontSize: 12, fontWeight: 600, color: "var(--charcoal)", background: "var(--surface)",
   border: "1px solid var(--border-strong)", borderRadius: 9, padding: "9px 0", cursor: "pointer", font: "inherit",
-};
-const hintToggle = {
-  font: "inherit", fontSize: 11.5, fontWeight: 600, color: "var(--accent)",
-  background: "none", border: "none", cursor: "pointer", padding: "12px 0 0",
-};
-const hintBox = {
-  marginTop: 8, background: "var(--surface)", border: "1px solid var(--border)",
-  borderRadius: 10, padding: "12px 13px",
-};
-const hintRow = {
-  width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "6px 7px",
-  background: "none", border: "none", borderRadius: 7, cursor: "pointer", font: "inherit",
-};
-const platformTag = {
-  fontSize: 9.5, fontWeight: 700, color: "var(--accent)", background: "var(--accent-bg)",
-  padding: "2px 6px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.04em",
-};
-const code = {
-  fontFamily: "var(--font-mono)", fontSize: 10.5, background: "var(--surface-2)",
-  border: "1px solid var(--border)", borderRadius: 4, padding: "1px 4px",
 };
 const errBox = {
   display: "flex", alignItems: "flex-start", gap: 7, background: "var(--bad-bg)",

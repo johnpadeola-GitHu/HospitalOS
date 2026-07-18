@@ -47,10 +47,7 @@ export default function Sidebar() {
         <div style={S.brandMark}>
           <Icons.Cross size={16} strokeWidth={2.5} color="#fff" />
         </div>
-        <div>
-          <div style={S.brandText}>HospitalOS</div>
-          <div style={S.brandSub}>Ibadan Teaching Hospital</div>
-        </div>
+        <div style={S.brandText}>HospitalOS</div>
       </div>
 
       <nav style={S.nav}>
