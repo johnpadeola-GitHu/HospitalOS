@@ -50,7 +50,7 @@ export function DemoForm({ onBack, onDone }) {
 
   return (
     <div>
-      <button onClick={onBack} style={backLink}><Icons.ChevronLeft size={14} /> Back to sign in</button>
+      <button onClick={onBack} style={backLink}><Icons.ChevronLeft size={14} /> Back</button>
       <h1 style={title}>Try HospitalOS free</h1>
       <p style={subtitle}>{DEMO_DURATION_DAYS} days, full access, nothing to pay. See if it fits before you decide.</p>
 

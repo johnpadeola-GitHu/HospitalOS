@@ -189,7 +189,7 @@ function Row({ active, onClick, onHover, icon, title, sub, tag }) {
 }
 
 const trigger = {
-  display: "flex", alignItems: "center", gap: 8, flex: "0 1 380px",
+  display: "flex", alignItems: "center", gap: 8, flex: "1 1 480px", maxWidth: 520,
   background: "var(--surface)", border: "1px solid var(--border)",
   borderRadius: 8, padding: "7px 10px", cursor: "pointer", font: "inherit",
 };

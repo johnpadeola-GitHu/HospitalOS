@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import * as Icons from "lucide-react";
 import { validateActivationCode, redeemActivationCode } from "../engines/onboarding/activationCodes";
 import { inputStyle } from "../lib/ui";
+import { useAuth } from "./AuthContext";
 
 // ============================== STATE MACHINE ==============================
 // ONB_STATE is the wizard's whole world: which step it's on, every field
@@ -13,10 +14,10 @@ import { inputStyle } from "../lib/ui";
 // redeemActivationCode() \u2014 everything before that is purely local state.
 
 const STORAGE_KEY = "hospitalos_onboarding_wizard";
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 7;
 
 const STEP_TITLES = [
-  "Activation code", "Hospital identity", "Administrator account", "Facility details",
+  "Activate your hospital", "Hospital identity", "Facility details",
   "Staff roles", "Branding", "Plan confirmation", "Review & confirm",
 ];
 
@@ -53,7 +54,7 @@ function emptyState() {
     data: {
       activationCode: "", validatedCode: null,
       hospitalName: "", hospitalType: HOSPITAL_TYPES[0], address: "",
-      adminName: "", adminEmail: "", adminPassword: "", adminPasswordConfirm: "",
+      adminName: "", adminPhone: "", adminEmail: "", adminPassword: "", adminPasswordConfirm: "",
       bedCount: "", centresCount: "1", departments: DEPARTMENT_OPTIONS.map((d) => d.key),
       roles: ["doctor", "nurse"],
       logoUrl: "", phone: "", registrationNumber: "",
@@ -83,7 +84,7 @@ function clearSavedState() {
 
 // ============================== WIZARD ROOT ==============================
 
-export default function OnboardingWizard({ onBack, onDone }) {
+export default function OnboardingWizard({ onSwitchToDemo, onDone, prefillEmail }) {
   const [state, setState] = useState(() => loadState() || emptyState());
   const [resumed] = useState(() => !!loadState());
   const [err, setErr] = useState("");
@@ -112,6 +113,7 @@ export default function OnboardingWizard({ onBack, onDone }) {
       const r = await redeemActivationCode({
         code: state.data.activationCode,
         adminName: state.data.adminName,
+        adminPhone: state.data.adminPhone,
         adminEmail: state.data.adminEmail,
         adminPassword: state.data.adminPassword,
         hospitalDetails: {
@@ -135,9 +137,11 @@ export default function OnboardingWizard({ onBack, onDone }) {
 
   return (
     <div>
-      <button onClick={state.step === 1 ? onBack : back} style={backLink}>
-        <Icons.ChevronLeft size={14} /> {state.step === 1 ? "Back to sign in" : "Back"}
-      </button>
+      {state.step > 1 && (
+        <button onClick={back} style={backLink}>
+          <Icons.ChevronLeft size={14} /> Back
+        </button>
+      )}
 
       {resumed && state.step === 1 && (
         <div style={resumeNote}>
@@ -147,19 +151,79 @@ export default function OnboardingWizard({ onBack, onDone }) {
       )}
 
       <ProgressBar step={state.step} />
-      <h1 style={title}>{STEP_TITLES[state.step - 1]}</h1>
-      <p style={subtitle}>Step {state.step} of {TOTAL_STEPS}</p>
+      <div style={stepKicker}>Step {state.step} of {TOTAL_STEPS}</div>
+      <h1 style={title}>
+        {state.step === 1 ? "Activate your hospital" : STEP_TITLES[state.step - 1]}
+      </h1>
+      <p style={subtitle}>
+        {state.step === 1 ? "Enter the activation code sent by your AgoroX administrator." : `${STEP_TITLES[state.step - 1]} \u2014 the rest of your hospital's profile`}
+      </p>
 
       {err && <div style={errBox}><Icons.AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />{err}</div>}
 
-      {state.step === 1 && <Step1Code data={state.data} patch={patch} onValid={next} setErr={setErr} />}
+      {state.step === 1 && <Step1Activate data={state.data} patch={patch} onValid={next} setErr={setErr} />}
       {state.step === 2 && <Step2Identity data={state.data} patch={patch} onNext={next} setErr={setErr} />}
-      {state.step === 3 && <Step3Admin data={state.data} patch={patch} onNext={next} setErr={setErr} />}
-      {state.step === 4 && <Step4Facility data={state.data} patch={patch} onNext={next} />}
-      {state.step === 5 && <Step5Roles data={state.data} patch={patch} onNext={next} />}
-      {state.step === 6 && <Step6Branding data={state.data} patch={patch} onNext={next} />}
-      {state.step === 7 && <Step7Plan data={state.data} onNext={next} />}
-      {state.step === 8 && <Step8Review data={state.data} onSubmit={submit} busy={busy} onEdit={goTo} />}
+      {state.step === 3 && <Step3Facility data={state.data} patch={patch} onNext={next} />}
+      {state.step === 4 && <Step4Roles data={state.data} patch={patch} onNext={next} />}
+      {state.step === 5 && <Step5Branding data={state.data} patch={patch} onNext={next} />}
+      {state.step === 6 && <Step6Plan data={state.data} onNext={next} />}
+      {state.step === 7 && <Step7Review data={state.data} onSubmit={submit} busy={busy} onEdit={goTo} />}
+
+      {state.step === 1 && <FrontDoorAlternatives onSwitchToDemo={onSwitchToDemo} onSignedIn={onDone} prefillEmail={prefillEmail} />}
+    </div>
+  );
+}
+
+// The two escape hatches that belong ONLY on the very front door (Step 1):
+// try the demo, or sign in if you already have an account. Once someone has
+// validated a real code and moved into Step 2+, they've committed to
+// building a hospital profile — these alternatives would just be noise.
+function FrontDoorAlternatives({ onSwitchToDemo, onSignedIn, prefillEmail }) {
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState(prefillEmail || "");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const doSignIn = async (e) => {
+    e.preventDefault();
+    setBusy(true); setErr("");
+    try { await signIn(email, password); }
+    catch (ex) { setErr(ex.message); setBusy(false); }
+  };
+
+  return (
+    <div style={{ marginTop: 6 }}>
+      <Divider label="or" />
+      <button type="button" onClick={onSwitchToDemo} style={demoLink}>
+        <Icons.Sparkles size={14} /> Explore the interactive demo
+      </button>
+      <p style={demoSub}>No code needed. Loads a sample hospital with demo data you can explore freely.</p>
+
+      <Divider label="or sign in" />
+      {err && <div style={errBox}><Icons.AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />{err}</div>}
+      <form onSubmit={doSignIn}>
+        <input
+          style={{ ...inputStyle, marginBottom: 8 }} type="email" value={email}
+          onChange={(e) => setEmail(e.target.value)} placeholder="you@hospitalos.ng" autoComplete="username"
+        />
+        <input
+          style={{ ...inputStyle, marginBottom: 12 }} type="password" value={password}
+          onChange={(e) => setPassword(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autoComplete="current-password"
+        />
+        <button type="submit" style={{ ...signInBtn, opacity: busy ? 0.7 : 1 }} disabled={busy}>
+          {busy ? "Signing in\u2026" : "Sign in"}
+          {!busy && <Icons.ArrowRight size={15} strokeWidth={2.2} />}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function Divider({ label }) {
+  return (
+    <div style={dividerWrap}>
+      <span style={dividerLine} /><span style={dividerLabel}>{label}</span><span style={dividerLine} />
     </div>
   );
 }
@@ -206,9 +270,21 @@ function ProgressBar({ step }) {
 
 // ============================== STEPS ==============================
 
-function Step1Code({ data, patch, onValid, setErr }) {
+// Step 1 combines what would otherwise be two separate steps \u2014 activation
+// code entry and personal account creation \u2014 into one screen, deliberately
+// matching the LabOS activation pattern: a hospital admin does this exactly
+// once, ever. Every other sign-in afterward, by them or any other staff
+// member, is a plain email/password sign-in \u2014 nothing in this screen runs
+// again once the tenant exists.
+function Step1Activate({ data, patch, onValid, setErr }) {
   const [busy, setBusy] = useState(false);
-  const check = async () => {
+
+  const submit = async () => {
+    if (!data.activationCode.trim()) { setErr("Enter your activation code."); return; }
+    if (!data.adminName.trim()) { setErr("Enter your full name."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.adminEmail.trim())) { setErr("Enter a valid work email address."); return; }
+    if (data.adminPassword.length < 12) { setErr("Password must be at least 12 characters."); return; }
+    if (data.adminPassword !== data.adminPasswordConfirm) { setErr("Passwords do not match."); return; }
     setBusy(true); setErr("");
     try {
       const v = await validateActivationCode(data.activationCode);
@@ -217,19 +293,46 @@ function Step1Code({ data, patch, onValid, setErr }) {
     } catch (e) { setErr(e.message); }
     setBusy(false);
   };
+
   return (
     <div>
-      <p style={helpText}>Enter the activation code you received from your AgoroX representative. Registration is invite-only \u2014 there is no public sign-up.</p>
+      <div style={inviteBox}>
+        <Icons.Lock size={14} style={{ flexShrink: 0, marginTop: 1, color: "var(--warn)" }} />
+        <span>
+          HospitalOS is <b>invite-only</b>. Your hospital must be provisioned by an AgoroX
+          administrator, who will send you a one-time <b>activation code</b>. Enter it below with
+          your details to begin.
+        </span>
+      </div>
+
       <Row><F label="Activation code">
         <input
           style={{ ...inputStyle, fontFamily: "var(--font-mono)", letterSpacing: "0.04em", textTransform: "uppercase" }}
           value={data.activationCode}
           onChange={(e) => patch({ activationCode: e.target.value })}
-          placeholder="HOS-XXXXX-XXXXX"
+          placeholder="E.G. HOS-7F3KX-2026Y"
         />
       </F></Row>
-      <button style={{ ...primaryBtn, opacity: busy ? 0.7 : 1 }} onClick={check} disabled={busy || !data.activationCode.trim()}>
-        {busy ? "Checking\u2026" : "Validate code"}
+
+      <Row cols={2}>
+        <F label="Full name"><input style={inputStyle} value={data.adminName} onChange={(e) => patch({ adminName: e.target.value })} placeholder="Dr. Adaeze Okafor" /></F>
+        <F label="Phone number"><input style={inputStyle} value={data.adminPhone} onChange={(e) => patch({ adminPhone: e.target.value })} placeholder="+234 803 …" /></F>
+      </Row>
+
+      <Row><F label="Work email"><input type="email" style={inputStyle} value={data.adminEmail} onChange={(e) => patch({ adminEmail: e.target.value })} placeholder="you@hospital.ng" /></F></Row>
+
+      <Row cols={2}>
+        <F label="Password"><input type="password" style={inputStyle} value={data.adminPassword} onChange={(e) => patch({ adminPassword: e.target.value })} placeholder="Minimum 12 characters" /></F>
+        <F label="Confirm password"><input type="password" style={inputStyle} value={data.adminPasswordConfirm} onChange={(e) => patch({ adminPasswordConfirm: e.target.value })} placeholder="Re-enter your password" /></F>
+      </Row>
+
+      <p style={{ ...helpText, marginBottom: 18 }}>
+        You'll create your hospital's profile over the next few steps. Don't have a code?{" "}
+        <a href="mailto:support@agorox.africa?subject=HospitalOS%20activation%20code%20request" style={inlineLink}>Request an invite</a>.
+      </p>
+
+      <button style={{ ...primaryBtn, opacity: busy ? 0.7 : 1 }} onClick={submit} disabled={busy}>
+        {busy ? "Verifying\u2026" : "Verify activation code"}
         {!busy && <Icons.ArrowRight size={15} strokeWidth={2.2} />}
       </button>
     </div>
@@ -263,30 +366,7 @@ function Step2Identity({ data, patch, onNext, setErr }) {
   );
 }
 
-function Step3Admin({ data, patch, onNext, setErr }) {
-  const submit = () => {
-    if (!data.adminName.trim()) { setErr("Enter the administrator's name."); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.adminEmail.trim())) { setErr("Enter a valid email address."); return; }
-    if (data.adminPassword.length < 8) { setErr("Password must be at least 8 characters."); return; }
-    if (data.adminPassword !== data.adminPasswordConfirm) { setErr("Passwords do not match."); return; }
-    setErr("");
-    onNext();
-  };
-  return (
-    <div>
-      <p style={helpText}>This becomes the hospital's first Super Admin account \u2014 able to create every other staff account afterward.</p>
-      <Row><F label="Full name"><input style={inputStyle} value={data.adminName} onChange={(e) => patch({ adminName: e.target.value })} /></F></Row>
-      <Row><F label="Email"><input type="email" style={inputStyle} value={data.adminEmail} onChange={(e) => patch({ adminEmail: e.target.value })} /></F></Row>
-      <Row cols={2}>
-        <F label="Password"><input type="password" style={inputStyle} value={data.adminPassword} onChange={(e) => patch({ adminPassword: e.target.value })} /></F>
-        <F label="Confirm password"><input type="password" style={inputStyle} value={data.adminPasswordConfirm} onChange={(e) => patch({ adminPasswordConfirm: e.target.value })} /></F>
-      </Row>
-      <button style={primaryBtn} onClick={submit}>Continue <Icons.ArrowRight size={15} strokeWidth={2.2} /></button>
-    </div>
-  );
-}
-
-function Step4Facility({ data, patch, onNext }) {
+function Step3Facility({ data, patch, onNext }) {
   const toggle = (key) => patch({ departments: data.departments.includes(key) ? data.departments.filter((d) => d !== key) : [...data.departments, key] });
   return (
     <div>
@@ -308,7 +388,7 @@ function Step4Facility({ data, patch, onNext }) {
   );
 }
 
-function Step5Roles({ data, patch, onNext }) {
+function Step4Roles({ data, patch, onNext }) {
   const toggle = (key) => patch({ roles: data.roles.includes(key) ? data.roles.filter((r) => r !== key) : [...data.roles, key] });
   return (
     <div>
@@ -325,7 +405,7 @@ function Step5Roles({ data, patch, onNext }) {
   );
 }
 
-function Step6Branding({ data, patch, onNext }) {
+function Step5Branding({ data, patch, onNext }) {
   return (
     <div>
       <p style={helpText}>All of this can be changed later in Administration \u2192 Settings \u2014 nothing here is locked in.</p>
@@ -339,7 +419,7 @@ function Step6Branding({ data, patch, onNext }) {
   );
 }
 
-function Step7Plan({ data, onNext }) {
+function Step6Plan({ data, onNext }) {
   const tier = data.validatedCode?.tier;
   if (!tier) return <div style={helpText}>No plan on file \u2014 go back to Step 1.</div>;
   const isEnterprise = tier.key === "enterprise";
@@ -364,18 +444,18 @@ function Step7Plan({ data, onNext }) {
   );
 }
 
-function Step8Review({ data, onSubmit, busy, onEdit }) {
+function Step7Review({ data, onSubmit, busy, onEdit }) {
   const tier = data.validatedCode?.tier;
   return (
     <div>
       <ReviewRow label="Activation code" value={data.activationCode.toUpperCase()} onEdit={() => onEdit(1)} />
+      <ReviewRow label="Administrator" value={`${data.adminName} \u00b7 ${data.adminEmail} \u00b7 ${data.adminPhone || "\u2014"}`} onEdit={() => onEdit(1)} />
       <ReviewRow label="Hospital" value={`${data.hospitalName} \u2014 ${data.hospitalType}`} onEdit={() => onEdit(2)} />
       <ReviewRow label="Address" value={data.address} onEdit={() => onEdit(2)} />
-      <ReviewRow label="Administrator" value={`${data.adminName} (${data.adminEmail})`} onEdit={() => onEdit(3)} />
-      <ReviewRow label="Facility" value={`${data.bedCount || "\u2014"} beds \u00b7 ${data.centresCount} centre(s) \u00b7 ${data.departments.length} department(s) enabled`} onEdit={() => onEdit(4)} />
-      <ReviewRow label="Staff roles" value={data.roles.length ? data.roles.join(", ") : "None selected"} onEdit={() => onEdit(5)} />
-      <ReviewRow label="Branding" value={data.logoUrl ? "Logo set" : "No logo yet"} onEdit={() => onEdit(6)} />
-      <ReviewRow label="Plan" value={tier ? tier.label : "\u2014"} onEdit={() => onEdit(7)} />
+      <ReviewRow label="Facility" value={`${data.bedCount || "\u2014"} beds \u00b7 ${data.centresCount} centre(s) \u00b7 ${data.departments.length} department(s) enabled`} onEdit={() => onEdit(3)} />
+      <ReviewRow label="Staff roles" value={data.roles.length ? data.roles.join(", ") : "None selected"} onEdit={() => onEdit(4)} />
+      <ReviewRow label="Branding" value={data.logoUrl ? "Logo set" : "No logo yet"} onEdit={() => onEdit(5)} />
+      <ReviewRow label="Plan" value={tier ? tier.label : "\u2014"} onEdit={() => onEdit(6)} />
 
       <button style={{ ...primaryBtn, opacity: busy ? 0.7 : 1, marginTop: 8 }} onClick={onSubmit} disabled={busy}>
         {busy ? "Activating your hospital\u2026" : "Confirm & activate"}
@@ -406,8 +486,24 @@ function F({ label, children }) {
   return <label style={{ display: "block" }}><span style={lbl}>{label}</span>{children}</label>;
 }
 
+const stepKicker = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 };
 const title = { fontSize: 20, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.02em", marginBottom: 2 };
 const subtitle = { fontSize: 12.5, color: "var(--muted)", marginBottom: 16 };
+const dividerWrap = { display: "flex", alignItems: "center", gap: 10, margin: "18px 0 14px" };
+const dividerLine = { flex: 1, height: 1, background: "var(--border)" };
+const dividerLabel = { fontSize: 11, fontWeight: 600, color: "var(--muted)" };
+const demoLink = {
+  width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+  font: "inherit", fontSize: 13, fontWeight: 600, color: "var(--accent)",
+  background: "var(--accent-soft)", border: "1px solid var(--accent-bg)", borderRadius: 10,
+  padding: "10px 0", cursor: "pointer",
+};
+const demoSub = { fontSize: 11, color: "var(--muted)", textAlign: "center", marginTop: 6, lineHeight: 1.5 };
+const signInBtn = {
+  width: "100%", font: "inherit", fontSize: 13.5, fontWeight: 600, padding: "11px 14px",
+  borderRadius: 9, cursor: "pointer", border: "none", background: "var(--charcoal)", color: "#fff",
+  display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+};
 const helpText = { fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6, marginBottom: 16 };
 const lbl = { display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--muted)", marginBottom: 5 };
 const backLink = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12.5, fontWeight: 600, color: "var(--muted)", background: "none", border: "none", cursor: "pointer", marginBottom: 14, padding: 0 };
@@ -424,6 +520,7 @@ const primaryBtn = {
 };
 const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
 const codePreview = { display: "flex", alignItems: "center", gap: 7, background: "var(--good-bg)", color: "var(--good)", fontSize: 12, padding: "9px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
+const inviteBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--ink)", fontSize: 12, padding: "12px 13px", borderRadius: 10, marginBottom: 18, lineHeight: 1.6 };
 const chipGrid = { display: "flex", flexWrap: "wrap", gap: 7 };
 const chip = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12, fontWeight: 500, padding: "7px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };

@@ -110,6 +110,18 @@ export const NAV_GROUPS = [
     ],
   },
   {
+    id: "public-health",
+    label: "Public health",
+    icon: "Globe",
+    comingSoon: true,
+    items: [
+      { id: "surveillance", label: "Disease surveillance", path: "/public-health/surveillance" , icon: "Radar" },
+      { id: "immunisation", label: "Immunisation programmes", path: "/public-health/immunisation" , icon: "Syringe" },
+      { id: "outreach", label: "Outreach & community", path: "/public-health/outreach" , icon: "Users" },
+      { id: "national-reporting", label: "National reporting", path: "/public-health/reporting" , icon: "FileBarChart" },
+    ],
+  },
+  {
     id: "specialty-services",
     label: "Specialty services",
     icon: "HeartHandshake",
@@ -121,18 +133,6 @@ export const NAV_GROUPS = [
       { id: "social-work", label: "Medical social services", path: "/social-work" , icon: "HeartHandshake" },
       { id: "occ-health", label: "Occupational health", path: "/occupational-health" , icon: "ShieldPlus" },
       { id: "chaplaincy", label: "Chaplaincy & pastoral care", path: "/chaplaincy" , icon: "Church" },
-    ],
-  },
-  {
-    id: "public-health",
-    label: "Public health",
-    icon: "Globe",
-    comingSoon: true,
-    items: [
-      { id: "surveillance", label: "Disease surveillance", path: "/public-health/surveillance" , icon: "Radar" },
-      { id: "immunisation", label: "Immunisation programmes", path: "/public-health/immunisation" , icon: "Syringe" },
-      { id: "outreach", label: "Outreach & community", path: "/public-health/outreach" , icon: "Users" },
-      { id: "national-reporting", label: "National reporting", path: "/public-health/reporting" , icon: "FileBarChart" },
     ],
   },
   {

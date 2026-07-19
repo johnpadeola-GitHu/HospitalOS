@@ -67,20 +67,19 @@ export default function AppLayout() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {isPlatformAdmin && (
-              <div style={viewToggle}>
-                <button
-                  onClick={() => setView("tenant")}
-                  style={{ ...toggleBtn, ...(!platformMode ? toggleActive : null) }}
-                >
-                  <Icons.Building2 size={13} /> Hospital
-                </button>
-                <button
-                  onClick={() => setView("platform")}
-                  style={{ ...toggleBtn, ...(platformMode ? toggleActive : null) }}
-                >
-                  <Icons.ShieldCheck size={13} /> Platform
-                </button>
-              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={platformMode}
+                aria-label={`Switch to ${platformMode ? "Hospital" : "Platform"} view`}
+                title={`Currently viewing: ${platformMode ? "Platform" : "Hospital"} \u2014 click to switch`}
+                onClick={() => setView(platformMode ? "tenant" : "platform")}
+                style={{ ...viewSwitchTrack, ...(platformMode ? viewSwitchTrackOn : null) }}
+              >
+                <Icons.Building2 size={11} style={{ position: "absolute", left: 5, color: platformMode ? "var(--muted)" : "#fff", zIndex: 1 }} />
+                <Icons.ShieldCheck size={11} style={{ position: "absolute", right: 5, color: platformMode ? "#fff" : "var(--muted)", zIndex: 1 }} />
+                <span style={{ ...viewSwitchThumb, ...(platformMode ? viewSwitchThumbOn : null) }} />
+              </button>
             )}
 
             <span style={pill}><span style={dot} /> Online</span>
@@ -172,16 +171,19 @@ const platformMark = {
   width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
   display: "flex", alignItems: "center", justifyContent: "center",
 };
-const viewToggle = {
-  display: "flex", gap: 2, background: "var(--surface)", border: "1px solid var(--border)",
-  borderRadius: 9, padding: 2,
+const viewSwitchTrack = {
+  position: "relative", display: "flex", alignItems: "center",
+  width: 48, height: 24, borderRadius: 999, border: "1px solid var(--border-strong)",
+  background: "var(--surface)", cursor: "pointer", padding: 0, flexShrink: 0,
+  transition: "background 0.15s ease",
 };
-const toggleBtn = {
-  display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 11.5,
-  fontWeight: 600, padding: "5px 10px", borderRadius: 7, border: "none",
-  background: "none", color: "var(--muted)", cursor: "pointer",
+const viewSwitchTrackOn = { background: "var(--accent)", borderColor: "var(--accent)" };
+const viewSwitchThumb = {
+  position: "absolute", top: 2, left: 2, width: 18, height: 18, borderRadius: "50%",
+  background: "#fff", boxShadow: "0 1px 3px rgba(22,35,59,0.25)",
+  transition: "transform 0.15s ease",
 };
-const toggleActive = { background: "var(--surface-2)", color: "var(--accent)", boxShadow: "var(--shadow-sm)" };
+const viewSwitchThumbOn = { transform: "translateX(24px)" };
 const signOutBtn = {
   background: "none", border: "1px solid var(--border)", borderRadius: 8,
   padding: "6px 7px", cursor: "pointer", color: "var(--muted)", display: "flex",

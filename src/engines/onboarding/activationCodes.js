@@ -153,7 +153,7 @@ export async function validateActivationCode(codeInput) {
  * ATOMICITY NOTE at the top of this file for why the check and the
  * redeemed-marking happen back to back with no `await` in between.
  */
-export async function redeemActivationCode({ code: codeInput, adminName, adminEmail, adminPassword, hospitalDetails, actor }) {
+export async function redeemActivationCode({ code: codeInput, adminName, adminPhone, adminEmail, adminPassword, hospitalDetails = {}, actor }) {
   const code = String(codeInput || "").trim().toUpperCase();
   const rec = _codes.get(code);
 
@@ -167,9 +167,9 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminEm
         : "This activation code has expired."
     );
   }
-  if (!adminName || !adminName.trim()) throw new Error("Enter the administrator's name.");
-  if (!adminEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim())) throw new Error("Enter a valid email address.");
-  if (!adminPassword || adminPassword.length < 8) throw new Error("Password must be at least 8 characters.");
+  if (!adminName || !adminName.trim()) throw new Error("Enter your full name.");
+  if (!adminEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim())) throw new Error("Enter a valid work email address.");
+  if (!adminPassword || adminPassword.length < 12) throw new Error("Password must be at least 12 characters.");
   if (emailTaken(adminEmail)) throw new Error("An account with this email already exists.");
   rec.status = "redeemed";
   rec.redeemedAt = new Date().toISOString();
@@ -182,6 +182,11 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminEm
 
   let tenant;
   try {
+    // The tenant's name and plan come from the activation code itself, set
+    // when AgoroX issued it. Everything else about the hospital \u2014
+    // address, logo, registration number, bed count \u2014 is still
+    // collected, just later in this same wizard (Steps 2 onward), not
+    // duplicated on the activation step alongside the person's own details.
     tenant = await addTenant({
       name: hospitalDetails.hospitalName?.trim() || rec.tenantName,
       plan: tier.label,
@@ -189,7 +194,7 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminEm
       commissionPct: isEnterprise ? null : tier.commissionPct,
       status: isEnterprise ? "pending-payment" : "active",
       address: hospitalDetails.address || "",
-      phone: hospitalDetails.phone || "",
+      phone: hospitalDetails.phone || adminPhone || "",
       email: adminEmail.trim().toLowerCase(),
       logoUrl: hospitalDetails.logoUrl || "",
       registrationNumber: hospitalDetails.registrationNumber || "",

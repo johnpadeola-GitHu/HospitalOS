@@ -807,3 +807,40 @@ mark) is a small, pre-existing, appropriately-scoped decorative element,
 not a large-surface colour deviation like the hero banner was.
 
 Total: 78 routes, 38 lint warnings (0 errors), clean build.
+
+## This round — topbar toggle, nav reorder, and signup mirrored to LabOS exactly
+
+**1. Hospital/Platform toggle** replaced with a genuine compact switch
+(48px, icon-only) instead of a two-button segmented control with text
+labels — freed real horizontal space, and the global search field's
+preferred width increased from 380px to 480px to actually use it.
+
+**2. Nav reorder** — Academic and Public health are now directly adjacent;
+Specialty services moved to immediately after Public health instead of
+sitting between them.
+
+**3. Signup rebuilt to mirror LabOS exactly**, based on the reference
+screenshots provided:
+- **The sign-in screen IS the activation wizard now** — no separate
+  “click to register” button. “Activate your hospital” is the first
+  thing anyone sees, landing directly on Step 1.
+- **Step 1 combines what were two separate steps** — activation code
+  validation and personal account creation — into one screen: code, full
+  name, phone, work email, password, confirm password, all together, one
+  submit button. This matches the reference exactly and reduced the wizard
+  from 8 steps to 7.
+- **The demo link and inline sign-in form live directly below Step 1**,
+  on the same screen — “or / Explore the interactive demo” then
+  “or sign in” with real email/password fields, matching the reference's
+  single continuous page rather than separate mode-toggled screens.
+- **Password minimum raised from 8 to 12 characters**, matching the
+  reference's stated policy.
+- **Hospital details remain fully collected**, per explicit correction
+  during this round — Steps 2 through 7 (identity, facility, roles,
+  branding, plan, review) are unchanged from the previous round's design.
+  Only Step 1's shape and the overall entry pattern changed.
+- Verified end-to-end: 12-character minimum enforced, phone number
+  correctly captured and stored, full activation-to-signed-in-account flow
+  still works after the restructuring.
+
+Total: 78 routes, 67 help articles, 39 lint warnings (0 errors).
