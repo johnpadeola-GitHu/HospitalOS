@@ -107,9 +107,9 @@ export default function AppLayout() {
           <footer style={footer} className="no-print">
             <div style={footerInner} className="app-footer-inner">
               <div style={footerBrandRow}>
-                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#fff" /></div>
+                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#D6241C" /></div>
                 <span style={footerBrand}>HospitalOS</span>
-                <span style={footerBy}>by AgoroX Africa</span>
+                <span style={footerBy}>powered by AgoroX Africa</span>
               </div>
               <nav style={footerLinks}>
                 <a href="#" style={footLink}>Privacy Policy</a>
@@ -145,7 +145,7 @@ const footerInner = {
   flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)",
 };
 const footerBrandRow = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
-const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "var(--bad)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "#FFFFFF", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const footerBrand = { fontSize: 12.5, fontWeight: 700, color: "var(--charcoal-strong)" };
 const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };

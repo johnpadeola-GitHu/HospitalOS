@@ -146,6 +146,14 @@ export const NAV_GROUPS = [
     ],
   },
   {
+    id: "compliance",
+    label: "Compliance",
+    icon: "ShieldCheck",
+    items: [
+      { id: "compliance", label: "Compliance & accreditation", path: "/compliance" , icon: "ShieldCheck" },
+    ],
+  },
+  {
     id: "system",
     label: "Administration",
     icon: "SlidersHorizontal",

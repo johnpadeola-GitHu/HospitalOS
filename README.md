@@ -908,3 +908,56 @@ signing, staff account creation via Users & Roles, and platform tenant
 visibility — all passing in combination, not just individually.
 
 Total: 78 routes, 68 help articles (2 new), 39 lint warnings (0 errors).
+
+## This round — brand consistency, Compliance module, audit, and help deepening
+
+**1. Footer text** now reads "HospitalOS powered by AgoroX Africa" exactly.
+
+**4. Logo consistency — found and fixed a real inconsistency.** Three
+different marks existed for what should be one brand identity: the sidebar
+top-left mark was dark charcoal with a white cross, the footer's was solid
+red with a white cross, and the login page's was a blue gradient with a
+white cross. All three now genuinely match the actual brand asset
+(favicon.svg): white background, red cross. Verified identical across all
+three locations.
+
+**5. New engine module: Compliance & Accreditation**
+(src/modules/compliance/). Closes a gap an earlier "nationally acceptable"
+review explicitly flagged and never built: practitioner license tracking
+(MDCN/NMCN/MLSCN/RRBN/PCN, each role mapped to its real licensing body),
+facility accreditation (State MoH, HEFAMAA, NHIA, ISO 15189), and a
+regulatory inspection log. Wired into the alert system as two new sources
+(18 → 20 total) for licenses/accreditation expiring within 60 days or
+already expired. New top-level nav group, RBAC-wired, fully tested.
+
+**3. Application audit — found and fixed three real issues:**
+- Stale docs: the alerts help article said "Eighteen sources" (actually
+  20 after this round), and the orientation article's sidebar group
+  count/order was stale after Compliance was added. Both corrected.
+- A genuine workflow inconsistency in the new Compliance module itself,
+  caught while auditing it: the "add license" form used free-text for
+  staff names instead of pulling from real accounts, meaning a typo could
+  create a license record for someone who does not exist. Fixed to pull
+  from the actual tenant staff list, verified working.
+- Nav↔route↔RBAC consistency re-verified perfect after all additions
+  this round; zero orphaned files (aside from the expected main.jsx entry
+  point false-positive).
+
+**2. Help documentation — substantial, measured deepening across the
+board.** Identified the 20 thinnest articles by actual content length and
+rewrote every one with real substance grounded in the underlying service
+code (not padding) — concrete workflow detail, tables, cross-references,
+and honest notes about what's simulated versus real. Added the new
+Compliance article. Also fixed a real drift bug found in the process: the
+"Downloadable guides" article was missing the Tenant Service Agreement PDF
+entirely, added a round after that article was last touched.
+
+Measured result: median article length went from 751 to 933 characters,
+and zero articles remain under 500 characters (14 did before this round).
+69 articles total, 0 orphans, 0 broken cross-references.
+
+**Full-system regression**: activation + signed agreement + real staff
+account creation + a compliance license triggering a genuine alert, all
+run together in one test, all passing.
+
+Total: 79 routes, 69 help articles, 39 lint warnings (0 errors).

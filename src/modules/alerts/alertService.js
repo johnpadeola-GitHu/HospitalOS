@@ -19,6 +19,7 @@ import { listOverdueDialysis } from "../renal/renalService";
 import { listReferrals } from "../referrals/referralsService";
 import { listOverdueImmunisations } from "../public-health/immunizationService";
 import { listOverdueDsars } from "../privacy/privacyService";
+import { listExpiringLicenses, listAccreditations } from "../compliance/complianceService";
 import { listActiveSevereCrises } from "../sickle-cell/sickleCellService";
 import { checkOutbreakThreshold } from "../ipc/ipcService";
 import { listHighRiskPatients as listHighRiskGeriatric } from "../geriatric/geriatricService";
@@ -302,10 +303,29 @@ function alertFromMhu(p) {
   };
 }
 
+function alertFromLicense(l) {
+  return {
+    id: `license:${l.id}`, source: "Compliance", severity: l.status === "expired" ? "critical" : "warning",
+    patientName: "\u2014", hospitalNo: "\u2014",
+    title: l.status === "expired" ? "Practitioner license expired" : "Practitioner license expiring soon",
+    detail: `${l.body} \u2014 ${l.staffName}, ${l.status === "expired" ? `expired ${Math.abs(l.daysLeft)}d ago` : `${l.daysLeft}d remaining`}`,
+    reference: l.ref, at: new Date().toISOString(),
+  };
+}
+function alertFromAccreditation(a) {
+  return {
+    id: `accreditation:${a.id}`, source: "Compliance", severity: a.status === "expired" ? "critical" : "warning",
+    patientName: "\u2014", hospitalNo: "\u2014",
+    title: a.status === "expired" ? "Facility accreditation expired" : "Facility accreditation expiring soon",
+    detail: `${a.type} \u2014 ${a.status === "expired" ? `expired ${Math.abs(a.daysLeft)}d ago` : `${a.daysLeft}d remaining`}`,
+    reference: a.ref, at: new Date().toISOString(),
+  };
+}
+
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity] = await Promise.all([
+  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity, expiringLicenses, allAccreditations] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
     listUrgentStudies(),
@@ -320,7 +340,7 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     listReferrals({ direction: "inbound", status: "received" }),
     listOverdueImmunisations(),
     listOverdueDsars(), listActiveSevereCrises(), checkOutbreakThreshold(),
-    listHighRiskGeriatric(), listHighAcuityMhu(),
+    listHighRiskGeriatric(), listHighAcuityMhu(), listExpiringLicenses(), listAccreditations(),
   ]);
   // checkOutbreakThreshold() result is bound to ipcOutbreaks above.
 
@@ -343,6 +363,8 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     ...ipcOutbreaks.map(alertFromIpcOutbreak),
     ...geriatricRisk.map(alertFromGeriatric),
     ...mhuAcuity.map(alertFromMhu),
+    ...expiringLicenses.map(alertFromLicense),
+    ...allAccreditations.filter((a) => a.status !== "current").map(alertFromAccreditation),
   ];
 
   const rank = { critical: 0, warning: 1 };

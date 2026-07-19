@@ -21,7 +21,7 @@ export default function Login() {
       <div style={panel}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 22 }}>
           <div style={mark}>
-            <Icons.Cross size={19} strokeWidth={2.5} color="#fff" />
+            <Icons.Cross size={19} strokeWidth={2.5} color="#D6241C" />
           </div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.02em" }}>
@@ -60,8 +60,9 @@ const panel = {
 };
 const mark = {
   width: 40, height: 40, borderRadius: 11,
-  background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
+  background: "#FFFFFF", border: "1px solid var(--border)",
   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  boxShadow: "0 1px 3px rgba(22,35,59,0.08)",
 };
 const footNote = {
   display: "flex", gap: 7, marginTop: 18, paddingTop: 14,

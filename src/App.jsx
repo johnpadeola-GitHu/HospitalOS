@@ -63,6 +63,7 @@ import Geriatric from "./modules/geriatric/Geriatric";
 import MentalHealth from "./modules/mental-health/MentalHealth";
 import VipServices from "./modules/vip-services/VipServices";
 import DataImport from "./modules/data-import/DataImport";
+import Compliance from "./modules/compliance/Compliance";
 import Privacy from "./modules/privacy/Privacy";
 import FhirExport from "./engines/fhir/FhirExport";
 import Ultrasound from "./modules/imaging/Ultrasound";
@@ -139,6 +140,7 @@ const MODULES = {
   "/mental-health": MentalHealth,
   "/vip-services": VipServices,
   "/system/data-import": DataImport,
+  "/compliance": Compliance,
   "/system/privacy": Privacy,
   "/system/fhir": FhirExport,
   "/ultrasound": Ultrasound,

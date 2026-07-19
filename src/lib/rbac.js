@@ -22,6 +22,7 @@ export const AREAS = [
   { key: "specialty-services", label: "Specialty services" },
   { key: "public-health", label: "Public health" },
   { key: "intelligence", label: "Intelligence" },
+  { key: "compliance", label: "Compliance" },
   { key: "system", label: "System administration" },
 ];
 

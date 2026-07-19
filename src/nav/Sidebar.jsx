@@ -45,7 +45,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
     <aside style={S.aside} className={`no-print app-sidebar${isOpen ? " is-open" : ""}`}>
       <div style={S.brand}>
         <div style={S.brandMark}>
-          <Icons.Cross size={16} strokeWidth={2.5} color="#fff" />
+          <Icons.Cross size={16} strokeWidth={2.5} color="#D6241C" />
         </div>
         <div style={S.brandText}>HospitalOS</div>
       </div>
@@ -145,7 +145,7 @@ const S = {
   },
   brandMark: {
     width: 30, height: 30, borderRadius: 8,
-    background: "linear-gradient(135deg, #33393F, #4B535B)",
+    background: "#FFFFFF", border: "1px solid var(--border)",
     display: "flex", alignItems: "center", justifyContent: "center",
     flexShrink: 0, boxShadow: "var(--shadow-sm)",
   },
