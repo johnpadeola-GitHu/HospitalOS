@@ -961,3 +961,45 @@ account creation + a compliance license triggering a genuine alert, all
 run together in one test, all passing.
 
 Total: 79 routes, 69 help articles, 39 lint warnings (0 errors).
+
+## This round — brand color reversal, topbar reorganization, Compliance expansion, hero banner restored
+
+**1. Logo/favicon colors reversed** — red background fill, white cross
+(the opposite of the previous round). Updated consistently across the
+favicon, sidebar, footer, and login page — all four verified identical.
+
+**2. Topbar reorganized — HospitalOS branding removed entirely from the
+topbar.** The top-left corner now belongs purely to the tenant: their own
+logo and their own name, with no "HospitalOS" text at all (that identity
+now lives only in the sidebar and footer). Removed the "Online" status pill
+for a cleaner bar, and added a subtle divider between the tenant identity
+and the breadcrumb now that they're visually distinct concepts rather than
+one flowing string.
+
+**3. Two more Compliance sub-modules added, so it's genuinely not just
+one:**
+- **Incident & Risk Management** (src/modules/incident-risk/) — adverse
+  events, near-misses, and sentinel events with a real root-cause and
+  corrective-action trail. Verified fail-safe: an incident cannot be closed
+  without a recorded corrective action and owner, enforced at the service
+  layer. Severe harm / Sentinel events raise a critical alert while open.
+- **Policies & SOPs** (src/modules/policies/) — policy documents with an
+  actual review cycle (12/24/36 months), distinct from the general
+  Documents & templates library. A policy within 60 days of review, or
+  overdue, raises an alert — the same mechanism as every other compliance
+  deadline in the system.
+- Alert sources: 20 → 22. **Caught and fixed a real bug while wiring
+  these in**: the destructuring list and the actual `Promise.all()` array
+  had drifted out of sync — two new names were added to one but not the
+  other, which would have thrown at runtime on every alert fetch. Caught by
+  testing immediately after wiring, not left for later.
+
+**Help & documentation — hero banner restored, this time correctly
+understood.** Re-read the earlier "restore color" feedback: the actual
+issue had been the rainbow category-icon palette, not the dark hero banner
+itself. Restored the dark gradient treatment using HospitalOS's own red
+brand identity (a charcoal-to-deep-red gradient) rather than copying
+LabOS's blue, keeping the neutral icon treatment that was correctly kept
+from the earlier fix.
+
+Total: 81 routes, 71 help articles, 39 lint warnings (0 errors).

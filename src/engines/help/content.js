@@ -335,7 +335,7 @@ export const ARTICLES = [
   {
     id: "alerts", cat: "safety", icon: "BellRing",
     title: "The alert system",
-    lead: "Twenty sources, one feed, and most alerts clear themselves.",
+    lead: "Twenty-two sources, one feed, and most alerts clear themselves.",
     body: [
       { p: "Overview \u2192 Alerts is a single feed for the whole hospital. The red badge on the sidebar refreshes every few seconds, so a critical result reaches you wherever you are working." },
       { h: "What raises an alert" },
@@ -362,6 +362,8 @@ export const ARTICLES = [
           ["Mental Health Unit", "Constant (1:1) observation or any active risk flag", "Critical"],
           ["Compliance", "A practitioner license expired or expires within 60 days", "Critical / Warning"],
           ["Compliance", "A facility accreditation expired or expires within 60 days", "Critical / Warning"],
+          ["Incident & Risk", "A Severe harm or Sentinel event incident is still open", "Critical"],
+          ["Policies & SOPs", "A policy's scheduled review date has passed or is within 60 days", "Warning"],
         ],
       } },
       { h: "How alerts clear" },
@@ -1157,8 +1159,37 @@ export const ARTICLES = [
       { h: "Inspections" },
       { p: "A simple log of regulatory inspections \u2014 who inspected, when, and the outcome (Passed, Passed with conditions, Failed, or Scheduled) \u2014 giving a hospital's own compliance history in one place rather than scattered paper records." },
       { note: "This module was added specifically to close a gap identified in an earlier review of what a genuinely \u201cnationally acceptable\u201d Nigerian hospital system needs \u2014 licensing and accreditation tracking existed nowhere in the system before it." },
+      { p: "This is one of three sub-modules under the Compliance nav group \u2014 see Incident and risk management for adverse events and sentinel events, and Policies and SOPs for policy documents with their own review cycle." },
     ],
-    related: ["account-security", "alerts", "roles-explained"],
+    related: ["incident-risk", "policies", "account-security", "alerts", "roles-explained"],
+  },
+  {
+    id: "incident-risk", cat: "admin", icon: "TriangleAlert",
+    title: "Incident and risk management",
+    lead: "A genuine patient-safety gap this closes: adverse events, near-misses, and sentinel events tracked with a real root-cause and corrective-action trail.",
+    body: [
+      { p: "Compliance \u2192 Incident & risk management is a second sub-module under Compliance, distinct from Compliance & accreditation \u2014 this one is about events that happened, not credentials or certificates that need renewing." },
+      { h: "Why this is not just the audit trail" },
+      { p: "The general Security & audit log records who did what, for security purposes \u2014 it was never meant to carry a root cause, a named corrective action owner, or a due date, which is what real clinical incident reporting actually requires. This module exists specifically for that gap." },
+      { h: "Severity levels" },
+      { p: "Near-miss (no harm), Minor harm, Moderate harm, Severe harm, and Sentinel event \u2014 the standard patient-safety severity scale, not a hospital-specific invention." },
+      { warn: "An incident cannot be closed without a recorded corrective action and a named owner \u2014 enforced at the service layer, not just suggested by the form. This stops a serious incident being marked resolved with nothing actually done about it." },
+      { p: "Severe harm and Sentinel event incidents that remain open raise a hospital-wide critical alert automatically \u2014 the same alert system every other safety-critical condition in HospitalOS uses, and the alert disappears the moment the incident is genuinely closed, not before." },
+    ],
+    related: ["compliance", "audit", "alerts"],
+  },
+  {
+    id: "policies", cat: "admin", icon: "FileText",
+    title: "Policies and SOPs",
+    lead: "Policy documents with a real review cycle \u2014 an out-of-date infection control or medication safety policy is itself a compliance risk.",
+    body: [
+      { p: "Compliance \u2192 Policies & SOPs is the third sub-module under Compliance. It is deliberately separate from Administration \u2192 Documents & templates: Documents is a general file cabinet for anything a hospital wants to keep on hand, while a policy is a different kind of document \u2014 it has an owner, a version, and a review date that must not silently pass." },
+      { h: "Review cycles" },
+      { p: "Every policy is assigned a review cycle \u2014 12, 24, or 36 months \u2014 counted from its last review date. \u201cMark reviewed\u201d resets that clock to today, and lets you bump the version number if the content itself changed, not just the review date." },
+      { warn: "A policy within 60 days of its scheduled review, or already past it, raises a hospital-wide alert \u2014 the same mechanism as every other compliance deadline in the system, so a lapsed infection-control policy cannot simply be forgotten in a filing cabinet." },
+      { p: "Categories \u2014 Clinical, Infection control, Medication safety, Health & safety, HR & conduct, Administrative \u2014 let a hospital filter its policy library the way an accreditation surveyor would actually ask to see it." },
+    ],
+    related: ["compliance", "documents-upload"],
   },
 ];
 

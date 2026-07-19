@@ -52,10 +52,11 @@ export default function AppLayout() {
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)" }}>AgoroX Platform</span>
               </span>
             ) : (
-              <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
                 <TenantBrand />
+                <span className="app-topbar-crumb" style={crumbDivider} />
                 <span className="app-topbar-crumb" style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {crumb.group ? <>&rsaquo; {crumb.group}</> : null} &rsaquo;{" "}
+                  {crumb.group ? <>{crumb.group} &rsaquo; </> : null}
                   <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
                 </span>
               </span>
@@ -83,7 +84,6 @@ export default function AppLayout() {
               </button>
             )}
 
-            <span style={pill}><span style={dot} /> Online</span>
             <NotificationBell />
 
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -107,7 +107,7 @@ export default function AppLayout() {
           <footer style={footer} className="no-print">
             <div style={footerInner} className="app-footer-inner">
               <div style={footerBrandRow}>
-                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#D6241C" /></div>
+                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#fff" /></div>
                 <span style={footerBrand}>HospitalOS</span>
                 <span style={footerBy}>powered by AgoroX Africa</span>
               </div>
@@ -145,7 +145,7 @@ const footerInner = {
   flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)",
 };
 const footerBrandRow = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
-const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "#FFFFFF", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "#D6241C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const footerBrand = { fontSize: 12.5, fontWeight: 700, color: "var(--charcoal-strong)" };
 const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
@@ -159,11 +159,7 @@ const kbd = {
   fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--muted)",
   background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 5px",
 };
-const pill = {
-  display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 500,
-  color: "var(--good)", background: "var(--good-bg)", padding: "4px 9px", borderRadius: 999, whiteSpace: "nowrap",
-};
-const dot = { width: 6, height: 6, borderRadius: "50%", background: "var(--good)" };
+const crumbDivider = { width: 1, height: 16, background: "var(--border)", flexShrink: 0 };
 const avatar = {
   width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
   color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",

@@ -342,17 +342,17 @@ const crumbLink = { font: "inherit", fontSize: 12, fontWeight: 600, color: "var(
 // gradient using HospitalOS's own charcoal tokens (not LabOS's blue, to
 // stay on-brand) with the search box embedded directly in the banner.
 const hero = {
-  background: "var(--surface-2)", border: "1px solid var(--border)",
-  borderRadius: 16, padding: "36px 32px 30px", textAlign: "center", marginBottom: 24,
+  background: "linear-gradient(135deg, #22272B 0%, #33393F 55%, #4A2422 100%)",
+  borderRadius: 16, padding: "40px 32px 34px", textAlign: "center", marginBottom: 24,
 };
-const heroKicker = { fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 };
-const heroTitle = { fontSize: 26, fontWeight: 800, color: "var(--ink-strong)", letterSpacing: "-0.02em", margin: "0 0 10px" };
-const heroSubtitle = { fontSize: 13.5, color: "var(--muted)", maxWidth: 480, margin: "0 auto 22px", lineHeight: 1.6 };
+const heroKicker = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 };
+const heroTitle = { fontSize: 30, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 10px" };
+const heroSubtitle = { fontSize: 13.5, color: "rgba(255,255,255,0.72)", maxWidth: 480, margin: "0 auto 22px", lineHeight: 1.6 };
 const heroSearchWrap = { position: "relative", maxWidth: 520, margin: "0 auto" };
 const heroSearchInput = {
-  width: "100%", boxSizing: "border-box", border: "1px solid var(--border-strong)", borderRadius: 12,
-  padding: "12px 16px 12px 42px", fontSize: 13.5, font: "inherit", background: "var(--surface)",
-  color: "var(--ink-strong)",
+  width: "100%", boxSizing: "border-box", border: "none", borderRadius: 12,
+  padding: "13px 16px 13px 42px", fontSize: 13.5, font: "inherit", background: "#fff",
+  color: "var(--ink-strong)", boxShadow: "0 6px 18px rgba(0,0,0,0.22)",
 };
 
 const sectionLabel = { fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "4px 0 12px" };

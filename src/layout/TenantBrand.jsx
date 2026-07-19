@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { getSettings } from "../modules/system/sysAdminService";
 
-// The single, unified brand element for the topbar: this tenant's own logo,
-// plus "HospitalOS (Tenant Name)" \u2014 product and tenant identity in one
-// compact unit instead of three separate, redundant labels scattered across
-// the sidebar and topbar (a real inconsistency this replaces: the sidebar
-// used to show a hardcoded, wrong tenant name; the topbar repeated
-// "HospitalOS" again in the breadcrumb; and this component duplicated the
-// tenant name a third time on the far right). Reads live from
-// Administration -> Settings, so a tenant admin changing it updates
-// immediately, no reload needed.
+// The topbar's top-left corner belongs entirely to the tenant now — their
+// own logo and their own name, nothing else. HospitalOS product branding
+// does not appear here at all; it lives in the sidebar and the footer,
+// which is where a platform identity belongs, not on every tenant's own
+// working screen. Reads live from Administration -> Settings, so a tenant
+// admin changing their logo or name updates immediately, no reload needed.
 export default function TenantBrand() {
   const [settings, setSettings] = useState(null);
 
@@ -37,18 +34,15 @@ export default function TenantBrand() {
       ) : (
         <div style={logoFallback}>{initials}</div>
       )}
-      <span style={name}>
-        HospitalOS<span style={tenantPart}> ({settings.hospitalName})</span>
-      </span>
+      <span style={name}>{settings.hospitalName}</span>
     </div>
   );
 }
 
-const wrap = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
-const logoImg = { width: 22, height: 22, borderRadius: 6, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
+const wrap = { display: "flex", alignItems: "center", gap: 9, flexShrink: 0, minWidth: 0 };
+const logoImg = { width: 28, height: 28, borderRadius: 7, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
 const logoFallback = {
-  width: 22, height: 22, borderRadius: 6, background: "var(--accent-bg)", color: "var(--accent)",
-  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, fontWeight: 700, flexShrink: 0,
+  width: 28, height: 28, borderRadius: 7, background: "var(--accent-bg)", color: "var(--accent)",
+  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0,
 };
-const name = { fontSize: 12.5, fontWeight: 700, color: "var(--ink-strong)", whiteSpace: "nowrap" };
-const tenantPart = { fontWeight: 500, color: "var(--muted)" };
+const name = { fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };

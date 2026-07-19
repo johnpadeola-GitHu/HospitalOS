@@ -151,6 +151,8 @@ export const NAV_GROUPS = [
     icon: "ShieldCheck",
     items: [
       { id: "compliance", label: "Compliance & accreditation", path: "/compliance" , icon: "ShieldCheck" },
+      { id: "incident-risk", label: "Incident & risk management", path: "/incident-risk" , icon: "TriangleAlert" },
+      { id: "policies", label: "Policies & SOPs", path: "/policies" , icon: "FileText" },
     ],
   },
   {
