@@ -5,6 +5,7 @@ import {
 } from "./incidentService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 function ago(iso) {
   const d = Math.round((Date.now() - new Date(iso)) / 86400000);
@@ -104,7 +105,7 @@ export default function IncidentRisk() {
 }
 
 function ReportModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ type: INCIDENT_TYPES[0], severity: SEVERITY_LEVELS[0], patientName: "", hospitalNo: "", ward: "", description: "" });
+  const [form, setForm] = useState({ type: INCIDENT_TYPES[0], severity: SEVERITY_LEVELS[0], patientId: null, patientName: "", hospitalNo: "", ward: "", description: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -124,7 +125,7 @@ function ReportModal({ actor, onClose, onDone }) {
         <div style={{ flex: 1 }}><Field label="Incident type"><select style={inputStyle} value={form.type} onChange={set("type")}>{INCIDENT_TYPES.map((t) => <option key={t}>{t}</option>)}</select></Field></div>
         <div style={{ flex: 1 }}><Field label="Severity"><select style={inputStyle} value={form.severity} onChange={set("severity")}>{SEVERITY_LEVELS.map((s) => <option key={s}>{s}</option>)}</select></Field></div>
       </div>
-      <Field label="Patient name (if applicable)"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
+      <Field label="Patient (if applicable)"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} allowUnregistered /></Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field></div>
         <div style={{ flex: 1 }}><Field label="Ward / location"><input style={inputStyle} value={form.ward} onChange={set("ward")} /></Field></div>

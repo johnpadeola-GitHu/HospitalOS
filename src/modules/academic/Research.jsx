@@ -1,38 +1,89 @@
-import { useEffect, useState } from "react";
-import { listResearch } from "./academicService";
-import { PageHeader } from "../../lib/ui";
+import { useEffect, useState, useCallback } from "react";
+import { listResearch, registerResearch, updateResearchStatus, RESEARCH_STATUSES } from "./academicService";
+import { PageHeader, Button, Modal, Field, inputStyle, Pill } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
 
-const TINT = {
-  ongoing: { bg: "#E6EFDF", fg: "#4A6329", label: "Ongoing" },
-  recruiting: { bg: "#E3ECF7", fg: "#3A5170", label: "Recruiting" },
-  analysis: { bg: "#FBF0DC", fg: "#8A5A17", label: "Analysis" },
-  complete: { bg: "#EDEFF2", fg: "#6B7C96", label: "Complete" },
-};
+const STATUS_TONE = { recruiting: "info", ongoing: "warn", analysis: "muted", completed: "good", suspended: "bad" };
 
 export default function Research() {
+  const { user } = useAuth();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { let a = true; listResearch().then((r) => { if (a) { setRows(r); setLoading(false); } }); return () => { a = false; }; }, []);
+  const [showAdd, setShowAdd] = useState(false);
+  const [err, setErr] = useState("");
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setRows(await listResearch());
+    setLoading(false);
+  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const changeStatus = async (id, status) => {
+    setErr("");
+    try { await updateResearchStatus(id, status, user); await refresh(); } catch (e) { setErr(e.message); }
+  };
+
   return (
     <div>
-      <PageHeader group="Academic" title={<>Research &amp; trials</>} icon="FlaskConical" />
-      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading projects…</div> : (
+      <PageHeader group="Academic" title={<>Research &amp; trials</>} icon="FlaskConical"
+        subtitle="Active studies and their principal investigators"
+        actions={<Button variant="primary" icon="Plus" onClick={() => setShowAdd(true)}>Register study</Button>} />
+
+      {err && <div style={errBox}>{err}</div>}
+
+      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading studies…</div> : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {rows.map((p) => {
-            const t = TINT[p.status] || TINT.ongoing;
-            return (
-              <div key={p.id} style={card}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, fontSize: 14, color: "var(--ink-strong)" }}>{p.title}</div>
-                  <div style={{ fontSize: 12, color: "var(--muted)" }}>PI: {p.pi} · {p.dept}</div>
-                </div>
-                <span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>{t.label}</span>
+          {rows.map((r) => (
+            <div key={r.id} style={card}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: "var(--ink-strong)" }}>{r.title}</div>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>PI: {r.pi} · {r.dept}</div>
               </div>
-            );
-          })}
+              <Pill tone={STATUS_TONE[r.status]}>{r.status}</Pill>
+              <select
+                style={{ ...inputStyle, width: 150, padding: "6px 8px", fontSize: 12 }}
+                value={r.status}
+                onChange={(e) => changeStatus(r.id, e.target.value)}
+              >
+                {RESEARCH_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          ))}
         </div>
       )}
+
+      {showAdd && <AddModal actor={user} onClose={() => setShowAdd(false)} onDone={async () => { setShowAdd(false); await refresh(); }} />}
     </div>
   );
 }
+
+function AddModal({ actor, onClose, onDone }) {
+  const [form, setForm] = useState({ title: "", pi: "", dept: "" });
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const submit = async () => {
+    setBusy(true); setErr("");
+    try { await registerResearch({ ...form, actor }); await onDone(); } catch (e) { setErr(e.message); setBusy(false); }
+  };
+
+  return (
+    <Modal title="Register a research study" onClose={onClose} footer={<>
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Register"}</Button>
+    </>}>
+      {err && <div style={errBox}>{err}</div>}
+      <Field label="Study title"><input style={inputStyle} value={form.title} onChange={set("title")} /></Field>
+      <Field label="Principal investigator"><input style={inputStyle} value={form.pi} onChange={set("pi")} /></Field>
+      <Field label="Department"><input style={inputStyle} value={form.dept} onChange={set("dept")} /></Field>
+      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
+        New studies start as "recruiting." If this study needs ethics approval, submit it separately in Ethics committee.
+      </div>
+    </Modal>
+  );
+}
+
 const card = { display: "flex", gap: 12, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };

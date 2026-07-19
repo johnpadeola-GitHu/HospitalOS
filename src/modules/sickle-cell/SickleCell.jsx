@@ -6,6 +6,7 @@ import {
 } from "./sickleCellService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 function ago(iso) {
   const d = Math.round((Date.now() - new Date(iso)) / 86400000);
@@ -127,7 +128,7 @@ export default function SickleCell() {
 }
 
 function RegisterModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", genotype: GENOTYPES[0] });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", genotype: GENOTYPES[0] });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -143,8 +144,7 @@ function RegisterModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Registering…" : "Register"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="Genotype"><select style={inputStyle} value={form.genotype} onChange={set("genotype")}>{GENOTYPES.map((g) => <option key={g}>{g}</option>)}</select></Field>
     </Modal>
   );

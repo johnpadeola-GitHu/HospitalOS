@@ -18,18 +18,23 @@ export const STATUS_TONE = { pending: "warn", processing: "info", settled: "good
 
 /* ---------------- Settlement cycles ---------------- */
 
-function cycle(id, month, gross, status, paidAt = null) {
+function cycle(id, period, gross, status, paidAt = null) {
   const fee = Math.round(gross * PLATFORM_FEE_RATE);
-  return { id, month, gross, fee, net: gross - fee, status, paidAt, ref: "STL-" + id.toUpperCase() };
+  return { id, month: period, gross, fee, net: gross - fee, status, paidAt, ref: "STL-" + id.toUpperCase() };
 }
 
+// Settlement runs every 15 days, not monthly \u2014 two cycles per calendar
+// month, each roughly half the gross of what a full month would collect.
 const _settlements = [
-  cycle("s2607", "July 2026", 4820000, "pending"),
-  cycle("s2606", "June 2026", 6140000, "settled", "2026-07-02"),
-  cycle("s2605", "May 2026", 5390000, "settled", "2026-06-02"),
-  cycle("s2604", "April 2026", 4970000, "settled", "2026-05-02"),
-  cycle("s2603", "March 2026", 3820000, "settled", "2026-04-02"),
-  cycle("s2602", "February 2026", 2450000, "failed", null),
+  cycle("s26071b", "1\u201315 Jul 2026", 2510000, "pending"),
+  cycle("s26062b", "16\u201330 Jun 2026", 3080000, "settled", "2026-07-02"),
+  cycle("s26061b", "1\u201315 Jun 2026", 2960000, "settled", "2026-06-17"),
+  cycle("s26052b", "16\u201331 May 2026", 2740000, "settled", "2026-06-02"),
+  cycle("s26051b", "1\u201315 May 2026", 2610000, "settled", "2026-05-17"),
+  cycle("s26042b", "16\u201330 Apr 2026", 2490000, "settled", "2026-05-02"),
+  cycle("s26041b", "1\u201315 Apr 2026", 2380000, "settled", "2026-04-17"),
+  cycle("s26032b", "16\u201331 Mar 2026", 1940000, "settled", "2026-04-02"),
+  cycle("s26031b", "1\u201315 Mar 2026", 1810000, "failed", null),
 ];
 
 export async function listSettlements() {
@@ -62,17 +67,17 @@ export async function settlementSummary() {
     pendingCount: pending.length,
     feeRate: PLATFORM_FEE_RATE,
     // Six-month fee trend for the chart.
-    trend: [..._settlements].reverse().map((s) => ({ month: s.month.split(" ")[0].slice(0, 3), fee: s.fee, gross: s.gross })),
+    trend: [..._settlements].reverse().map((s) => ({ month: s.month.split(" ")[1] || s.month, fee: s.fee, gross: s.gross })),
   };
 }
 
 /* ---------------- Payout destination ---------------- */
 
 const _payout = {
-  bank: "Guaranty Trust Bank",
-  accountName: "AgoroX Africa Ltd",
-  accountNumber: "0123456789",
-  schedule: "Monthly, 2nd working day",
+  bank: "Lotus Bank",
+  accountName: "Ipadeola Agoro Farms Limited",
+  accountNumber: "1012950136",
+  schedule: "Every 15 days",
   processor: "Paystack",
 };
 

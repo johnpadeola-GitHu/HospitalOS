@@ -100,7 +100,6 @@ export const NAV_GROUPS = [
     id: "academic",
     label: "Academic",
     icon: "GraduationCap",
-    comingSoon: true,
     items: [
       { id: "training", label: "Training & rotations", path: "/academic/training" , icon: "GraduationCap" },
       { id: "logbooks", label: "Clinical logbooks", path: "/academic/logbooks" , icon: "NotebookPen" },
@@ -113,7 +112,6 @@ export const NAV_GROUPS = [
     id: "public-health",
     label: "Public health",
     icon: "Globe",
-    comingSoon: true,
     items: [
       { id: "surveillance", label: "Disease surveillance", path: "/public-health/surveillance" , icon: "Radar" },
       { id: "immunisation", label: "Immunisation programmes", path: "/public-health/immunisation" , icon: "Syringe" },

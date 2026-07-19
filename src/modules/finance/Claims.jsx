@@ -9,6 +9,7 @@ import {
 } from "./claimsService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
@@ -164,7 +165,7 @@ function ClaimStatus({ status }) {
 }
 
 function NewClaimModal({ onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", insurer: "NHIA", amount: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", insurer: "NHIA", amount: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -197,15 +198,10 @@ function NewClaimModal({ onClose, onDone }) {
       }
     >
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name">
-        <input style={inputStyle} value={form.patientName} onChange={set("patientName")} placeholder="Surname, First name" />
+      <Field label="Patient">
+        <PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} />
       </Field>
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <Field label="Hospital no.">
-            <input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} placeholder="H00…" />
-          </Field>
-        </div>
         <div style={{ width: 150 }}>
           <Field label="Amount (\u20a6)">
             <input type="number" min="1" style={inputStyle} value={form.amount} onChange={set("amount")} />

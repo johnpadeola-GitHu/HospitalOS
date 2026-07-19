@@ -2,6 +2,8 @@
 // community outreach, and national reporting (IDSR-style).
 // In-memory now; async API shaped for a later D1 swap.
 
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
+
 const delay = (ms = 90) => new Promise((r) => setTimeout(r, ms));
 
 /* -------- Disease surveillance (weekly notifiable case counts) -------- */
@@ -14,6 +16,36 @@ const _surveillance = [
   { id: "sv6", disease: "COVID-19", cases: 8, trend: "down", notifiable: true },
 ];
 export async function listSurveillance() { await delay(); return [..._surveillance]; }
+
+export const NOTIFIABLE_DISEASES = ["Cholera", "Measles", "Lassa fever", "COVID-19", "Yellow fever", "Meningitis", "Diphtheria", "Mpox", "Other notifiable disease"];
+
+/**
+ * Logs a new case count for a disease this week. If the disease already has
+ * a row this period, the case count is added to it and the trend is
+ * recomputed from the change; otherwise a new tracked disease is created.
+ * A notifiable disease trending up feeds Alerts directly — the same
+ * "condition itself is the alert" pattern as every other source.
+ */
+export async function logCase({ disease, count, notifiable, actor }) {
+  await delay();
+  if (!disease || !disease.trim()) throw new Error("Enter or choose a disease.");
+  const n = parseInt(count, 10);
+  if (!n || n < 1) throw new Error("Enter a case count of at least 1.");
+  let d = _surveillance.find((x) => x.disease.toLowerCase() === disease.trim().toLowerCase());
+  if (d) {
+    d.trend = "up";
+    d.cases += n;
+  } else {
+    d = { id: "sv" + Date.now(), disease: disease.trim(), cases: n, trend: "up", notifiable: !!notifiable };
+    _surveillance.push(d);
+  }
+  record({
+    actor, action: AUDIT_ACTIONS.CREATE, entity: "surveillance-case", entityId: d.id,
+    detail: `${n} case(s) of ${d.disease} logged — running total ${d.cases}`,
+    severity: d.notifiable ? "warn" : "info",
+  });
+  return d;
+}
 
 // Feed for Alerts: notifiable diseases with a rising trend.
 export async function listOutbreakSignals() {
@@ -43,6 +75,29 @@ const _outreach = [
 ];
 export async function listOutreach() { await delay(); return [..._outreach].sort((a, b) => b.date.localeCompare(a.date)); }
 
+export async function planOutreach({ activity, date, team, actor }) {
+  await delay();
+  if (!activity || !activity.trim()) throw new Error("Describe the activity.");
+  if (!date) throw new Error("Choose a date.");
+  if (!team || !team.trim()) throw new Error("Enter the team.");
+  const o = { id: "or" + Date.now(), activity: activity.trim(), date, team: team.trim(), reached: 0, status: "planned" };
+  _outreach.unshift(o);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "outreach", entityId: o.id, detail: `${o.activity} planned for ${o.date}`, severity: "info" });
+  return o;
+}
+
+export async function completeOutreach(id, reached, actor) {
+  await delay(80);
+  const o = _outreach.find((x) => x.id === id);
+  if (!o) throw new Error("Activity not found.");
+  const n = parseInt(reached, 10);
+  if (!n && n !== 0) throw new Error("Enter how many people were reached.");
+  o.reached = n;
+  o.status = "completed";
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "outreach", entityId: o.id, detail: `${o.activity} completed — ${n} reached`, severity: "info" });
+  return o;
+}
+
 /* -------- National reporting (IDSR / DHIS2 submissions) -------- */
 const _reports = [
   { id: "rp1", form: "IDSR Weekly (Form 001)", period: "Week 28, 2026", status: "submitted", due: "2026-07-14" },
@@ -55,4 +110,16 @@ export const REPORT_TINT = {
   pending: { bg: "#FBF0DC", fg: "#8A5A17", label: "Pending" },
   overdue: { bg: "#F7E4E2", fg: "#B0281F", label: "Overdue" },
 };
-export async function listReports() { await delay(); return [..._reports]; }
+export async function listReports() {
+  await delay();
+  const today = new Date().toISOString().slice(0, 10);
+  return _reports.map((r) => ({ ...r, status: r.status === "pending" && r.due < today ? "overdue" : r.status }));
+}
+export async function submitReport(id, actor) {
+  await delay(90);
+  const r = _reports.find((x) => x.id === id);
+  if (!r) throw new Error("Report not found.");
+  r.status = "submitted";
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "national-report", entityId: r.id, detail: `${r.form} (${r.period}) submitted`, severity: "info" });
+  return r;
+}

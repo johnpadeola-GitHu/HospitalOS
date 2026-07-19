@@ -8,6 +8,7 @@ import {
 } from "./ipcService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function IPC() {
   const { user } = useAuth();
@@ -134,7 +135,7 @@ export default function IPC() {
 }
 
 function ReportModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", type: HAI_TYPES[0], ward: "", bed: "", notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", type: HAI_TYPES[0], ward: "", bed: "", notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -150,8 +151,7 @@ function ReportModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Reporting…" : "Report"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="Infection type"><select style={inputStyle} value={form.type} onChange={set("type")}>{HAI_TYPES.map((t) => <option key={t}>{t}</option>)}</select></Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Ward"><input style={inputStyle} value={form.ward} onChange={set("ward")} /></Field></div>
@@ -163,7 +163,7 @@ function ReportModal({ actor, onClose, onDone }) {
 }
 
 function IsolateModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", ward: "", bed: "", precaution: PRECAUTION_TYPES[0], reason: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", ward: "", bed: "", precaution: PRECAUTION_TYPES[0], reason: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -179,8 +179,7 @@ function IsolateModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Starting…" : "Start isolation"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Ward"><input style={inputStyle} value={form.ward} onChange={set("ward")} /></Field></div>
         <div style={{ width: 100 }}><Field label="Bed"><input style={inputStyle} value={form.bed} onChange={set("bed")} /></Field></div>

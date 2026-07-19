@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { REFERRAL_REASONS, CASE_STATUS, STATUS_TONE, listCases, openCase, updateCase, socialWorkSummary } from "./socialWorkService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function SocialWork() {
   const { user } = useAuth();
@@ -77,7 +78,7 @@ export default function SocialWork() {
 }
 
 function OpenModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", reason: REFERRAL_REASONS[0], notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", reason: REFERRAL_REASONS[0], notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -93,8 +94,7 @@ function OpenModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Opening…" : "Open case"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="Reason"><select style={inputStyle} value={form.reason} onChange={set("reason")}>{REFERRAL_REASONS.map((r) => <option key={r}>{r}</option>)}</select></Field>
       <Field label="Notes"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={form.notes} onChange={set("notes")} /></Field>
     </Modal>

@@ -6,6 +6,7 @@ import {
 } from "./privacyService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function Privacy() {
   const { user } = useAuth();
@@ -131,7 +132,7 @@ export default function Privacy() {
 }
 
 function ConsentModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", purpose: CONSENT_PURPOSES[0], method: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", purpose: CONSENT_PURPOSES[0], method: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -147,7 +148,7 @@ function ConsentModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Record"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
+      <Field label="Patient (if applicable)"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} allowUnregistered /></Field>
       <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
       <Field label="Purpose"><select style={inputStyle} value={form.purpose} onChange={set("purpose")}>{CONSENT_PURPOSES.map((p) => <option key={p}>{p}</option>)}</select></Field>
       <Field label="How was consent captured?"><input style={inputStyle} value={form.method} onChange={set("method")} placeholder="e.g. Signed paper form, scanned" /></Field>
@@ -156,7 +157,7 @@ function ConsentModal({ actor, onClose, onDone }) {
 }
 
 function DsarModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", type: DSAR_TYPES[0], detail: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", type: DSAR_TYPES[0], detail: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -172,7 +173,7 @@ function DsarModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Filing…" : "File request"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
+      <Field label="Patient (if applicable)"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} allowUnregistered /></Field>
       <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
       <Field label="Request type"><select style={inputStyle} value={form.type} onChange={set("type")}>{DSAR_TYPES.map((t) => <option key={t}>{t}</option>)}</select></Field>
       <Field label="Details"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={form.detail} onChange={set("detail")} /></Field>

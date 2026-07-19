@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { FRAILTY_LEVELS, FRAILTY_TONE, COGNITIVE_SCREEN, listPatients, admitPatient, updateAssessment, geriatricSummary } from "./geriatricService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function Geriatric() {
   const { user } = useAuth();
@@ -74,7 +75,7 @@ export default function Geriatric() {
 }
 
 function AdmitModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", age: "", bed: "", fallsRiskScore: "2", medicationCount: "", cognitiveScreen: COGNITIVE_SCREEN[0], frailty: FRAILTY_LEVELS[1], notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", age: "", bed: "", fallsRiskScore: "2", medicationCount: "", cognitiveScreen: COGNITIVE_SCREEN[0], frailty: FRAILTY_LEVELS[1], notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -91,11 +92,10 @@ function AdmitModal({ actor, onClose, onDone }) {
     </>}>
       {err && <div style={errBox}>{err}</div>}
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field></div>
+        <div style={{ flex: 1 }}><Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field></div>
         <div style={{ width: 80 }}><Field label="Age"><input type="number" style={inputStyle} value={form.age} onChange={set("age")} /></Field></div>
       </div>
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field></div>
         <div style={{ width: 100 }}><Field label="Bed"><input style={inputStyle} value={form.bed} onChange={set("bed")} /></Field></div>
       </div>
       <div style={{ display: "flex", gap: 12 }}>

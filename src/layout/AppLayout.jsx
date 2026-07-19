@@ -36,7 +36,7 @@ export default function AppLayout() {
         <div className="app-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
         <header style={topbar} className="no-print app-topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
             {!platformMode && (
@@ -130,7 +130,7 @@ const hamburgerBtn = {
   background: "var(--surface)", color: "var(--charcoal-strong)", cursor: "pointer", flexShrink: 0,
 };
 // Generous padding on all four sides, with a max width so content breathes.
-const main = { flex: 1, overflowY: "auto", background: "var(--bg)", padding: "28px 32px 0", display: "flex", flexDirection: "column" };
+const main = { flex: 1, overflowY: "auto", background: "var(--bg)", padding: "28px 32px 0", display: "flex", flexDirection: "column", minHeight: 0 };
 const container = { maxWidth: 1320, margin: "0 auto", width: "100%", flex: 1, paddingBottom: 36 };
 const footer = { maxWidth: 1320, margin: "0 auto", width: "100%", borderTop: "1px solid var(--border)", padding: "18px 0 22px" };
 const footerInner = {

@@ -6,6 +6,7 @@ import {
 } from "./renalService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 const STAGE_TONE = { "1": "good", "2": "good", "3a": "warn", "3b": "warn", "4": "bad", "5": "bad" };
 
@@ -120,7 +121,7 @@ export default function Renal() {
 }
 
 function EnrolModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", access: ACCESS_TYPES[0], schedule: "Mon / Wed / Fri", dryWeight: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", access: ACCESS_TYPES[0], schedule: "Mon / Wed / Fri", dryWeight: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -136,8 +137,7 @@ function EnrolModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Enrolling…" : "Enrol"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Vascular access"><select style={inputStyle} value={form.access} onChange={set("access")}>{ACCESS_TYPES.map((a) => <option key={a}>{a}</option>)}</select></Field></div>
         <div style={{ width: 120 }}><Field label="Dry weight (kg)"><input type="number" style={inputStyle} value={form.dryWeight} onChange={set("dryWeight")} /></Field></div>
@@ -148,7 +148,7 @@ function EnrolModal({ actor, onClose, onDone }) {
 }
 
 function CkdModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", egfr: "", followUp: "3-monthly" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", egfr: "", followUp: "3-monthly" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -165,8 +165,7 @@ function CkdModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Add"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="eGFR (mL/min/1.73m²)"><input type="number" style={inputStyle} value={form.egfr} onChange={set("egfr")} /></Field>
       {preview && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>Stages as: <b style={{ color: "var(--ink-strong)" }}>{preview.label}</b></div>}
       <Field label="Follow-up interval">

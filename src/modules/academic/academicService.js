@@ -2,6 +2,8 @@
 // clinical logbooks, CME activities, research projects, ethics submissions.
 // In-memory now; async API shaped for a later D1 swap.
 
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
+
 const delay = (ms = 90) => new Promise((r) => setTimeout(r, ms));
 
 /* -------- Training programmes -------- */
@@ -12,6 +14,23 @@ const _training = [
   { id: "tr4", programme: "Medical Student Clerkship", level: "Undergraduate", trainees: 46, lead: "Dr. Ogun" },
 ];
 export async function listTraining() { await delay(); return [..._training]; }
+export async function addTrainingProgramme({ programme, level, lead, actor }) {
+  await delay();
+  if (!programme || !programme.trim()) throw new Error("Enter the programme name.");
+  if (!lead || !lead.trim()) throw new Error("Enter the programme lead.");
+  const t = { id: "tr" + Date.now(), programme: programme.trim(), level: level || "Residency", trainees: 0, lead: lead.trim() };
+  _training.unshift(t);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "training-programme", entityId: t.id, detail: `${t.programme} created \u2014 lead ${t.lead}`, severity: "info" });
+  return t;
+}
+export async function enrollTrainee(programmeId, actor) {
+  await delay(70);
+  const t = _training.find((x) => x.id === programmeId);
+  if (!t) throw new Error("Programme not found.");
+  t.trainees += 1;
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "training-programme", entityId: t.id, detail: `Trainee enrolled \u2014 ${t.programme}, now ${t.trainees}`, severity: "info" });
+  return t;
+}
 
 /* -------- Clinical logbooks -------- */
 let _logSeq = 0;
@@ -37,6 +56,23 @@ const _cme = [
   { id: "cme3", title: "Seminar: Antimicrobial stewardship", date: "2026-07-24", credits: 2, category: "Clinical" },
 ];
 export async function listCME() { await delay(); return [..._cme].sort((a, b) => a.date.localeCompare(b.date)); }
+export async function addCmeActivity({ title, date, credits, category, actor }) {
+  await delay();
+  if (!title || !title.trim()) throw new Error("Enter the activity title.");
+  if (!date) throw new Error("Choose a date.");
+  const c = { id: "cme" + Date.now(), title: title.trim(), date, credits: Number(credits) || 1, category: category || "Clinical", attendees: 0 };
+  _cme.push(c);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "cme-activity", entityId: c.id, detail: `${c.title} scheduled \u2014 ${c.credits} credit(s)`, severity: "info" });
+  return c;
+}
+export async function recordCmeAttendance(cmeId, actor) {
+  await delay(70);
+  const c = _cme.find((x) => x.id === cmeId);
+  if (!c) throw new Error("Activity not found.");
+  c.attendees = (c.attendees || 0) + 1;
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "cme-activity", entityId: c.id, detail: `Attendance recorded \u2014 ${c.title}, now ${c.attendees}`, severity: "info" });
+  return c;
+}
 
 /* -------- Research projects -------- */
 const _research = [
@@ -45,10 +81,27 @@ const _research = [
   { id: "rs3", title: "Surgical site infection audit", pi: "Mr. Okonkwo", status: "analysis", dept: "Surgery" },
 ];
 export async function listResearch() { await delay(); return [..._research]; }
+export const RESEARCH_STATUSES = ["recruiting", "ongoing", "analysis", "completed", "suspended"];
+export async function registerResearch({ title, pi, dept, actor }) {
+  await delay();
+  if (!title || !title.trim()) throw new Error("Enter the study title.");
+  if (!pi || !pi.trim()) throw new Error("Enter the principal investigator.");
+  const r = { id: "rs" + Date.now(), title: title.trim(), pi: pi.trim(), status: "recruiting", dept: dept || "\u2014" };
+  _research.unshift(r);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "research-project", entityId: r.id, detail: `${r.title} registered \u2014 PI ${r.pi}`, severity: "info" });
+  return r;
+}
+export async function updateResearchStatus(id, status, actor) {
+  await delay(70);
+  const r = _research.find((x) => x.id === id);
+  if (!r) throw new Error("Study not found.");
+  if (!RESEARCH_STATUSES.includes(status)) throw new Error("Unknown status.");
+  r.status = status;
+  record({ actor, action: AUDIT_ACTIONS.UPDATE, entity: "research-project", entityId: r.id, detail: `${r.title} \u2014 status now ${status}`, severity: "info" });
+  return r;
+}
 
 /* -------- Ethics committee: real submit -> review -> decision lifecycle -------- */
-import { record, AUDIT_ACTIONS } from "../../lib/audit";
-
 export const ETHICS_STATUSES = ["submitted", "under-review", "revisions", "approved", "rejected"];
 export const ETHICS_TINT = {
   submitted: { bg: "#E3ECF7", fg: "#3A5170", label: "Submitted" },

@@ -3,6 +3,7 @@ import * as Icons from "lucide-react";
 import { VIP_TIERS, listProfiles, createProfile, updateProfile, closeProfile, vipSummary } from "./vipServicesService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function VipServices() {
   const { user } = useAuth();
@@ -88,7 +89,7 @@ export default function VipServices() {
 }
 
 function CreateModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", tier: VIP_TIERS[0], bed: "", consultantOfChoice: "", conciergeContact: "", dietaryPreference: "", privacyFlag: false, notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", tier: VIP_TIERS[0], bed: "", consultantOfChoice: "", conciergeContact: "", dietaryPreference: "", privacyFlag: false, notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -104,11 +105,10 @@ function CreateModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Create"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field></div>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
+        <div style={{ display: "flex", gap: 12 }}>
         <div style={{ width: 100 }}><Field label="Bed"><input style={inputStyle} value={form.bed} onChange={set("bed")} /></Field></div>
-      </div>
+        </div>
       <Field label="Accommodation tier"><select style={inputStyle} value={form.tier} onChange={set("tier")}>{VIP_TIERS.map((t) => <option key={t}>{t}</option>)}</select></Field>
       <Field label="Consultant of choice"><input style={inputStyle} value={form.consultantOfChoice} onChange={set("consultantOfChoice")} /></Field>
       <Field label="Concierge contact"><input style={inputStyle} value={form.conciergeContact} onChange={set("conciergeContact")} /></Field>

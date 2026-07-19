@@ -36,10 +36,10 @@ export async function listQueue({ includeCompleted = false } = {}) {
     .sort((a, b) => new Date(a.checkedInAt) - new Date(b.checkedInAt));
 }
 
-export async function checkIn({ patientName, hospitalNo, actor }) {
+export async function checkIn({ patientId, patientName, hospitalNo, actor }) {
   await delay();
-  if (!patientName || !patientName.trim()) throw new Error("Enter the patient.");
-  const v = { id: "d" + Date.now(), ref: visitRef(), patientName: patientName.trim(), hospitalNo: hospitalNo || "\u2014", stage: "waiting", checkedInAt: new Date().toISOString(), procedures: [] };
+  if (!patientId) throw new Error("Select a registered patient — search by name or hospital number.");
+  const v = { id: "d" + Date.now(), ref: visitRef(), patientId, patientName: patientName.trim(), hospitalNo: hospitalNo || "\u2014", stage: "waiting", checkedInAt: new Date().toISOString(), procedures: [] };
   _queue.unshift(v);
   record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "dental-visit", entityId: v.ref, detail: `Checked in ${v.patientName}`, severity: "info" });
   return v;

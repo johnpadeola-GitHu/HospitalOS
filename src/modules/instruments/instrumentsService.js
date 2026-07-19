@@ -18,6 +18,7 @@
 import { listOrders, enterResults, getTest } from "../lab/labService";
 import { listStudies, scheduleStudy, markPerformed as markStudyPerformed } from "../radiology/radiologyService";
 import { listCourses, deliverFraction } from "../radiotherapy/radiotherapyService";
+import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
 const iso = (m) => new Date(Date.now() + m * 60000).toISOString();
@@ -80,6 +81,32 @@ export function listDevices() {
 export async function listInstruments({ category = "all" } = {}) {
   await delay();
   return _devices.filter((d) => (category === "all" ? true : d.category === category)).map((d) => ({ ...d }));
+}
+
+/**
+ * Registers a device the browser genuinely detected (via WebUSB or Web
+ * Serial — see deviceDetection.js) into the gateway. The vendor/product ID
+ * and connection type are real, read from the browser API when the person
+ * picked the device from their OS's own device list; everything else
+ * (protocol, host, AE title) is left for the person to fill in, since a
+ * browser has no way to know a lab analyzer's network configuration just
+ * from its USB identity.
+ */
+export async function registerInstrument({ category, name, vendor, connectionType, vendorId, productId, actor }) {
+  await delay(150);
+  if (!DEVICE_CATEGORIES.some((c) => c.key === category)) throw new Error("Choose a device category.");
+  if (!name || !name.trim()) throw new Error("Enter a name for this device.");
+  const protocolByCategory = { analyzer: "HL7 v2 / MLLP (configure host)", imaging: "DICOM (configure AE title)", radiotherapy: "DICOM-RT (configure host)", printer: connectionType === "usb" || connectionType === "serial" ? "Direct USB/Serial (no network config needed)" : "IPP / raw socket (configure host)" };
+  const d = {
+    id: "det" + Date.now(), category, name: name.trim(), vendor: vendor || "Unknown",
+    year: new Date().getFullYear(), type: DEVICE_CATEGORIES.find((c) => c.key === category)?.label || category,
+    ae: "\u2014", host: connectionType ? `${connectionType.toUpperCase()} ${vendorId || ""}${productId ? "/" + productId : ""}`.trim() : "\u2014",
+    protocol: protocolByCategory[category], handles: [], status: "idle", lastSeen: new Date().toISOString(),
+    messages: 0, errors: 0, detectedVia: connectionType || null,
+  };
+  _devices.unshift(d);
+  record({ actor, action: AUDIT_ACTIONS.CREATE, entity: "instrument", entityId: d.id, detail: `${d.name} registered${connectionType ? ` (detected via ${connectionType.toUpperCase()})` : " (manual entry)"}`, severity: "info" });
+  return d;
 }
 
 export async function listMessages({ limit = 30, category = "all" } = {}) {

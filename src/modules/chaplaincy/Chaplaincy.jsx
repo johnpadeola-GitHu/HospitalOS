@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { STATUS_TONE, listRequests, requestVisit, advanceRequest, chaplaincySummary } from "./chaplaincyService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 const NEXT_LABEL = { requested: "Schedule visit", scheduled: "Mark completed" };
 
@@ -70,7 +71,7 @@ export default function Chaplaincy() {
 }
 
 function RequestModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", ward: "", faithPreference: "", notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", ward: "", faithPreference: "", notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -86,8 +87,7 @@ function RequestModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Requesting…" : "Request"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="Ward"><input style={inputStyle} value={form.ward} onChange={set("ward")} /></Field>
       <Field label="Faith preference (optional)"><input style={inputStyle} value={form.faithPreference} onChange={set("faithPreference")} /></Field>
       <Field label="Notes"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={form.notes} onChange={set("notes")} /></Field>

@@ -1,37 +1,51 @@
-import { useEffect, useState } from "react";
-import { listReports, REPORT_TINT } from "./publicHealthService";
-import { PageHeader } from "../../lib/ui";
+import { useEffect, useState, useCallback } from "react";
+import { listReports, submitReport, REPORT_TINT } from "./publicHealthService";
+import { PageHeader, Button, Pill } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function Reporting() {
+  const { user } = useAuth();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { let a = true; listReports().then((r) => { if (a) { setRows(r); setLoading(false); } }); return () => { a = false; }; }, []);
+  const [err, setErr] = useState("");
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setRows(await listReports());
+    setLoading(false);
+  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const submit = async (id) => {
+    setErr("");
+    try { await submitReport(id, user); await refresh(); } catch (e) { setErr(e.message); }
+  };
+
   return (
     <div>
-      <PageHeader group="Public health" title={<>National reporting</>} icon="FileBarChart" />
-      <div style={tableWrap}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Form", "Period", "Due", "Status"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={4} style={emptyCell}>Loading…</td></tr> :
-              rows.map((r) => {
-                const t = REPORT_TINT[r.status];
-                return (
-                  <tr key={r.id} style={{ borderTop: "1px solid var(--border)" }}>
-                    <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{r.form}</td>
-                    <td style={td}>{r.period}</td>
-                    <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--muted)" }}>{r.due}</td>
-                    <td style={td}><span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>{t.label}</span></td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
+      <PageHeader group="Public health" title={<>National reporting</>} icon="FileBarChart"
+        subtitle="IDSR and NHMIS submissions — statutory reporting to national health authorities" />
+
+      {err && <div style={errBox}>{err}</div>}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading…</div> : rows.map((r) => {
+          const tint = REPORT_TINT[r.status];
+          return (
+            <div key={r.id} style={card}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: "var(--ink-strong)" }}>{r.form}</div>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{r.period} · due {r.due}</div>
+              </div>
+              <Pill tone={r.status === "submitted" ? "good" : r.status === "overdue" ? "bad" : "warn"}>{tint.label}</Pill>
+              {r.status !== "submitted" && <Button variant="primary" onClick={() => submit(r.id)}>Mark submitted</Button>}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
-const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
-const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
-const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
+
+const card = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };

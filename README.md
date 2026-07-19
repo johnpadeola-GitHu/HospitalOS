@@ -1083,3 +1083,89 @@ one place in the whole app: the sidebar.
 
 Total: 81 routes, 71 help articles across 12 categories, 37 lint warnings
 (0 errors).
+
+## This round (part 2) — Academic/Public Health finished, help privacy fixes, real settlement details
+
+**5. Academic and Public Health finished — "Soon" badges genuinely earned to
+be removed, not just deleted.** Found 6 of 9 screens across these groups
+were read-only stubs displaying data with no way to act on it: Training,
+CME, Research, Surveillance, Outreach, Reporting. Built real backend
+functions and working UI for all six — create training programmes and
+enroll trainees, schedule CME and record attendance, register research
+studies and move them through their lifecycle, log notifiable disease
+cases (feeding Alerts directly), plan and complete outreach activities,
+mark national reports submitted. Verified every single action end-to-end
+before removing the `comingSoon` flags. Logbooks, Ethics, and Immunisation
+were already fully built from earlier work and untouched.
+
+**8. Fixed a real privacy/trust problem in Help & documentation.** The
+Signing In article — the first thing any new tenant reads — publicly
+displayed the platform admin's password in a table (and it was already
+stale, since that password was hardened rounds ago). Rewrote it to focus
+entirely on how a tenant's own staff get accounts and recover access, with
+zero platform-admin content. Also substantially shortened and softened the
+"Platform view" article, removing the detailed enumeration of what AgoroX
+can see and reframing it around the reassurance that actually matters: a
+completely separate support tool your own staff, including your Super
+Admin, never sees or has access to.
+
+**9. Settlement now genuinely runs on a 15-day cycle, not just relabeled.**
+Restructured the underlying cycle generator itself — previously one
+settlement per calendar month, now two real half-month periods per month
+with correspondingly adjusted amounts, not a cosmetic text change. Payout
+destination updated to the real account: Lotus Bank, Ipadeola Agoro Farms
+Limited, 1012950136. Verified end-to-end.
+
+**6. Help & documentation updated throughout** for everything in this
+extended session — Academic and Public Health articles rewritten to
+describe real actions instead of "tracking lists," the Instruments gateway
+article gained a full section on device detection (including the honest
+limitation that no browser can install an OS driver), alert source count
+corrected to twenty-two, and the settlement article reflects the new cycle
+and payout details.
+
+Total: 81 routes, 71 help articles across 12 categories, 39 lint warnings
+(0 errors), zero remaining "Soon" badges.
+
+---
+
+## Earlier this round (part 1) — patient interconnection, honest device
+## detection, footer fix, favicon inversion
+
+**1. Patient registration/records interconnection — audited and largely
+fixed.** Found 14 modules across the app let staff free-type a patient's
+name and hospital number, completely disconnected from the real Master
+Patient Index — a genuine, serious gap. Built a shared `PatientPicker`
+component (real search-and-select against the actual registry) and
+retrofitted 13 of the 14 modules: Dental, Mental Health, Geriatric,
+Chaplaincy, Social Work, VIP Services, Nutrition, Sickle Cell, Renal, IPC,
+Claims, Privacy, and Incident & Risk. Referrals.jsx deliberately kept
+free-text — inbound referrals often involve patients from other
+facilities not yet in this hospital's registry, so forcing a match there
+would be wrong. Verified end-to-end that free-text-only entry is now
+genuinely blocked and a real patient stays linked through to the record.
+
+**3. Industry standard, stated directly**: one-time hospital-wide
+registration via a Master Patient Index is the real standard — a patient
+registered anywhere in the hospital is found and reused everywhere else,
+including months later at a different department. Re-registering a
+returning patient is a data-quality defect in real systems, not normal
+behaviour. This is what informed the item 1 fix.
+
+**2. Instruments gateway device detection — built honestly.** Literal
+driver installation is impossible for any browser page, on any browser;
+stated that plainly rather than fabricating a feature that couldn't work.
+Built the real alternative instead: genuine WebUSB/Web Serial detection of
+physically connected devices, with the browser's own native permission
+picker, matched against a small starting set of known vendor IDs, feeding
+into a real "register device" flow. Verified working end-to-end.
+
+**7. Fixed the whitespace-below-footer bug.** Real, well-known CSS issue:
+flex children default to `min-height: auto` rather than `0`, letting the
+page shell grow taller than the viewport instead of scrolling internally.
+Applied the standard fix at every level of the layout chain.
+
+**4. Favicon-only colour inversion.** Regenerated every PNG icon asset
+(apple-touch-icon, manifest icons, 16/32px favicons) with white background
+and red plus — inverted from the red-background version used everywhere
+else in the app (footer, login page).

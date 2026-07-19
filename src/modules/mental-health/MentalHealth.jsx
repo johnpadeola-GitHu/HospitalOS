@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ADMISSION_STATUS, OBSERVATION_LEVELS, OBS_TONE, RISK_FLAGS, listPatients, admitPatient, updateObservation, updateRiskFlags, mhuSummary } from "./mentalHealthService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function MentalHealth() {
   const { user } = useAuth();
@@ -78,7 +79,7 @@ export default function MentalHealth() {
 }
 
 function AdmitModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", bed: "", admissionStatus: ADMISSION_STATUS[0], observationLevel: OBSERVATION_LEVELS[0], riskFlags: [], notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", bed: "", admissionStatus: ADMISSION_STATUS[0], observationLevel: OBSERVATION_LEVELS[0], riskFlags: [], notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -95,11 +96,10 @@ function AdmitModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Admitting…" : "Admit"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field></div>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
+        <div style={{ display: "flex", gap: 12 }}>
         <div style={{ width: 100 }}><Field label="Bed"><input style={inputStyle} value={form.bed} onChange={set("bed")} /></Field></div>
-      </div>
+        </div>
       <Field label="Admission status"><select style={inputStyle} value={form.admissionStatus} onChange={set("admissionStatus")}>{ADMISSION_STATUS.map((s) => <option key={s}>{s}</option>)}</select></Field>
       <Field label="Observation level"><select style={inputStyle} value={form.observationLevel} onChange={set("observationLevel")}>{OBSERVATION_LEVELS.map((o) => <option key={o}>{o}</option>)}</select></Field>
       <Field label="Risk flags">

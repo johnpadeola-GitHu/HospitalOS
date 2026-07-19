@@ -5,6 +5,7 @@ import {
 } from "./nutritionService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 export default function Nutrition() {
   const { user } = useAuth();
@@ -85,7 +86,7 @@ export default function Nutrition() {
 }
 
 function ReferModal({ actor, onClose, onDone }) {
-  const [form, setForm] = useState({ patientName: "", hospitalNo: "", source: REFERRAL_SOURCES[0], weightKg: "", heightCm: "", status: NUTRITION_STATUS[0], dietType: DIET_TYPES[0], notes: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", source: REFERRAL_SOURCES[0], weightKg: "", heightCm: "", status: NUTRITION_STATUS[0], dietType: DIET_TYPES[0], notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -101,8 +102,7 @@ function ReferModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Refer"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={form.patientName} onChange={set("patientName")} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={form.hospitalNo} onChange={set("hospitalNo")} /></Field>
+      <Field label="Patient"><PatientPicker value={form} onChange={(p) => setForm((f) => ({ ...f, ...p }))} /></Field>
       <Field label="Referred from"><select style={inputStyle} value={form.source} onChange={set("source")}>{REFERRAL_SOURCES.map((s) => <option key={s}>{s}</option>)}</select></Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Weight (kg)"><input type="number" style={inputStyle} value={form.weightKg} onChange={set("weightKg")} /></Field></div>

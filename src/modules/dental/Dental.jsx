@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { PROCEDURES, listQueue, checkIn, advanceStage, addProcedure, dentalSummary } from "./dentalService";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
+import PatientPicker from "../patients/PatientPicker";
 
 const naira = (n) => "\u20a6" + n.toLocaleString();
 const STAGE_LABEL = { waiting: "Waiting", "in-chair": "In chair", completed: "Completed" };
@@ -83,14 +84,13 @@ export default function Dental() {
 }
 
 function CheckInModal({ actor, onClose, onDone }) {
-  const [patientName, setPatientName] = useState("");
-  const [hospitalNo, setHospitalNo] = useState("");
+  const [patient, setPatient] = useState({ patientId: null, patientName: "", hospitalNo: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true); setErr("");
-    try { await checkIn({ patientName, hospitalNo, actor }); await onDone(); } catch (e) { setErr(e.message); setBusy(false); }
+    try { await checkIn({ ...patient, actor }); await onDone(); } catch (e) { setErr(e.message); setBusy(false); }
   };
 
   return (
@@ -99,8 +99,7 @@ function CheckInModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Checking in…" : "Check in"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Patient name"><input style={inputStyle} value={patientName} onChange={(e) => setPatientName(e.target.value)} /></Field>
-      <Field label="Hospital no."><input style={inputStyle} value={hospitalNo} onChange={(e) => setHospitalNo(e.target.value)} /></Field>
+      <Field label="Patient"><PatientPicker value={patient} onChange={setPatient} /></Field>
     </Modal>
   );
 }

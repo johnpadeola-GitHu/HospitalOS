@@ -2,13 +2,15 @@ import { useEffect, useState, useCallback } from "react";
 import * as Icons from "lucide-react";
 import {
   DEVICE_CATEGORIES, STATUS_TONE, PRINT_JOB_TYPES,
-  listInstruments, listMessages, setInstrumentStatus, gatewaySummary,
+  listInstruments, listMessages, setInstrumentStatus, gatewaySummary, registerInstrument,
   pendingForInstrument, postResultMessage,
   pendingForModality, receiveDicomStudy,
   pendingForRtMachine, confirmFractionDelivery,
   sendPrintJob,
 } from "./instrumentsService";
-import { PageHeader, StatCard, Card, Pill, Button, Modal, inputStyle, EmptyState } from "../../lib/ui";
+import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
+import { isDeviceDetectionSupported, isWebUsbSupported, isWebSerialSupported, detectUsbDevice, detectSerialDevice } from "./deviceDetection";
+import { useAuth } from "../../auth/AuthContext";
 
 const CATEGORY_ICON = { analyzer: "TestTube", imaging: "ScanFace", radiotherapy: "Radiation", printer: "Printer" };
 
@@ -21,12 +23,14 @@ function ago(iso) {
 }
 
 export default function Instruments() {
+  const { user } = useAuth();
   const [cat, setCat] = useState("all");
   const [devices, setDevices] = useState([]);
   const [messages, setMessages] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionFor, setActionFor] = useState(null); // { device, kind }
+  const [showDetect, setShowDetect] = useState(false);
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
@@ -53,7 +57,8 @@ export default function Instruments() {
   return (
     <div>
       <PageHeader group="Diagnostics" title="Instruments &amp; devices gateway" icon="Cable"
-        subtitle="Analyzers, imaging modalities, radiotherapy systems, and printers — one interoperability hub for old and modern equipment" />
+        subtitle="Analyzers, imaging modalities, radiotherapy systems, and printers — one interoperability hub for old and modern equipment"
+        actions={<Button variant="primary" icon="Usb" onClick={() => setShowDetect(true)}>Detect connected device</Button>} />
 
       <div style={note}>
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
@@ -155,6 +160,10 @@ export default function Instruments() {
           onDone={async () => { setActionFor(null); await refresh(); }}
         />
       )}
+
+      {showDetect && (
+        <DetectDeviceModal actor={user} onClose={() => setShowDetect(false)} onDone={async () => { setShowDetect(false); await refresh(); }} />
+      )}
     </div>
   );
 }
@@ -165,6 +174,116 @@ function ActionModal({ device, kind, onClose, onDone }) {
   if (kind === "radiotherapy") return <RtAction device={device} onClose={onClose} onDone={onDone} />;
   if (kind === "printer") return <PrinterAction device={device} onClose={onClose} onDone={onDone} />;
   return null;
+}
+
+// Detects a real, physically connected USB or serial device via the
+// browser's own WebUSB/Web Serial APIs — genuine detection, not a
+// simulation. What it deliberately does NOT do: install an operating
+// system driver. No web page can do that on any browser; the honest
+// alternative is direct browser-to-device communication for devices that
+// speak standard USB/serial protocols, which is what these APIs provide.
+function DetectDeviceModal({ actor, onClose, onDone }) {
+  const [detected, setDetected] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState(DEVICE_CATEGORIES[0].key);
+
+  const supported = isDeviceDetectionSupported();
+
+  const runDetect = async (via) => {
+    setErr(""); setBusy(true);
+    try {
+      const result = via === "usb" ? await detectUsbDevice() : await detectSerialDevice();
+      setDetected(result);
+      setName(result.productName !== "Unnamed USB device" ? result.productName : "");
+      if (result.suggestedCategory) setCategory(result.suggestedCategory);
+    } catch (e) {
+      setErr(e.message);
+    }
+    setBusy(false);
+  };
+
+  const submit = async () => {
+    setBusy(true); setErr("");
+    try {
+      await registerInstrument({
+        category, name, vendor: detected.manufacturerName,
+        connectionType: detected.connectionType, vendorId: detected.vendorId, productId: detected.productId,
+        actor,
+      });
+      await onDone();
+    } catch (e) { setErr(e.message); setBusy(false); }
+  };
+
+  return (
+    <Modal title="Detect connected device" onClose={onClose} footer={detected ? (
+      <>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy || !name.trim()}>{busy ? "Registering\u2026" : "Register device"}</Button>
+      </>
+    ) : (
+      <Button variant="ghost" onClick={onClose}>Close</Button>
+    )}>
+      {err && <div style={errBox}>{err}</div>}
+
+      {!supported && (
+        <div style={warnBox}>
+          <Icons.AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>
+            WebUSB and Web Serial \u2014 the browser features that let this page detect connected devices \u2014
+            aren't available in this browser. Use Chrome or Edge on desktop, or add this device manually below.
+          </span>
+        </div>
+      )}
+
+      {!detected ? (
+        <>
+          <p style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.6, marginBottom: 14 }}>
+            Connect the device to this computer, then choose how it's connected. Your browser will show its own
+            device picker \u2014 select the device there to grant this page access.
+          </p>
+          <div style={{ display: "flex", gap: 10, marginBottom: 6 }}>
+            <Button variant="primary" onClick={() => runDetect("usb")} disabled={busy || !isWebUsbSupported()}>
+              {busy ? "Waiting for selection\u2026" : "Detect USB device"}
+            </Button>
+            <Button onClick={() => runDetect("serial")} disabled={busy || !isWebSerialSupported()}>
+              Detect serial port
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={detectedBox}>
+            <Icons.CheckCircle2 size={14} color="var(--good)" style={{ flexShrink: 0, marginTop: 1 }} />
+            <div>
+              <div style={{ fontWeight: 600, color: "var(--ink-strong)", fontSize: 13 }}>{detected.manufacturerName}</div>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", fontFamily: "var(--font-mono)", marginTop: 2 }}>
+                {detected.connectionType.toUpperCase()} \u00b7 vendor {detected.vendorId} \u00b7 product {detected.productId}
+              </div>
+              {detected.matched ? (
+                <div style={{ fontSize: 11.5, color: "var(--good)", marginTop: 4 }}>Recognised \u2014 category suggested below.</div>
+              ) : (
+                <div style={{ fontSize: 11.5, color: "var(--warn)", marginTop: 4 }}>
+                  Not in the known-device list yet \u2014 confirm the category yourself; it'll be recognised automatically next time.
+                </div>
+              )}
+            </div>
+          </div>
+          <Field label="Name this device"><input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Front desk label printer" /></Field>
+          <Field label="Category">
+            <select style={inputStyle} value={category} onChange={(e) => setCategory(e.target.value)}>
+              {DEVICE_CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
+          </Field>
+          <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>
+            Network-based devices (most analyzers, imaging modalities) still need their host/AE title configured
+            after registering \u2014 detection confirms what's physically connected, not network setup.
+          </div>
+        </>
+      )}
+    </Modal>
+  );
 }
 
 function AnalyzerAction({ device, onClose, onDone }) {
@@ -385,3 +504,5 @@ const codeBox = { background: "var(--surface)", border: "1px solid var(--border)
 const dicomStat = { display: "flex", gap: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" };
 const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12, padding: "10px 12px", borderRadius: 9, marginBottom: 14, lineHeight: 1.5 };
+const detectedBox = { display: "flex", gap: 9, background: "var(--good-bg)", padding: "11px 12px", borderRadius: 9, marginBottom: 14 };
