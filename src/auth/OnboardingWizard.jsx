@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import * as Icons from "lucide-react";
 import { validateActivationCode, redeemActivationCode } from "../engines/onboarding/activationCodes";
+import { AGREEMENT_SECTIONS, AGREEMENT_VERSION, AGREEMENT_EFFECTIVE_DATE } from "../engines/onboarding/tenantAgreement";
 import { inputStyle } from "../lib/ui";
 import { useAuth } from "./AuthContext";
 
@@ -14,11 +15,11 @@ import { useAuth } from "./AuthContext";
 // redeemActivationCode() \u2014 everything before that is purely local state.
 
 const STORAGE_KEY = "hospitalos_onboarding_wizard";
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
 
 const STEP_TITLES = [
   "Activate your hospital", "Hospital identity", "Facility details",
-  "Staff roles", "Branding", "Plan confirmation", "Review & confirm",
+  "Staff roles", "Branding", "Plan confirmation", "Service agreement", "Review & confirm",
 ];
 
 const DEPARTMENT_OPTIONS = [
@@ -57,6 +58,7 @@ function emptyState() {
       adminName: "", adminPhone: "", adminEmail: "", adminPassword: "", adminPasswordConfirm: "",
       bedCount: "", centresCount: "1", departments: DEPARTMENT_OPTIONS.map((d) => d.key),
       roles: ["doctor", "nurse"],
+      agreementAccepted: false, agreementSignedName: "",
       logoUrl: "", phone: "", registrationNumber: "",
     },
   };
@@ -108,6 +110,11 @@ export default function OnboardingWizard({ onSwitchToDemo, onDone, prefillEmail 
   };
 
   const submit = async () => {
+    if (!state.data.agreementAccepted || !state.data.agreementSignedName.trim()) {
+      setErr("The Tenant Service Agreement must be signed before activation can complete.");
+      goTo(7);
+      return;
+    }
     setBusy(true); setErr("");
     try {
       const r = await redeemActivationCode({
@@ -123,6 +130,11 @@ export default function OnboardingWizard({ onSwitchToDemo, onDone, prefillEmail 
           logoUrl: state.data.logoUrl,
           registrationNumber: state.data.registrationNumber,
           bedCount: state.data.bedCount,
+        },
+        agreement: {
+          version: AGREEMENT_VERSION,
+          signedName: state.data.agreementSignedName.trim(),
+          signedAt: new Date().toISOString(),
         },
       });
       clearSavedState();
@@ -167,7 +179,8 @@ export default function OnboardingWizard({ onSwitchToDemo, onDone, prefillEmail 
       {state.step === 4 && <Step4Roles data={state.data} patch={patch} onNext={next} />}
       {state.step === 5 && <Step5Branding data={state.data} patch={patch} onNext={next} />}
       {state.step === 6 && <Step6Plan data={state.data} onNext={next} />}
-      {state.step === 7 && <Step7Review data={state.data} onSubmit={submit} busy={busy} onEdit={goTo} />}
+      {state.step === 7 && <Step7Agreement data={state.data} patch={patch} onNext={next} setErr={setErr} />}
+      {state.step === 8 && <Step8Review data={state.data} onSubmit={submit} busy={busy} onEdit={goTo} />}
 
       {state.step === 1 && <FrontDoorAlternatives onSwitchToDemo={onSwitchToDemo} onSignedIn={onDone} prefillEmail={prefillEmail} />}
     </div>
@@ -288,7 +301,7 @@ function Step1Activate({ data, patch, onValid, setErr }) {
     setBusy(true); setErr("");
     try {
       const v = await validateActivationCode(data.activationCode);
-      patch({ validatedCode: v, hospitalName: data.hospitalName || v.tenantName });
+      patch({ validatedCode: v, hospitalName: v.tenantName });
       onValid();
     } catch (e) { setErr(e.message); }
     setBusy(false);
@@ -341,7 +354,6 @@ function Step1Activate({ data, patch, onValid, setErr }) {
 
 function Step2Identity({ data, patch, onNext, setErr }) {
   const submit = () => {
-    if (!data.hospitalName.trim()) { setErr("Enter the hospital's name."); return; }
     if (!data.address.trim()) { setErr("Enter the hospital's address."); return; }
     setErr("");
     onNext();
@@ -354,7 +366,16 @@ function Step2Identity({ data, patch, onNext, setErr }) {
           Code valid for <b>{data.validatedCode.tier.label}</b> \u2014 issued for "{data.validatedCode.tenantName}"
         </div>
       )}
-      <Row><F label="Hospital name"><input style={inputStyle} value={data.hospitalName} onChange={(e) => patch({ hospitalName: e.target.value })} /></F></Row>
+      <Row><F label="Hospital name">
+        <div style={lockedField}>
+          <Icons.Lock size={13} style={{ color: "var(--muted)", flexShrink: 0 }} />
+          {data.hospitalName}
+        </div>
+      </F></Row>
+      <p style={lockedNote}>
+        Set by your activation code, and cannot be changed here \u2014 this stops a stolen code being
+        redeemed under a different hospital's name. Contact AgoroX if this is wrong.
+      </p>
       <Row><F label="Hospital type">
         <select style={inputStyle} value={data.hospitalType} onChange={(e) => patch({ hospitalType: e.target.value })}>
           {HOSPITAL_TYPES.map((t) => <option key={t}>{t}</option>)}
@@ -444,7 +465,100 @@ function Step6Plan({ data, onNext }) {
   );
 }
 
-function Step7Review({ data, onSubmit, busy, onEdit }) {
+// The Agreement must be genuinely read-or-at-least-scrolled before it can
+// be signed \u2014 the checkbox and signature field stay disabled until the
+// scrollable text has been scrolled to its end, a real (if soft) guard
+// against a rubber-stamp "agree" click on text nobody opened.
+function Step7Agreement({ data, patch, onNext, setErr }) {
+  const [scrolledToEnd, setScrolledToEnd] = useState(false);
+
+  const onScroll = (e) => {
+    const el = e.target;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 24) setScrolledToEnd(true);
+  };
+
+  const submit = () => {
+    if (!scrolledToEnd) { setErr("Please scroll through the agreement before signing."); return; }
+    if (!data.agreementSignedName.trim()) { setErr("Type your full legal name to sign."); return; }
+    if (!data.agreementAccepted) { setErr("You must check the box confirming you agree before continuing."); return; }
+    setErr("");
+    onNext();
+  };
+
+  return (
+    <div>
+      <p style={helpText}>
+        This becomes a binding agreement between {data.hospitalName || "your hospital"} and AgoroX
+        Africa the moment you sign it below. Version {AGREEMENT_VERSION}, effective {AGREEMENT_EFFECTIVE_DATE}.
+        {" "}
+        <a href="/guides/HospitalOS-Tenant-Service-Agreement.pdf" download style={inlineLink}>Download as PDF</a>.
+      </p>
+
+      <div style={agreementScroll} onScroll={onScroll}>
+        {AGREEMENT_SECTIONS.map((s) => (
+          <div key={s.title} style={{ marginBottom: 16 }}>
+            <div style={agreementH}>{s.title}</div>
+            {s.body.map((p, i) => <p key={i} style={agreementP}>{p}</p>)}
+            {s.table && (
+              <table style={agreementTable}>
+                <thead><tr>{s.table.head.map((h) => <th key={h} style={agreementTh}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {s.table.rows.map((row, i) => (
+                    <tr key={i}>{row.map((cell, j) => <td key={j} style={agreementTd}>{cell}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {s.bodyAfter && s.bodyAfter.map((p, i) => <p key={i} style={agreementP}>{p}</p>)}
+            {s.list && (
+              <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
+                {s.list.map((li, i) => <li key={i} style={agreementLi}>{li}</li>)}
+              </ul>
+            )}
+          </div>
+        ))}
+        <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "center", paddingTop: 10 }}>
+          \u2014 End of agreement \u2014
+        </div>
+      </div>
+
+      {!scrolledToEnd && (
+        <div style={scrollHint}><Icons.ArrowDown size={12} /> Scroll to the end to unlock signing</div>
+      )}
+
+      <div style={{ marginTop: 16 }}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 9, fontSize: 12.5, color: "var(--ink)", cursor: scrolledToEnd ? "pointer" : "not-allowed", marginBottom: 14 }}>
+          <input
+            type="checkbox" checked={data.agreementAccepted} disabled={!scrolledToEnd}
+            onChange={(e) => patch({ agreementAccepted: e.target.checked })}
+            style={{ marginTop: 2 }}
+          />
+          <span>
+            I have read and agree to the Tenant Service Agreement on behalf of {data.hospitalName || "this hospital"},
+            and I am authorised to accept it.
+          </span>
+        </label>
+
+        <Row><F label="Type your full legal name to sign">
+          <input
+            style={inputStyle} value={data.agreementSignedName} disabled={!scrolledToEnd}
+            onChange={(e) => patch({ agreementSignedName: e.target.value })}
+            placeholder={data.adminName || "Full name"}
+          />
+        </F></Row>
+        <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 16 }}>
+          Signed and dated automatically at the moment of activation. This record is retained with your tenant's account.
+        </div>
+
+        <button style={primaryBtn} onClick={submit} disabled={!scrolledToEnd}>
+          Sign &amp; continue <Icons.ArrowRight size={15} strokeWidth={2.2} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Step8Review({ data, onSubmit, busy, onEdit }) {
   const tier = data.validatedCode?.tier;
   return (
     <div>
@@ -456,6 +570,7 @@ function Step7Review({ data, onSubmit, busy, onEdit }) {
       <ReviewRow label="Staff roles" value={data.roles.length ? data.roles.join(", ") : "None selected"} onEdit={() => onEdit(4)} />
       <ReviewRow label="Branding" value={data.logoUrl ? "Logo set" : "No logo yet"} onEdit={() => onEdit(5)} />
       <ReviewRow label="Plan" value={tier ? tier.label : "\u2014"} onEdit={() => onEdit(6)} />
+      <ReviewRow label="Service agreement" value={data.agreementSignedName ? `Signed by ${data.agreementSignedName}` : "Not yet signed"} onEdit={() => onEdit(7)} />
 
       <button style={{ ...primaryBtn, opacity: busy ? 0.7 : 1, marginTop: 8 }} onClick={onSubmit} disabled={busy}>
         {busy ? "Activating your hospital\u2026" : "Confirm & activate"}
@@ -520,11 +635,27 @@ const primaryBtn = {
 };
 const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
 const codePreview = { display: "flex", alignItems: "center", gap: 7, background: "var(--good-bg)", color: "var(--good)", fontSize: 12, padding: "9px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
+const lockedField = {
+  display: "flex", alignItems: "center", gap: 8, ...inputStyle,
+  background: "var(--surface)", color: "var(--ink-strong)", fontWeight: 600, cursor: "not-allowed",
+};
+const lockedNote = { fontSize: 11, color: "var(--muted)", lineHeight: 1.5, margin: "-8px 0 16px" };
 const inviteBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--ink)", fontSize: 12, padding: "12px 13px", borderRadius: 10, marginBottom: 18, lineHeight: 1.6 };
 const chipGrid = { display: "flex", flexWrap: "wrap", gap: 7 };
 const chip = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12, fontWeight: 500, padding: "7px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const planCard = { background: "var(--surface-2)", border: "1.5px solid var(--border-strong)", borderRadius: 12, padding: "16px 16px 14px", marginBottom: 18 };
+const agreementScroll = {
+  maxHeight: 340, overflowY: "auto", border: "1px solid var(--border-strong)", borderRadius: 10,
+  padding: "16px 18px", background: "var(--surface)",
+};
+const agreementH = { fontSize: 12.5, fontWeight: 700, color: "var(--ink-strong)", marginBottom: 6 };
+const agreementP = { fontSize: 11.5, color: "var(--ink)", lineHeight: 1.6, margin: "0 0 6px" };
+const agreementLi = { fontSize: 11.5, color: "var(--ink)", lineHeight: 1.6, marginBottom: 4 };
+const agreementTable = { width: "100%", borderCollapse: "collapse", fontSize: 11, margin: "8px 0" };
+const agreementTh = { textAlign: "left", padding: "5px 8px", background: "var(--surface-2)", borderBottom: "1.5px solid var(--border-strong)", fontWeight: 700, color: "var(--muted)" };
+const agreementTd = { padding: "5px 8px", borderBottom: "1px solid var(--border)", color: "var(--ink)" };
+const scrollHint = { display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--warn)", marginTop: 8, fontWeight: 600 };
 const reviewRow = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--border)" };
 const editLink = { font: "inherit", fontSize: 11.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 };
 const successIcon = { width: 48, height: 48, borderRadius: "50%", background: "var(--good)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 };

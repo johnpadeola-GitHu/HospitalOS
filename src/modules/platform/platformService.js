@@ -49,6 +49,7 @@ export async function setTenantStatus(id, status) {
 export async function addTenant({
   name, subdomain, plan, billingType, commissionPct, status,
   address, phone, email, logoUrl, registrationNumber, seats, demoExpiresAt,
+  agreementVersion, agreementSignedName, agreementSignedAt,
 }) {
   await delay(120);
   const t = {
@@ -57,6 +58,8 @@ export async function addTenant({
     seats: seats || 5, activeUsers: 0, status, since: new Date().toISOString().slice(0, 10),
     mrr: 0, lastSeen: new Date().toISOString(),
     address, phone, email, logoUrl: logoUrl || "", registrationNumber, demoExpiresAt: demoExpiresAt || null,
+    agreementVersion: agreementVersion || null, agreementSignedName: agreementSignedName || null,
+    agreementSignedAt: agreementSignedAt || null,
   };
   _tenants.unshift(t);
   return t;

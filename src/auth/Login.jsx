@@ -27,7 +27,7 @@ export default function Login() {
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.02em" }}>
               HospitalOS
             </div>
-            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>by AgoroX Africa</div>
+            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Powered by AgoroX Africa</div>
           </div>
         </div>
 
@@ -54,8 +54,8 @@ const wrap = {
   background: "linear-gradient(160deg, #EEF3FB 0%, #F4F6FA 55%, #E9EFF9 100%)", padding: 24,
 };
 const panel = {
-  width: "100%", maxWidth: 420, background: "var(--surface-2)",
-  border: "1px solid var(--border)", borderRadius: 16, padding: "28px 28px 22px",
+  width: "75%", maxWidth: 920, minWidth: 320, background: "var(--surface-2)",
+  border: "1px solid var(--border)", borderRadius: 16, padding: "32px 40px 26px",
   boxShadow: "0 10px 40px rgba(22,35,59,0.10)", maxHeight: "92vh", overflowY: "auto",
 };
 const mark = {

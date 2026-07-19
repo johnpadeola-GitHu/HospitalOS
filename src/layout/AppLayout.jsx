@@ -9,6 +9,7 @@ import GlobalSearch from "./GlobalSearch";
 import TenantBrand from "./TenantBrand";
 import NotificationBell from "./NotificationBell";
 import DemoBanner from "./DemoBanner";
+import NewDeviceBanner from "./NewDeviceBanner";
 
 function useCrumb() {
   const { pathname } = useLocation();
@@ -98,6 +99,7 @@ export default function AppLayout() {
           </div>
         </header>
 
+        <NewDeviceBanner />
         <DemoBanner />
 
         <main style={main}>

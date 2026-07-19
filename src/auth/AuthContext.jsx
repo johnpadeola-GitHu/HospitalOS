@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback } from "react";
 import { canAccessArea, canDo, roleLabel as rbacRoleLabel, areasFor } from "../lib/rbac";
 import { record, AUDIT_ACTIONS } from "../lib/audit";
 import { findAccount, demoAccountsPublicList } from "./accountsStore";
+import { checkAndRecordDevice } from "../lib/deviceFingerprint";
 
 // Auth context — email/password sign-in, session state, and (for the platform
 // admin) a Platform/Tenant view switch.
@@ -40,8 +41,16 @@ export function AuthProvider({ children }) {
       err.demoExpired = true;
       throw err;
     }
+    if (found.active === false) {
+      record({
+        actor: found, action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
+        detail: "Blocked sign-in — account deactivated", severity: "warn",
+      });
+      throw new Error("This account has been deactivated. Contact your hospital's administrator.");
+    }
     const { password: _pw, ...safe } = found;
-    setUser(safe);
+    const device = checkAndRecordDevice(safe);
+    setUser({ ...safe, newDevice: device.isNew, deviceLabel: device.label });
     setView("tenant");
     record({ actor: safe, action: AUDIT_ACTIONS.SIGN_IN, entity: "session", entityId: safe.email, detail: `Signed in as ${rbacRoleLabel(safe.role)}` });
     return safe;

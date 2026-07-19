@@ -153,7 +153,7 @@ export async function validateActivationCode(codeInput) {
  * ATOMICITY NOTE at the top of this file for why the check and the
  * redeemed-marking happen back to back with no `await` in between.
  */
-export async function redeemActivationCode({ code: codeInput, adminName, adminPhone, adminEmail, adminPassword, hospitalDetails = {}, actor }) {
+export async function redeemActivationCode({ code: codeInput, adminName, adminPhone, adminEmail, adminPassword, hospitalDetails = {}, agreement, actor }) {
   const code = String(codeInput || "").trim().toUpperCase();
   const rec = _codes.get(code);
 
@@ -169,6 +169,15 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminPh
   }
   if (!adminName || !adminName.trim()) throw new Error("Enter your full name.");
   if (!adminEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim())) throw new Error("Enter a valid work email address.");
+  // The Tenant Service Agreement is a hard gate, enforced here at the
+  // service layer, not just by the wizard UI's disabled buttons — no
+  // signature record, no tenant. This is the same principle as every other
+  // platform-admin-only action in this codebase: the real boundary is
+  // server-side (or, in this preview, the one function every redemption
+  // path must go through), never just a disabled button.
+  if (!agreement || !agreement.signedName || !agreement.signedName.trim()) {
+    throw new Error("The Tenant Service Agreement must be signed before activation can complete.");
+  }
   if (!adminPassword || adminPassword.length < 12) throw new Error("Password must be at least 12 characters.");
   if (emailTaken(adminEmail)) throw new Error("An account with this email already exists.");
   rec.status = "redeemed";
@@ -187,8 +196,16 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminPh
     // address, logo, registration number, bed count \u2014 is still
     // collected, just later in this same wizard (Steps 2 onward), not
     // duplicated on the activation step alongside the person's own details.
+    // SECURITY: the tenant's name is taken ONLY from the code record, never
+    // from client-supplied input, regardless of what hospitalDetails
+    // contains. If this accepted an override, a stolen code could be
+    // redeemed under a different hospital's name \u2014 the platform admin's
+    // choice of who a code belongs to would mean nothing. Everything else
+    // about the hospital (address, type, facility details, branding) is
+    // still freely editable; only the identity that makes a code belong to
+    // a specific, named hospital is locked.
     tenant = await addTenant({
-      name: hospitalDetails.hospitalName?.trim() || rec.tenantName,
+      name: rec.tenantName,
       plan: tier.label,
       billingType: isEnterprise ? "flat" : "commission",
       commissionPct: isEnterprise ? null : tier.commissionPct,
@@ -200,6 +217,9 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminPh
       registrationNumber: hospitalDetails.registrationNumber || "",
       seats: hospitalDetails.bedCount ? Math.max(10, Math.round(parseInt(hospitalDetails.bedCount, 10) * 1.5)) : 20,
       demoExpiresAt: null,
+      agreementVersion: agreement.version,
+      agreementSignedName: agreement.signedName.trim(),
+      agreementSignedAt: agreement.signedAt || new Date().toISOString(),
     });
 
     const account = addAccount({
@@ -211,6 +231,12 @@ export async function redeemActivationCode({ code: codeInput, adminName, adminPh
     record({
       actor: actor || account, action: AUDIT_ACTIONS.CREATE, entity: "activation-redemption", entityId: code,
       detail: `${tenant.name} activated via code ${code} \u2014 ${tier.label}`, severity: "info",
+    });
+
+    record({
+      actor: actor || account, action: AUDIT_ACTIONS.CREATE, entity: "tenant-agreement", entityId: tenant.id,
+      detail: `Tenant Service Agreement v${agreement.version} signed by ${agreement.signedName.trim()} for ${tenant.name}`,
+      severity: "info",
     });
 
     return { tenant, account, tier, code: rec.code, requiresPayment: isEnterprise };

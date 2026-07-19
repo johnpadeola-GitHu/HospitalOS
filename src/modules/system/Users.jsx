@@ -2,10 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import { listUsers, createUser, updateUserRole, toggleUserActive } from "./systemService";
 import { ROLES, AREAS, ACTIONS, roleLabel, canDo, areasFor } from "../../lib/rbac";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
+import { useAuth } from "../../auth/AuthContext";
 
 const ROLE_KEYS = Object.keys(ROLES);
 
 export default function Users() {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -15,9 +17,9 @@ export default function Users() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setUsers(await listUsers({ query }));
+    setUsers(await listUsers({ tenantId: user.tenantId, query }));
     setLoading(false);
-  }, [query]);
+  }, [query, user.tenantId]);
 
   useEffect(() => {
     const t = setTimeout(refresh, 180);
@@ -37,7 +39,7 @@ export default function Users() {
   const toggle = async (id) => {
     setErr("");
     try {
-      await toggleUserActive(id);
+      await toggleUserActive(id, user.tenantId);
       await refresh();
     } catch (e) {
       setErr(e.message);
@@ -127,6 +129,7 @@ export default function Users() {
 
       {showAdd && (
         <AddUserModal
+          tenantId={user.tenantId}
           onClose={() => setShowAdd(false)}
           onDone={async () => {
             setShowAdd(false);
@@ -140,17 +143,18 @@ export default function Users() {
   );
 }
 
-function AddUserModal({ onClose, onDone }) {
-  const [form, setForm] = useState({ name: "", email: "", role: "nurse" });
+function AddUserModal({ tenantId, onClose, onDone }) {
+  const [form, setForm] = useState({ name: "", email: "", password: "", passwordConfirm: "", role: "nurse" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async () => {
+    if (form.password !== form.passwordConfirm) { setErr("Passwords do not match."); return; }
     setBusy(true);
     setErr("");
     try {
-      await createUser(form);
+      await createUser({ ...form, tenantId });
       await onDone();
     } catch (e) {
       setErr(e.message);
@@ -168,7 +172,7 @@ function AddUserModal({ onClose, onDone }) {
             Cancel
           </Button>
           <Button variant="primary" onClick={submit} disabled={busy}>
-            {busy ? "Adding…" : "Add user"}
+            {busy ? "Adding\u2026" : "Add user"}
           </Button>
         </>
       }
@@ -177,9 +181,13 @@ function AddUserModal({ onClose, onDone }) {
       <Field label="Full name">
         <input style={inputStyle} value={form.name} onChange={set("name")} placeholder="Dr. Chioma Nwosu" />
       </Field>
-      <Field label="Email">
+      <Field label="Email — this becomes their sign-in username">
         <input style={inputStyle} value={form.email} onChange={set("email")} placeholder="c.nwosu@hospitalos.ng" />
       </Field>
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ flex: 1 }}><Field label="Password"><input type="password" style={inputStyle} value={form.password} onChange={set("password")} placeholder="Minimum 12 characters" /></Field></div>
+        <div style={{ flex: 1 }}><Field label="Confirm password"><input type="password" style={inputStyle} value={form.passwordConfirm} onChange={set("passwordConfirm")} /></Field></div>
+      </div>
       <Field label="Role">
         <select style={inputStyle} value={form.role} onChange={set("role")}>
           {ROLE_KEYS.map((rk) => (
@@ -191,6 +199,10 @@ function AddUserModal({ onClose, onDone }) {
       </Field>
       <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
         Grants access to: {areasFor(form.role).map((k) => AREAS.find((a) => a.key === k)?.label).filter(Boolean).join(", ")}
+      </div>
+      <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10, lineHeight: 1.5 }}>
+        You are setting this staff member's own sign-in credentials directly \u2014 share the email and
+        password with them yourself; there is no automated invite email.
       </div>
     </Modal>
   );

@@ -844,3 +844,67 @@ screenshots provided:
   still works after the restructuring.
 
 Total: 78 routes, 67 help articles, 39 lint warnings (0 errors).
+
+## This round — security hardening and the Tenant Service Agreement
+
+**1a. Confirmed platform-admin-only code provisioning.** Verified
+`generateActivationCode()` is called from exactly one place —
+Platform → Activation codes — gated to the platform admin account only.
+No self-serve path exists anywhere.
+
+**1b. Found and fixed a real, pre-existing bug: staff accounts couldn't
+actually sign in.** Administration → Users & roles wrote to a completely
+disconnected list from the account store sign-in actually checks — a
+"created" staff member could never log in. Rewired `createUser()` to
+create genuine sign-in-capable accounts via the same store the activation
+wizard uses: 12-character password minimum, tenant-scoped, deactivation
+genuinely blocks sign-in (verified), and the last active Super Admin per
+tenant cannot be deactivated by anyone.
+
+**1c. Device fingerprinting**, implemented and tested. A best-effort
+browser fingerprint (user agent, screen, timezone, language) tracks known
+devices per account. A genuinely new device is logged to the audit trail
+and shown as a dismissible banner; an account's first-ever sign-in isn't
+falsely flagged. New "Trusted devices" panel in Administration → Security
+& audit gives real visibility. Verified: same device recognised across
+sign-ins, a genuinely different device (tested Chrome/Windows vs.
+Safari/iPhone) correctly flagged.
+
+**1d. Closed the stolen-code rename exploit.** Previously, client input
+could override the hospital name during activation — a stolen code could
+be redeemed under a different hospital's name. Fixed at the service layer
+(not just hidden in the UI): the tenant name is now locked to the
+activation code record, full stop. Verified by attempting the exact attack
+described — injecting a different hospital name during redemption — and
+confirming the tenant was created under the code's real name, not the
+injected one. Step 2 of the wizard shows the name read-only with an
+explanation.
+
+**2. Activation page footer** now reads "Powered by AgoroX Africa."
+
+**3. Activation panel widened** to 75% of page width (capped at 920px).
+
+**4. Tenant Service Agreement** — drafted and wired as a genuine hard gate,
+not decoration:
+- 20-section agreement (src/engines/onboarding/tenantAgreement.js) covering
+  parties, the real Starter/Growth/Scale/Enterprise fee structure, data
+  ownership, NDPA compliance, term/termination, liability, and Nigerian
+  arbitration — with an explicit template notice that it needs qualified
+  legal review before carrying real contractual weight.
+- New **Step 7 of 8**: the agreement is scrollable, and the checkbox plus
+  signature field stay locked until scrolled to the end.
+- **Verified the gate is real**: redemption attempts with no agreement or
+  an empty signature were both rejected at the service layer (not just the
+  UI), and the activation code stayed unredeemed after each failed
+  attempt — a bad signature doesn't burn the tenant's only code, matching
+  the same fail-safe principle as every other guard in this system.
+- A signed submission stores the signer's name, agreement version, and
+  timestamp on the tenant record, plus a dedicated audit entry.
+- Downloadable PDF version generated and linked from the signing step.
+
+**Full integration regression**: ran everything from this round together
+in one test — activation, the identity-lock attack attempt, agreement
+signing, staff account creation via Users & Roles, and platform tenant
+visibility — all passing in combination, not just individually.
+
+Total: 78 routes, 68 help articles (2 new), 39 lint warnings (0 errors).

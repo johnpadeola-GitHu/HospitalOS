@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import * as Icons from "lucide-react";
 import { listAudit, verifyChain, auditStats, auditActors, AUDIT_ACTIONS } from "../../lib/audit";
+import { listKnownDevices } from "../../lib/deviceFingerprint";
+import { listAccountsByTenant } from "../../auth/accountsStore";
 import { PageHeader, StatCard, Card, Pill, Button, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -16,7 +18,7 @@ function when(iso) {
 }
 
 export default function Security() {
-  const { may } = useAuth();
+  const { may, user } = useAuth();
   const [rows, setRows] = useState([]);
   const [stats, setStats] = useState(null);
   const [chain, setChain] = useState(null);
@@ -24,13 +26,16 @@ export default function Security() {
   const [action, setAction] = useState("all");
   const [actor, setActor] = useState("all");
   const [actors, setActors] = useState([]);
+  const [devices, setDevices] = useState([]);
 
   const refresh = useCallback(() => {
     setRows(listAudit({ limit: 200, action, actor, query }));
     setStats(auditStats());
     setChain(verifyChain());
     setActors(auditActors());
-  }, [action, actor, query]);
+    const tenantEmails = listAccountsByTenant(user.tenantId).map((a) => a.email);
+    setDevices(listKnownDevices(tenantEmails));
+  }, [action, actor, query, user.tenantId]);
 
   useEffect(() => {
     const t = setTimeout(refresh, 120);
@@ -132,6 +137,34 @@ export default function Security() {
             </table>
           </div>
         )}
+      </Card>
+
+      <Card title="Trusted devices" pad={false}>
+        {devices.length === 0 ? (
+          <div style={{ padding: 22 }}><EmptyState icon="Smartphone" title="No device history yet" /></div>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead><tr>{["Staff", "Device", "First seen", "Last seen"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
+            <tbody>
+              {devices.map((d, i) => (
+                <tr key={d.fingerprint + d.email} style={{ borderTop: i ? "1px solid var(--border)" : "none" }}>
+                  <td style={td}>{d.email}</td>
+                  <td style={{ ...td, fontWeight: 600, color: "var(--ink-strong)" }}>{d.label}</td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--muted)" }}>{when(d.firstSeenAt)}</td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--muted)" }}>{when(d.lastSeenAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <div style={{ ...note, borderTop: "1px solid var(--border)", borderRadius: 0, margin: 0 }}>
+          <Icons.Info size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>
+            A best-effort browser fingerprint, not a hardware-verified one \u2014 good enough to notice an
+            unfamiliar sign-in and log it, not a hard security boundary. A first-ever sign-in for an
+            account is not flagged as "new"; every device after that is.
+          </span>
+        </div>
       </Card>
 
       <div style={note}>
