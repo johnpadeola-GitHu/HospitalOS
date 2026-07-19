@@ -1048,3 +1048,38 @@ brandText/brandSub styles and two other pre-existing dead style constants
 found during the lint pass. Warnings down to 37 (0 errors).
 
 Total: 81 routes, 71 help articles, 37 lint warnings (0 errors).
+
+## This round — 12 help categories, iOS home screen icon, topbar decluttered fully
+
+**1. Help & documentation now has 12 categories, not 11.** Split the
+overloaded "Administration" category (11 articles, genuinely too broad) by
+pulling four compliance-related articles — Compliance & accreditation,
+Incident & risk management, Policies & SOPs, and Staff accounts & device
+security — into a new "Compliance & risk" category. This wasn't an
+arbitrary split: it mirrors the app's own real "Compliance" nav group,
+which already has three dedicated screens. Administration now holds 7
+articles, Compliance & risk holds 4. Verified all 71 articles still
+resolve correctly, zero orphans, zero broken cross-references.
+
+**2. Proper iOS "Add to Home Screen" icon support — this was genuinely
+missing entirely.** iOS Safari does not use SVG favicons for home screen
+icons; it specifically requires an `apple-touch-icon` PNG link tag, which
+did not exist anywhere in the app. Generated real PNG icons at the exact
+proportions of the SVG mark (180×180 for iOS, 192×192 and 512×512 for a
+proper web manifest, 16/32px favicons) and wired up `index.html` with the
+full set: apple-touch-icon, apple-mobile-web-app meta tags, a
+manifest.json for Android/general PWA install, and a proper page title
+("HospitalOS" instead of the lowercase "hospitalos" that was there
+before). Adding to an iPhone home screen should now show the actual red
+plus-sign logo instead of a screenshot of the page.
+
+**3. Topbar tenant brand element removed entirely — confirmed this was
+still there.** The previous round's sidebar fix was correct but left the
+topbar's tenant name + logo (with its initials-fallback avatar) still
+showing before the search field, genuinely redundant with the sidebar.
+Removed it completely; the topbar's left side is now just the breadcrumb
+(and the hamburger on mobile). Verified TenantBrand now renders in exactly
+one place in the whole app: the sidebar.
+
+Total: 81 routes, 71 help articles across 12 categories, 37 lint warnings
+(0 errors).

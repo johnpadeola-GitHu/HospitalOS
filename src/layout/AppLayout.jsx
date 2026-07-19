@@ -6,7 +6,6 @@ import { ALL_ROUTES } from "../nav/navGroups";
 import { useAuth } from "../auth/AuthContext";
 import Platform from "../modules/platform/Platform";
 import GlobalSearch from "./GlobalSearch";
-import TenantBrand from "./TenantBrand";
 import NotificationBell from "./NotificationBell";
 import DemoBanner from "./DemoBanner";
 import NewDeviceBanner from "./NewDeviceBanner";
@@ -51,13 +50,9 @@ export default function AppLayout() {
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)" }}>AgoroX Platform</span>
               </span>
             ) : (
-              <span style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                <TenantBrand />
-                <span className="app-topbar-crumb" style={crumbDivider} />
-                <span className="app-topbar-crumb" style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {crumb.group ? <>{crumb.group} &rsaquo; </> : null}
-                  <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
-                </span>
+              <span className="app-topbar-crumb" style={{ fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {crumb.group ? <>{crumb.group} &rsaquo; </> : null}
+                <span style={{ color: "var(--ink-strong)", fontWeight: 600 }}>{crumb.label}</span>
               </span>
             )}
           </div>
@@ -149,7 +144,6 @@ const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
 const footLink = { color: "var(--muted)", fontWeight: 500, whiteSpace: "nowrap" };
 const footerMeta = { fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap", flexShrink: 0 };
-const crumbDivider = { width: 1, height: 16, background: "var(--border)", flexShrink: 0 };
 const platformMark = {
   width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
   display: "flex", alignItems: "center", justifyContent: "center",

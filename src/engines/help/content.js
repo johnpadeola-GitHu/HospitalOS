@@ -13,6 +13,7 @@ export const CATEGORIES = [
   { key: "finance", label: "Finance", icon: "Wallet", blurb: "Billing, payments, claims, and accommodation charges." },
   { key: "safety", label: "Safety & alerts", icon: "BellRing", blurb: "What raises an alert and how alerts clear." },
   { key: "admin", label: "Administration", icon: "SlidersHorizontal", blurb: "Users, roles, permissions, and the audit trail." },
+  { key: "compliance-risk", label: "Compliance & risk", icon: "ShieldCheck", blurb: "Practitioner licenses, accreditation, incidents, policies, and account security." },
   { key: "platform", label: "Platform & configuration", icon: "Settings2", blurb: "Pricing, tenant branding, communication, bookings, and the vendor view." },
   { key: "operations", label: "Operations & institution", icon: "Building2", blurb: "Facility operations, academic programmes, public health, and analytics." },
   { key: "reference", label: "Reference", icon: "BookMarked", blurb: "Shortcuts, glossary, and current limitations." },
@@ -1089,7 +1090,7 @@ export const ARTICLES = [
     related: ["signing-in", "pricing", "activation-codes", "settlement"],
   },
   {
-    id: "account-security", cat: "admin", icon: "ShieldCheck",
+    id: "account-security", cat: "compliance-risk", icon: "ShieldCheck",
     title: "Staff accounts and device security",
     lead: "Every staff account your hospital creates is a real, sign-in-capable account \u2014 and every sign-in is checked against a device history.",
     body: [
@@ -1139,7 +1140,7 @@ export const ARTICLES = [
     related: ["register-admit", "limitations"],
   },
   {
-    id: "compliance", cat: "admin", icon: "ShieldCheck",
+    id: "compliance", cat: "compliance-risk", icon: "ShieldCheck",
     title: "Compliance and accreditation",
     lead: "The legal basis for operating \u2014 practitioner licenses and facility accreditation, tracked with real expiry dates, not just filed away.",
     body: [
@@ -1164,7 +1165,7 @@ export const ARTICLES = [
     related: ["incident-risk", "policies", "account-security", "alerts", "roles-explained"],
   },
   {
-    id: "incident-risk", cat: "admin", icon: "TriangleAlert",
+    id: "incident-risk", cat: "compliance-risk", icon: "TriangleAlert",
     title: "Incident and risk management",
     lead: "A genuine patient-safety gap this closes: adverse events, near-misses, and sentinel events tracked with a real root-cause and corrective-action trail.",
     body: [
@@ -1179,7 +1180,7 @@ export const ARTICLES = [
     related: ["compliance", "audit", "alerts"],
   },
   {
-    id: "policies", cat: "admin", icon: "FileText",
+    id: "policies", cat: "compliance-risk", icon: "FileText",
     title: "Policies and SOPs",
     lead: "Policy documents with a real review cycle \u2014 an out-of-date infection control or medication safety policy is itself a compliance risk.",
     body: [
