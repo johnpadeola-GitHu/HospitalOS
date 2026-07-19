@@ -1003,3 +1003,48 @@ LabOS's blue, keeping the neutral icon treatment that was correctly kept
 from the earlier fix.
 
 Total: 81 routes, 71 help articles, 39 lint warnings (0 errors).
+
+## This round — sidebar tenant branding, bolder logo, real search bug fix
+
+**1. Sidebar now shows tenant identity permanently, not "HospitalOS."**
+The previous round only fixed the topbar; the sidebar's top-left brand
+block — arguably the more prominent, persistent logo spot in the whole
+app — still showed the hardcoded "HospitalOS" text and mark. Replaced it
+with the exact same TenantBrand component the topbar uses, so both are
+now driven by one canonical source and can never drift apart again.
+HospitalOS/AgoroX branding now exists in exactly three places: the Login
+page (pre-authentication, no tenant context yet), the Footer
+(attribution), and the Favicon — nowhere in the actual working app.
+
+**2. Logo made bigger and bolder everywhere it still legitimately
+appears.** Favicon redrawn with thicker, more edge-to-edge plus-sign bars
+(68% → 74% span, 18% → 22% thickness). The two remaining in-app
+occurrences (Login page mark, Footer mark) both increased in icon size and
+stroke weight to match. Swept the whole codebase for any other
+`Icons.Cross` usage — confirmed only those two remain, both consistent.
+
+**3. Found and fixed a real, verifiable bug in Help & documentation
+search** — not a design tweak, an actual defect. The hero's search input
+and the compact header's search input were two separate DOM elements.
+Typing a single character flipped `isLanding` to false, which unmounted
+the hero (destroying the focused input) and mounted the compact header's
+different input in its place — so the field lost focus after exactly one
+keystroke, and every character typed after that went nowhere. From the
+user's side, this looked exactly like "search isn't content-sensitive."
+Root cause traced and fixed: the hero (and its one search input) now stays
+mounted for as long as no specific article or category is open, including
+while actively typing, so there is never a remount mid-query. Verified the
+underlying `searchArticles()` function itself was always correct — the
+bug was purely a UI remount issue, confirmed by testing the search logic
+directly against real queries (title matches, body-only matches like
+"MDCN", case-insensitivity) before concluding the fix target.
+
+**4. Removed the avatar initials badge** ("AS" for AgoroX Support) from
+the topbar's user info cluster — name, role, and sign-out remain; the
+redundant colored circle does not.
+
+Housekeeping while in here: removed the now-dead sidebar brandMark/
+brandText/brandSub styles and two other pre-existing dead style constants
+found during the lint pass. Warnings down to 37 (0 errors).
+
+Total: 81 routes, 71 help articles, 37 lint warnings (0 errors).

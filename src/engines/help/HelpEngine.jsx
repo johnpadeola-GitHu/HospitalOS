@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import * as Icons from "lucide-react";
 import { allCategories, allArticles, articlesIn, getArticle, searchArticles, useHelp } from "./index";
-import { PageHeader, Card, inputStyle, EmptyState } from "../../lib/ui";
+import { PageHeader, Card, EmptyState } from "../../lib/ui";
 import { useEffect } from "react";
 
 function Ico({ name, size = 16, color = "var(--muted)" }) {
@@ -20,7 +20,14 @@ export default function Help() {
   const results = useMemo(() => searchArticles(query), [query]);
   const article = openId ? getArticle(openId) : null;
   const searching = query.trim().length > 0;
-  const isLanding = !article && !openCat && !searching;
+  // The hero (and the single search input inside it) stays mounted for as
+  // long as no specific article or category is open — including while
+  // actively typing a search query. Switching to a different <input>
+  // element the moment `searching` became true was the actual bug: React
+  // would unmount the hero's focused input and mount a new one in the
+  // compact header on the very next render, so the field lost focus after
+  // exactly one keystroke and every character after that went nowhere.
+  const showHero = !article && !openCat;
 
   const open = (id) => { setOpenId(id); setQuery(""); };
 
@@ -32,7 +39,7 @@ export default function Help() {
 
   return (
     <div>
-      {isLanding ? (
+      {showHero ? (
         <HelpHero query={query} setQuery={setQuery} setOpenId={setOpenId} totalArticles={totalArticles} totalCategories={CATEGORIES.length} />
       ) : (
         <>
@@ -42,17 +49,6 @@ export default function Help() {
             icon="BookOpen"
             subtitle="How HospitalOS works, and why it works that way"
           />
-          <div style={{ marginBottom: 18, maxWidth: 440 }}>
-            <div style={{ position: "relative" }}>
-              <Icons.Search size={15} style={{ position: "absolute", left: 12, top: 11, color: "var(--muted)" }} />
-              <input
-                style={{ ...inputStyle, paddingLeft: 34, paddingTop: 10, paddingBottom: 10 }}
-                placeholder="Search the documentation…"
-                value={query}
-                onChange={(e) => { setQuery(e.target.value); setOpenId(null); }}
-              />
-            </div>
-          </div>
         </>
       )}
 

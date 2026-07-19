@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import { NAV_GROUPS } from "./navGroups";
 import { alertCount } from "../modules/alerts/alertService";
 import { useAuth } from "../auth/AuthContext";
+import TenantBrand from "../layout/TenantBrand";
 
 function Icon({ name, size = 16, style }) {
   const C = Icons[name] || Icons.Circle;
@@ -44,10 +45,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
   return (
     <aside style={S.aside} className={`no-print app-sidebar${isOpen ? " is-open" : ""}`}>
       <div style={S.brand}>
-        <div style={S.brandMark}>
-          <Icons.Cross size={16} strokeWidth={2.5} color="#fff" />
-        </div>
-        <div style={S.brandText}>HospitalOS</div>
+        <TenantBrand />
       </div>
 
       <nav style={S.nav}>
@@ -143,14 +141,6 @@ const S = {
     borderBottom: "1px solid var(--border)", flexShrink: 0,
     background: "var(--sidebar)",
   },
-  brandMark: {
-    width: 30, height: 30, borderRadius: 8,
-    background: "#D6241C",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    flexShrink: 0, boxShadow: "var(--shadow-sm)",
-  },
-  brandText: { fontSize: 14, fontWeight: 700, color: "var(--charcoal-strong)", letterSpacing: "-0.02em" },
-  brandSub: { fontSize: 10, color: "var(--muted)" },
   nav: { padding: "8px 10px 12px", flex: 1, overflowY: "auto" },
   pinnedFooter: { flexShrink: 0, borderTop: "1px solid var(--border)", padding: "8px", background: "var(--sidebar)" },
   pinnedLink: {

@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- The HospitalOS mark: a bold red rounded square with a clean white
-       medical cross, matching the guide document headers. -->
+  <!-- The HospitalOS mark: a bold red rounded square with a big, bold
+       white plus sign — the canonical logo, used consistently as the
+       favicon and at every remaining brand occurrence. -->
   <rect width="100" height="100" rx="20" fill="#D6241C"/>
-  <rect x="41" y="16" width="18" height="68" rx="5" fill="#FFFFFF"/>
-  <rect x="16" y="41" width="68" height="18" rx="5" fill="#FFFFFF"/>
+  <rect x="39" y="13" width="22" height="74" rx="6" fill="#FFFFFF"/>
+  <rect x="13" y="39" width="74" height="22" rx="6" fill="#FFFFFF"/>
 </svg>

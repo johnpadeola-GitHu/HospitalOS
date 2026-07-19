@@ -22,7 +22,6 @@ export default function AppLayout() {
   const crumb = useCrumb();
   const { pathname } = useLocation();
   const { user, roleLabel, signOut, isPlatformAdmin, view, setView } = useAuth();
-  const initials = user.name.split(" ").map((p) => p[0]).slice(-2).join("");
   const platformMode = view === "platform";
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -86,12 +85,11 @@ export default function AppLayout() {
 
             <NotificationBell />
 
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ textAlign: "right", lineHeight: 1.25 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-strong)", whiteSpace: "nowrap" }}>{user.name}</div>
                 <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{roleLabel}</div>
               </div>
-              <div style={avatar}>{initials}</div>
               <button onClick={signOut} style={signOutBtn} title="Sign out">
                 <Icons.LogOut size={15} />
               </button>
@@ -107,7 +105,7 @@ export default function AppLayout() {
           <footer style={footer} className="no-print">
             <div style={footerInner} className="app-footer-inner">
               <div style={footerBrandRow}>
-                <div style={footerLogo}><Icons.Cross size={11} strokeWidth={2.5} color="#fff" /></div>
+                <div style={footerLogo}><Icons.Cross size={13} strokeWidth={3} color="#fff" /></div>
                 <span style={footerBrand}>HospitalOS</span>
                 <span style={footerBy}>powered by AgoroX Africa</span>
               </div>
@@ -151,20 +149,7 @@ const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
 const footLink = { color: "var(--muted)", fontWeight: 500, whiteSpace: "nowrap" };
 const footerMeta = { fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap", flexShrink: 0 };
-const searchBox = {
-  display: "flex", alignItems: "center", gap: 8, flex: "0 1 380px",
-  background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 10px",
-};
-const kbd = {
-  fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--muted)",
-  background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 5px",
-};
 const crumbDivider = { width: 1, height: 16, background: "var(--border)", flexShrink: 0 };
-const avatar = {
-  width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
-  color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-  fontSize: 11, fontWeight: 700, flexShrink: 0,
-};
 const platformMark = {
   width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
   display: "flex", alignItems: "center", justifyContent: "center",

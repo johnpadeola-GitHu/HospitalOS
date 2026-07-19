@@ -21,7 +21,7 @@ export default function Login() {
       <div style={panel}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 22 }}>
           <div style={mark}>
-            <Icons.Cross size={19} strokeWidth={2.5} color="#fff" />
+            <Icons.Cross size={24} strokeWidth={3} color="#fff" />
           </div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "-0.02em" }}>
