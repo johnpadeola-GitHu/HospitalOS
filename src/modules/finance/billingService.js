@@ -3,7 +3,14 @@
 // into one account per patient. Payments are recorded here and net against the
 // charge total to give an outstanding balance. Source-agnostic like Alerts:
 // add a billable feed and it rolls into accounts automatically.
-// In-memory now; async API shaped for a later D1 swap.
+//
+// PHASE 1 LIVE: only the payment ledger moved to D1 in this round — the
+// charge-aggregation logic below (allCharges()) is UNCHANGED, since it's
+// already source-agnostic and doesn't care that lab/pharmacy/radiology are
+// now real HTTP calls while theatre/bed-nights are still in-memory. See
+// routes/billing.js for why the balance-exceeded check stays client-side
+// for now: it genuinely can't be validated server-side until every charge
+// source is migrated.
 
 import { listBillableOrders } from "../lab/labService";
 import { listBillableDispenses } from "../pharmacy/pharmacyService";
@@ -11,11 +18,28 @@ import { listBillableStudies } from "../radiology/radiologyService";
 import { listBillableProcedures } from "../theatre/theatreService";
 import { listBillableBedNights } from "../wards/bedService";
 
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
 
-// Payments recorded, keyed by patientId -> array of { amount, at, method }.
-const _payments = {};
-let _receiptSeq = 0;
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 async function allCharges() {
   const [lab, pharmacy, radiology, theatre, accommodation] = await Promise.all([
@@ -30,8 +54,7 @@ async function allCharges() {
 
 // Build one account per patient with charges, paid total, and balance.
 export async function listAccounts() {
-  await delay();
-  const charges = await allCharges();
+  const [charges, payments] = await Promise.all([allCharges(), listPayments()]);
   const byPatient = new Map();
 
   for (const c of charges) {
@@ -49,9 +72,14 @@ export async function listAccounts() {
     acc.chargeTotal += c.amount;
   }
 
+  const paidByPatient = new Map();
+  for (const p of payments) {
+    paidByPatient.set(p.patientId, (paidByPatient.get(p.patientId) || 0) + p.amount);
+  }
+
   const accounts = [];
   for (const acc of byPatient.values()) {
-    const paid = (_payments[acc.patientId] || []).reduce((s, p) => s + p.amount, 0);
+    const paid = paidByPatient.get(acc.patientId) || 0;
     acc.charges.sort((a, b) => new Date(b.at) - new Date(a.at));
     accounts.push({ ...acc, paid, balance: acc.chargeTotal - paid });
   }
@@ -60,13 +88,15 @@ export async function listAccounts() {
 }
 
 export async function getAccount(patientId) {
-  await delay(60);
   const accounts = await listAccounts();
   return accounts.find((a) => a.patientId === patientId) || null;
 }
 
+// Balance-exceeded validation stays client-side (see routes/billing.js's
+// header note for exactly why) — genuinely the same check the in-memory
+// version always ran, just still computed from all five sources here
+// rather than something the server can fully see yet.
 export async function recordPayment(patientId, amount, method = "Cash") {
-  await delay();
   const amt = parseFloat(amount);
   if (!amt || amt <= 0) throw new Error("Enter a payment amount greater than zero.");
   const account = await getAccount(patientId);
@@ -74,27 +104,12 @@ export async function recordPayment(patientId, amount, method = "Cash") {
   if (amt > account.balance + 0.001) {
     throw new Error(`Payment exceeds the outstanding balance of \u20a6${account.balance.toLocaleString()}.`);
   }
-  _receiptSeq += 1;
-  const payment = {
-    receipt: "RCT-" + String(_receiptSeq).padStart(5, "0"),
-    patientId,
-    patientName: account.patientName,
-    hospitalNo: account.hospitalNo,
-    amount: amt,
-    method,
-    at: new Date().toISOString(),
-  };
-  if (!_payments[patientId]) _payments[patientId] = [];
-  _payments[patientId].push(payment);
-  return payment;
+  return apiCall("/billing/payments", { method: "POST", body: { patientId, amount: amt, method } });
 }
 
 // Flat ledger of all payments across patients, most recent first.
 export async function listPayments() {
-  await delay(60);
-  const all = [];
-  for (const list of Object.values(_payments)) all.push(...list);
-  return all.sort((a, b) => new Date(b.at) - new Date(a.at));
+  return apiCall("/billing/payments");
 }
 
 export async function billingSummary() {
