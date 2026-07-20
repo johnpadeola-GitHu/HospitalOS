@@ -7,6 +7,7 @@ const FLAG_COLOR = {
   high: "#A35A2E",
   low: "#1E5A8A",
   normal: "var(--ink-strong)",
+  unrecorded: "var(--muted)",
 };
 
 function sinceLabel(iso) {
@@ -71,23 +72,29 @@ export default function CriticalCare() {
               </div>
 
               <div style={vitalsGrid}>
-                {VITALS.map((vd) => {
-                  const flag = flagVital(vd, r.vitals[vd.key]);
-                  return (
-                    <div key={vd.key} style={vitalCell}>
-                      <div style={{ fontSize: 10, color: "var(--muted)" }}>{vd.label}</div>
-                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 600, color: FLAG_COLOR[flag] }}>
-                        {r.vitals[vd.key]}
-                        <span style={{ fontSize: 10, fontWeight: 400, color: "var(--muted)" }}> {vd.unit}</span>
+                {r.vitals ? (
+                  VITALS.map((vd) => {
+                    const flag = flagVital(vd, r.vitals[vd.key]);
+                    return (
+                      <div key={vd.key} style={vitalCell}>
+                        <div style={{ fontSize: 10, color: "var(--muted)" }}>{vd.label}</div>
+                        <div style={{ fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 600, color: FLAG_COLOR[flag] }}>
+                          {r.vitals[vd.key]}
+                          <span style={{ fontSize: 10, fontWeight: 400, color: "var(--muted)" }}> {vd.unit}</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <div style={{ gridColumn: "1 / -1", fontSize: 12, color: "var(--warn)", padding: "6px 0" }}>
+                    No vitals recorded yet
+                  </div>
+                )}
               </div>
 
               <div style={cardFoot}>
                 <span style={{ fontSize: 11, color: "var(--muted)" }}>
-                  Updated {sinceLabel(r.vitals.updatedAt)}
+                  {r.vitals ? `Updated ${sinceLabel(r.vitals.updatedAt)}` : "Awaiting first reading"}
                 </span>
                 <Button onClick={() => setRecordFor(r)}>Record vitals</Button>
               </div>
@@ -124,7 +131,7 @@ function Stat({ label, value, danger }) {
 function VitalsModal({ row, onClose, onDone }) {
   const [vals, setVals] = useState(() => {
     const init = {};
-    for (const vd of VITALS) init[vd.key] = String(row.vitals[vd.key] ?? "");
+    for (const vd of VITALS) init[vd.key] = String(row.vitals?.[vd.key] ?? "");
     return init;
   });
   const [busy, setBusy] = useState(false);

@@ -2,11 +2,38 @@
 // Layers vital signs on top of the occupied ICU/HDU beds from bedService. Each
 // vital is flagged against critical thresholds; a bed with any critical vital is
 // "unstable" and feeds the Alerts screen as a fifth source.
-// In-memory now; async API shaped for a later D1 swap.
+//
+// PHASE 1 LIVE, twelfth module — and a genuine safety fix along the way:
+// the in-memory version auto-fabricated a plausible vital-signs preset the
+// first time a newly occupied ICU/HDU bed was viewed, purely so the demo
+// board was never empty. That's dangerous in a real system — invented
+// vitals could mislead staff into thinking a patient has been assessed
+// when they haven't. The server now returns vitals: null for a bed with
+// no real reading yet, and this file's flagVital()/bedIsUnstable() handle
+// that null case explicitly rather than assuming data always exists.
 
-import { listWards } from "../wards/bedService";
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
 
-const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 export const CC_WARDS = ["ICU", "HDU"];
 
@@ -19,23 +46,12 @@ export const VITALS = [
   { key: "temp", label: "Temp", unit: "\u00b0C", low: 36, high: 37.8, critLow: 35, critHigh: 39.5 },
 ];
 
-// Vitals keyed by patient/occupant id. Seed the one admitted ICU patient (p1
-// sits in MA-04 in the ward seed, but for the demo we place a critical-care
-// patient set here keyed to whoever occupies ICU/HDU beds).
-const _vitals = {};
-
-// Seed: give any occupant we find a baseline; specific criticals added on read
-// if absent so the board is never empty when a bed is occupied.
-function seedVitalsFor(occupantId, preset) {
-  if (!_vitals[occupantId]) {
-    _vitals[occupantId] = preset || { hr: 82, sbp: 118, spo2: 97, rr: 16, temp: 37.0, updatedAt: new Date().toISOString() };
-  }
-}
-
-// Flag one vital value against its thresholds.
+// Flag one vital value against its thresholds. Handles a missing value
+// (no reading recorded yet) explicitly rather than assuming data exists.
 export function flagVital(vital, value) {
+  if (value === undefined || value === null) return "unrecorded";
   const v = parseFloat(value);
-  if (Number.isNaN(v)) return "normal";
+  if (Number.isNaN(v)) return "unrecorded";
   if (vital.critLow != null && v <= vital.critLow) return "critical";
   if (vital.critHigh != null && v >= vital.critHigh) return "critical";
   if (vital.low != null && v < vital.low) return "low";
@@ -48,54 +64,21 @@ export function bedIsUnstable(vitals) {
   return VITALS.some((vd) => flagVital(vd, vitals[vd.key]) === "critical");
 }
 
-// Build the board: occupied ICU/HDU beds with their vitals.
+// Build the board: occupied ICU/HDU beds with their vitals (or null if
+// none recorded yet — a real, honest empty state, not fabricated data).
 export async function listCriticalCare() {
-  await delay();
-  const wards = await listWards();
-  const ccWards = wards.filter((w) => CC_WARDS.includes(w.name));
-
-  const rows = [];
-  for (const w of ccWards) {
-    for (const bed of w.beds) {
-      if (!bed.occupantId) continue;
-      // Seed a plausible vital set; give the first ICU occupant a critical SpO2
-      // so the board and alerts demonstrate the unstable path.
-      if (!_vitals[bed.occupantId]) {
-        const preset =
-          w.name === "ICU"
-            ? { hr: 122, sbp: 86, spo2: 86, rr: 28, temp: 38.4, updatedAt: new Date().toISOString() }
-            : null;
-        seedVitalsFor(bed.occupantId, preset);
-      }
-      rows.push({
-        ward: w.name,
-        bedId: bed.id,
-        occupantId: bed.occupantId,
-        occupantName: bed.occupantName,
-        vitals: { ..._vitals[bed.occupantId] },
-        unstable: bedIsUnstable(_vitals[bed.occupantId]),
-      });
-    }
-  }
-  return rows.sort((a, b) => Number(b.unstable) - Number(a.unstable));
+  return apiCall("/critical-care/board");
 }
 
 export async function updateVitals(occupantId, vitals) {
-  await delay();
-  const clean = {};
   for (const vd of VITALS) {
-    const val = parseFloat(vitals[vd.key]);
-    if (Number.isNaN(val)) throw new Error(`Enter a value for ${vd.label}.`);
-    clean[vd.key] = val;
+    if (Number.isNaN(parseFloat(vitals[vd.key]))) throw new Error(`Enter a value for ${vd.label}.`);
   }
-  clean.updatedAt = new Date().toISOString();
-  _vitals[occupantId] = clean;
-  return { ...clean, unstable: bedIsUnstable(clean) };
+  return apiCall(`/critical-care/vitals/${encodeURIComponent(occupantId)}`, { method: "PATCH", body: vitals });
 }
 
 // Feed for Alerts: unstable critical-care patients.
 export async function listUnstablePatients() {
-  await delay(60);
   const board = await listCriticalCare();
   return board.filter((r) => r.unstable);
 }
