@@ -59,8 +59,12 @@ export default function GlobalSearch() {
       let patients = [];
       // Only search patients if the role can reach patient care.
       if (can("patient-care")) {
-        const rows = await listPatients({ query: q, status: "all" });
-        patients = rows.slice(0, 5);
+        try {
+          const rows = await listPatients({ query: q, status: "all" });
+          patients = rows.slice(0, 5);
+        } catch (e) {
+          console.error(e);
+        }
       }
       if (alive) setResults({ nav, patients, help });
     }, 140);

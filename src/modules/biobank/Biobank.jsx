@@ -112,7 +112,7 @@ function BankModal({ onClose, onDone }) {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   useEffect(() => {
-    let a = true; const t = setTimeout(async () => { const r = await listPatients({ query, status: "all" }); if (a) setResults(r.slice(0, 5)); }, 180);
+    let a = true; const t = setTimeout(async () => { try { const r = await listPatients({ query, status: "all" }); if (a) setResults(r.slice(0, 5)); } catch (e) { console.error(e); if (a) setResults([]); } }, 180);
     return () => { a = false; clearTimeout(t); };
   }, [query]);
 

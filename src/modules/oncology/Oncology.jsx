@@ -54,8 +54,12 @@ export default function Oncology() {
   };
 
   const changeStatus = async (id, s) => {
-    await setStatus(id, s);
-    await refresh();
+    try {
+      await setStatus(id, s);
+      await refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
   };
 
   return (
@@ -151,8 +155,7 @@ function RegisterModal({ onClose, onDone }) {
   useEffect(() => {
     let alive = true;
     const t = setTimeout(async () => {
-      const rows = await listPatients({ query, status: "all" });
-      if (alive) setResults(rows.slice(0, 5));
+      try { const rows = await listPatients({ query, status: "all" }); if (alive) setResults(rows.slice(0, 5)); } catch (e) { console.error(e); if (alive) setResults([]); }
     }, 180);
     return () => { alive = false; clearTimeout(t); };
   }, [query]);

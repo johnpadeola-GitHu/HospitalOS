@@ -307,8 +307,7 @@ function OrderModal({ onClose, onDone }) {
   useEffect(() => {
     let alive = true;
     const t = setTimeout(async () => {
-      const rows = await listPatients({ query, status: "all" });
-      if (alive) setResults(rows.slice(0, 6));
+      try { const rows = await listPatients({ query, status: "all" }); if (alive) setResults(rows.slice(0, 6)); } catch (e) { console.error(e); if (alive) setResults([]); }
     }, 180);
     return () => {
       alive = false;

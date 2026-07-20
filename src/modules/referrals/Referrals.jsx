@@ -172,7 +172,7 @@ function SendModal({ actor, onClose, onDone }) {
 
   useEffect(() => {
     let alive = true;
-    const t = setTimeout(async () => { const r = await listPatients({ query, status: "all" }); if (alive) setResults(r.slice(0, 5)); }, 180);
+    const t = setTimeout(async () => { try { const r = await listPatients({ query, status: "all" }); if (alive) setResults(r.slice(0, 5)); } catch (e) { console.error(e); if (alive) setResults([]); } }, 180);
     return () => { alive = false; clearTimeout(t); };
   }, [query]);
 

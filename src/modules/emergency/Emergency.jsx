@@ -38,8 +38,12 @@ export default function Emergency() {
   const advance = async (e) => {
     const idx = ED_STAGES.indexOf(e.stage);
     if (idx < ED_STAGES.length - 1) {
-      await setStage(e.id, ED_STAGES[idx + 1]);
-      await refresh();
+      try {
+        await setStage(e.id, ED_STAGES[idx + 1]);
+        await refresh();
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -154,8 +158,7 @@ function PresentModal({ onClose, onDone }) {
     if (unregistered) return;
     let alive = true;
     const t = setTimeout(async () => {
-      const rows = await listPatients({ query, status: "all" });
-      if (alive) setResults(rows.slice(0, 5));
+      try { const rows = await listPatients({ query, status: "all" }); if (alive) setResults(rows.slice(0, 5)); } catch (e) { console.error(e); if (alive) setResults([]); }
     }, 180);
     return () => {
       alive = false;

@@ -32,26 +32,36 @@ export default function Records() {
   useEffect(() => {
     let alive = true;
     const t = setTimeout(async () => {
-      const rows = await listPatients({ query, status: "all" });
-      if (alive) setPatients(rows.slice(0, 8));
+      try {
+        const rows = await listPatients({ query, status: "all" });
+        if (alive) setPatients(rows.slice(0, 8));
+      } catch (e) {
+        console.error(e);
+        if (alive) setPatients([]);
+      }
     }, 180);
     return () => { alive = false; clearTimeout(t); };
   }, [query]);
 
   const loadChart = useCallback(async (p) => {
     if (!p) return setChart(null);
-    const [notes, diagnoses, allergies, summary, labs, studies] = await Promise.all([
-      listNotes(p.id), listDiagnoses(p.id), listAllergies(p.id), recordSummary(p.id),
-      listOrders({ status: "all" }), listStudies({ status: "all" }),
-    ]);
-    const myLabs = labs.filter((l) => l.patientId === p.id);
-    const myImaging = studies.filter((s) => s.patientId === p.id && s.status === "reported");
-    const [labReleased, imagingReleased] = await Promise.all([
-      Promise.all(myLabs.filter((l) => l.status === "verified").map(async (l) => [l.id, await isReleased("lab", l.id)])),
-      Promise.all(myImaging.map(async (s) => [s.id, await isReleased("imaging", s.id)])),
-    ]);
-    const releaseMap = Object.fromEntries([...labReleased, ...imagingReleased]);
-    setChart({ notes, diagnoses, allergies, summary, labs: myLabs, imaging: myImaging, releaseMap });
+    try {
+      const [notes, diagnoses, allergies, summary, labs, studies] = await Promise.all([
+        listNotes(p.id), listDiagnoses(p.id), listAllergies(p.id), recordSummary(p.id),
+        listOrders({ status: "all" }), listStudies({ status: "all" }),
+      ]);
+      const myLabs = labs.filter((l) => l.patientId === p.id);
+      const myImaging = studies.filter((s) => s.patientId === p.id && s.status === "reported");
+      const [labReleased, imagingReleased] = await Promise.all([
+        Promise.all(myLabs.filter((l) => l.status === "verified").map(async (l) => [l.id, await isReleased("lab", l.id)])),
+        Promise.all(myImaging.map(async (s) => [s.id, await isReleased("imaging", s.id)])),
+      ]);
+      const releaseMap = Object.fromEntries([...labReleased, ...imagingReleased]);
+      setChart({ notes, diagnoses, allergies, summary, labs: myLabs, imaging: myImaging, releaseMap });
+    } catch (e) {
+      console.error(e);
+      setChart(null);
+    }
   }, []);
 
   useEffect(() => { loadChart(selected); }, [selected, loadChart]);
@@ -182,7 +192,7 @@ export default function Records() {
                           <span style={{ fontSize: 11, color: "var(--muted)" }}>{d.onset}</span>
                           <Pill tone={DX_TONE[d.status]}>{d.status}</Pill>
                           {d.status !== "resolved" && may("patient-care:note") && (
-                            <button style={amendBtn} onClick={async () => { await resolveDiagnosis(d.id, user); refresh(); }}>Resolve</button>
+                            <button style={amendBtn} onClick={async () => { try { await resolveDiagnosis(d.id, user); refresh(); } catch (e) { console.error(e); setErr(e.message); } }}>Resolve</button>
                           )}
                         </div>
                       ))}

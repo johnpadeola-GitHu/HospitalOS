@@ -13,44 +13,59 @@ const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     let alive = true;
     async function load() {
-      const [patients, wards, visits, orders, alerts, billing] = await Promise.all([
-        listPatients({ status: "all" }), listWards(), listVisits({ includeCompleted: false }),
-        listOrders({ status: "all" }), listAlerts({ includeAcknowledged: false }), billingSummary(),
-      ]);
-      if (!alive) return;
-      const beds = wards.reduce((a, w) => ({ total: a.total + w.total, occupied: a.occupied + w.occupied }), { total: 0, occupied: 0 });
-      const occPct = beds.total ? Math.round((beds.occupied / beds.total) * 100) : 0;
-      const labByStage = orders.reduce((a, o) => { a[o.status] = (a[o.status] || 0) + 1; return a; }, {});
-      const pendingLab = (labByStage.ordered || 0) + (labByStage.collected || 0) + (labByStage.resulted || 0);
+      try {
+        const [patients, wards, visits, orders, alerts, billing] = await Promise.all([
+          listPatients({ status: "all" }), listWards(), listVisits({ includeCompleted: false }),
+          listOrders({ status: "all" }), listAlerts({ includeAcknowledged: false }), billingSummary(),
+        ]);
+        if (!alive) return;
+        const beds = wards.reduce((a, w) => ({ total: a.total + w.total, occupied: a.occupied + w.occupied }), { total: 0, occupied: 0 });
+        const occPct = beds.total ? Math.round((beds.occupied / beds.total) * 100) : 0;
+        const labByStage = orders.reduce((a, o) => { a[o.status] = (a[o.status] || 0) + 1; return a; }, {});
+        const pendingLab = (labByStage.ordered || 0) + (labByStage.collected || 0) + (labByStage.resulted || 0);
 
-      // 14-day activity trend derived from current volume (illustrative shape).
-      const base = Math.max(4, patients.length * 2);
-      const trend = Array.from({ length: 14 }, (_, i) => ({
-        day: `D${i + 1}`,
-        visits: Math.round(base + Math.sin(i / 1.7) * (base * 0.35) + (i % 3)),
-      }));
+        // 14-day activity trend derived from current volume (illustrative shape).
+        const base = Math.max(4, patients.length * 2);
+        const trend = Array.from({ length: 14 }, (_, i) => ({
+          day: `D${i + 1}`,
+          visits: Math.round(base + Math.sin(i / 1.7) * (base * 0.35) + (i % 3)),
+        }));
 
-      setData({
-        patients: patients.length,
-        admitted: patients.filter((p) => p.status === "admitted").length,
-        beds, occPct, wards, queue: visits.length, pendingLab,
-        alerts, billing, trend,
-        labChart: [
-          { stage: "Ordered", n: labByStage.ordered || 0 },
-          { stage: "Collected", n: labByStage.collected || 0 },
-          { stage: "Resulted", n: labByStage.resulted || 0 },
-          { stage: "Verified", n: labByStage.verified || 0 },
-        ],
-      });
+        setData({
+          patients: patients.length,
+          admitted: patients.filter((p) => p.status === "admitted").length,
+          beds, occPct, wards, queue: visits.length, pendingLab,
+          alerts, billing, trend,
+          labChart: [
+            { stage: "Ordered", n: labByStage.ordered || 0 },
+            { stage: "Collected", n: labByStage.collected || 0 },
+            { stage: "Resulted", n: labByStage.resulted || 0 },
+            { stage: "Verified", n: labByStage.verified || 0 },
+          ],
+        });
+      } catch (e) {
+        console.error(e);
+        if (alive) setError(e.message);
+      }
     }
     load();
     return () => { alive = false; };
   }, []);
+
+  if (error) {
+    return (
+      <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>
+        <div style={{ fontSize: 13, marginBottom: 8 }}>Couldn't load the dashboard.</div>
+        <div style={{ fontSize: 12 }}>{error}</div>
+      </div>
+    );
+  }
 
   if (!data) {
     return (

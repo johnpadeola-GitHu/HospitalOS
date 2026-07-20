@@ -9,7 +9,16 @@ export default function Formulary() {
   const [query, setQuery] = useState("");
   useEffect(() => {
     let a = true;
-    const t = setTimeout(async () => { const d = await listDrugs({ query }); if (a) { setRows(d); setLoading(false); } }, 180);
+    const t = setTimeout(async () => {
+      try {
+        const d = await listDrugs({ query });
+        if (a) setRows(d);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (a) setLoading(false);
+      }
+    }, 180);
     return () => { a = false; clearTimeout(t); };
   }, [query]);
   return (

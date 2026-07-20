@@ -61,7 +61,7 @@ function NewModal({ onClose, onDone }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  useEffect(() => { let a = true; const t = setTimeout(async () => { const r = await listPatients({ query, status: "all" }); if (a) setResults(r.slice(0, 5)); }, 180); return () => { a = false; clearTimeout(t); }; }, [query]);
+  useEffect(() => { let a = true; const t = setTimeout(async () => { try { const r = await listPatients({ query, status: "all" }); if (a) setResults(r.slice(0, 5)); } catch (e) { console.error(e); if (a) setResults([]); } }, 180); return () => { a = false; clearTimeout(t); }; }, [query]);
   const submit = async () => {
     if (!selected) { setErr("Select a patient."); return; }
     setBusy(true); setErr("");
