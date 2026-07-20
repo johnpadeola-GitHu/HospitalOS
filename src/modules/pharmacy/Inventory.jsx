@@ -17,8 +17,14 @@ export default function Inventory() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setDrugs(await listDrugs({ query, onlyLow }));
-    setLoading(false);
+    try {
+      setDrugs(await listDrugs({ query, onlyLow }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, onlyLow]);
 
   useEffect(() => {

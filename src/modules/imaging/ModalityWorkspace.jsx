@@ -33,14 +33,20 @@ export default function ModalityWorkspace({ modalityGroup, icon, subtitle }) {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const all = await listStudies({ status: "all" });
-    const mine = all.filter((s) => s.modality === modalityGroup);
-    setStudies(mine);
-    const reportedOnes = mine.filter((s) => s.status === "reported");
-    const flags = {};
-    await Promise.all(reportedOnes.map(async (s) => { flags[s.id] = await isReleased("imaging", s.id); }));
-    setReleasedIds((prev) => ({ ...prev, ...flags }));
-    setLoading(false);
+    try {
+      const all = await listStudies({ status: "all" });
+      const mine = all.filter((s) => s.modality === modalityGroup);
+      setStudies(mine);
+      const reportedOnes = mine.filter((s) => s.status === "reported");
+      const flags = {};
+      await Promise.all(reportedOnes.map(async (s) => { flags[s.id] = await isReleased("imaging", s.id); }));
+      setReleasedIds((prev) => ({ ...prev, ...flags }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [modalityGroup]);
 
   useEffect(() => { refresh(); }, [refresh]);

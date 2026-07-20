@@ -21,8 +21,14 @@ export default function Emergency() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setEncounters(await listEncounters());
-    setLoading(false);
+    try {
+      setEncounters(await listEncounters());
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -258,10 +264,17 @@ function PresentModal({ onClose, onDone }) {
 
 function DisposeModal({ encounter, onClose, onDone }) {
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
   const run = async (disp) => {
     setBusy(true);
-    await disposePatient(encounter.id, disp);
-    await onDone();
+    setErr("");
+    try {
+      await disposePatient(encounter.id, disp);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
   return (
     <Modal
@@ -273,6 +286,7 @@ function DisposeModal({ encounter, onClose, onDone }) {
         </Button>
       }
     >
+      {err && <div style={errBox}>{err}</div>}
       <div style={{ fontSize: 13, marginBottom: 14 }}>
         <span style={{ fontWeight: 500, color: "var(--ink-strong)" }}>{encounter.patientName}</span>
         <span style={{ color: "var(--muted)" }}> · {encounter.complaint}</span>

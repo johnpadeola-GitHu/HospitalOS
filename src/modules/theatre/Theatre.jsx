@@ -27,8 +27,14 @@ export default function Theatre() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setCases(await listCases());
-    setLoading(false);
+    try {
+      setCases(await listCases());
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

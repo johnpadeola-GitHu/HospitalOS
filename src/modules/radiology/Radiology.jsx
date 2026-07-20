@@ -36,13 +36,19 @@ export default function Radiology() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const rows = await listStudies({ query, status });
-    setStudies(rows);
-    const reportedOnes = rows.filter((s) => s.status === "reported");
-    const flags = {};
-    await Promise.all(reportedOnes.map(async (s) => { flags[s.id] = await isReleased("imaging", s.id); }));
-    setReleasedIds((prev) => ({ ...prev, ...flags }));
-    setLoading(false);
+    try {
+      const rows = await listStudies({ query, status });
+      setStudies(rows);
+      const reportedOnes = rows.filter((s) => s.status === "reported");
+      const flags = {};
+      await Promise.all(reportedOnes.map(async (s) => { flags[s.id] = await isReleased("imaging", s.id); }));
+      setReleasedIds((prev) => ({ ...prev, ...flags }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, status]);
 
   useEffect(() => {

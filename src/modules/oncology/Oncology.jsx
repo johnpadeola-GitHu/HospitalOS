@@ -29,8 +29,14 @@ export default function Oncology() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listOncology({ status }));
-    setLoading(false);
+    try {
+      setRows(await listOncology({ status }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [status]);
 
   useEffect(() => {

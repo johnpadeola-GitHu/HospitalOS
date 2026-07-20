@@ -27,10 +27,16 @@ export default function Dispensing() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [d, h] = await Promise.all([listDrugs({ query, onlyLow }), listDispenses({ limit: 6 })]);
-    setDrugs(d);
-    setDispenses(h);
-    setLoading(false);
+    try {
+      const [d, h] = await Promise.all([listDrugs({ query, onlyLow }), listDispenses({ limit: 6 })]);
+      setDrugs(d);
+      setDispenses(h);
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, onlyLow]);
 
   useEffect(() => {

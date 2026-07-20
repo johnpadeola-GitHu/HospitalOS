@@ -41,8 +41,14 @@ function InventoryTab() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setInv(await listInventory());
-    setLoading(false);
+    try {
+      setInv(await listInventory());
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -159,8 +165,13 @@ function RequestsTab() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRequests(await listRequests());
-    setLoading(false);
+    try {
+      setRequests(await listRequests());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

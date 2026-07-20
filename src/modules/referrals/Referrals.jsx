@@ -28,8 +28,14 @@ export default function Referrals() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [r, s] = await Promise.all([listReferrals({ direction: tab }), referralsSummary()]);
-    setRows(r); setSummary(s); setLoading(false);
+    try {
+      const [r, s] = await Promise.all([listReferrals({ direction: tab }), referralsSummary()]);
+      setRows(r); setSummary(s); 
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [tab]);
 
   useEffect(() => { refresh(); }, [refresh]);

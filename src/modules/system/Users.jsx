@@ -17,8 +17,14 @@ export default function Users() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setUsers(await listUsers({ tenantId: user.tenantId, query }));
-    setLoading(false);
+    try {
+      setUsers(await listUsers({ tenantId: user.tenantId, query }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, user.tenantId]);
 
   useEffect(() => {

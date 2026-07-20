@@ -25,8 +25,14 @@ export default function PatientPicker({ value, onChange, placeholder = "Search b
     if (!open) return;
     const t = setTimeout(async () => {
       setLoading(true);
-      setResults(await listPatients({ query, status: "all" }));
-      setLoading(false);
+      try {
+        setResults(await listPatients({ query, status: "all" }));
+      } catch (e) {
+        console.error(e);
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
     }, 180);
     return () => clearTimeout(t);
   }, [query, open]);

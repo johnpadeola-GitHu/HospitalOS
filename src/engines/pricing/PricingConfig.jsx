@@ -33,10 +33,16 @@ export default function PricingConfig() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [c, o] = await Promise.all([catalogueFor(cat), listOverrides(cat)]);
-    setCatalogue(c);
-    setOverrides(o);
-    setLoading(false);
+    try {
+      const [c, o] = await Promise.all([catalogueFor(cat), listOverrides(cat)]);
+      setCatalogue(c);
+      setOverrides(o);
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [cat]);
 
   useEffect(() => { refresh(); }, [refresh]);

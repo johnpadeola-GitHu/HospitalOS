@@ -22,8 +22,14 @@ export default function OutpatientClinic() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setVisits(await listVisits({ clinic }));
-    setLoading(false);
+    try {
+      setVisits(await listVisits({ clinic }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [clinic]);
 
   useEffect(() => {
@@ -102,13 +108,25 @@ function VisitCard({ visit, onChanged }) {
 
   const advance = async () => {
     setBusy(true);
-    await advanceVisit(visit.id);
-    await onChanged();
+    try {
+      await advanceVisit(visit.id);
+      await onChanged();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
   };
   const complete = async () => {
     setBusy(true);
-    await setVisitStage(visit.id, "completed");
-    await onChanged();
+    try {
+      await setVisitStage(visit.id, "completed");
+      await onChanged();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (

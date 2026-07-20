@@ -16,12 +16,18 @@ export default function Billing() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [accs, sum] = await Promise.all([listAccounts(), billingSummary()]);
-    setAccounts(accs);
-    setSummary(sum);
-    // Keep an open detail drawer in sync after a payment.
-    setDetailFor((cur) => (cur ? accs.find((a) => a.patientId === cur.patientId) || null : null));
-    setLoading(false);
+    try {
+      const [accs, sum] = await Promise.all([listAccounts(), billingSummary()]);
+      setAccounts(accs);
+      setSummary(sum);
+      // Keep an open detail drawer in sync after a payment.
+      setDetailFor((cur) => (cur ? accs.find((a) => a.patientId === cur.patientId) || null : null));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

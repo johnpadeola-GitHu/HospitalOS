@@ -9,8 +9,14 @@ export default function WardsBoard() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setWards(await listWards());
-    setLoading(false);
+    try {
+      setWards(await listWards());
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

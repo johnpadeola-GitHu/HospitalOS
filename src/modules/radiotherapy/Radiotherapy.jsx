@@ -8,7 +8,12 @@ export default function Radiotherapy() {
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [err, setErr] = useState("");
-  const refresh = useCallback(async () => { setLoading(true); setRows(await listCourses()); setLoading(false); }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try { setRows(await listCourses()); }
+    catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  }, []);
   useEffect(() => { refresh(); }, [refresh]);
 
   const deliver = async (id) => {

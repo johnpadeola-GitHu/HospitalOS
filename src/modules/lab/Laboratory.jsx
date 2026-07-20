@@ -47,13 +47,19 @@ export default function Laboratory() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const rows = await listOrders({ query, status });
-    setOrders(rows);
-    const verified = rows.filter((o) => o.status === "verified");
-    const flags = {};
-    await Promise.all(verified.map(async (o) => { flags[o.id] = await isReleased("lab", o.id); }));
-    setReleasedIds((prev) => ({ ...prev, ...flags }));
-    setLoading(false);
+    try {
+      const rows = await listOrders({ query, status });
+      setOrders(rows);
+      const verified = rows.filter((o) => o.status === "verified");
+      const flags = {};
+      await Promise.all(verified.map(async (o) => { flags[o.id] = await isReleased("lab", o.id); }));
+      setReleasedIds((prev) => ({ ...prev, ...flags }));
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, status]);
 
   useEffect(() => {

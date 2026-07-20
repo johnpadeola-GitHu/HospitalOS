@@ -14,8 +14,14 @@ export default function Biobank() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [s, st, sum] = await Promise.all([listSpecimens({ query, unit }), storageUtilisation(), biobankSummary()]);
-    setRows(s); setStorage(st); setSummary(sum); setLoading(false);
+    try {
+      const [s, st, sum] = await Promise.all([listSpecimens({ query, unit }), storageUtilisation(), biobankSummary()]);
+      setRows(s); setStorage(st); setSummary(sum); 
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, unit]);
 
   useEffect(() => { const t = setTimeout(refresh, 150); return () => clearTimeout(t); }, [refresh]);

@@ -20,10 +20,16 @@ export default function Specialties() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [d, r] = await Promise.all([listDepartments(), listReferrals({ deptCode: dept })]);
-    setDepts(d);
-    setReferrals(r);
-    setLoading(false);
+    try {
+      const [d, r] = await Promise.all([listDepartments(), listReferrals({ deptCode: dept })]);
+      setDepts(d);
+      setReferrals(r);
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [dept]);
 
   useEffect(() => {

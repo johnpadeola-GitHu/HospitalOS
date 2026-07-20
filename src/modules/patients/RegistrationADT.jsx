@@ -30,9 +30,15 @@ export default function RegistrationADT() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const rows = await listPatients({ query, status });
-    setPatients(rows);
-    setLoading(false);
+    try {
+      const rows = await listPatients({ query, status });
+      setPatients(rows);
+    
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, status]);
 
   useEffect(() => {
