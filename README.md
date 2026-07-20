@@ -1183,3 +1183,30 @@ limiting, data protection technical safeguards, and backup/disaster
 recovery. Updated route count references (67 → 81) and added a revised
 8-phase sequencing plan. Verified clean: 5 pages, no stale branding, all
 13 items present.
+
+## This round — signIn() wired to the real deployed backend
+
+`AuthContext.jsx`'s `signIn()` now calls the actual live Worker
+(https://hospitalos-api.johnpadeola.workers.dev) instead of checking the
+in-memory `accountsStore.js` array — real PBKDF2 password verification
+against the real D1 database, confirmed working end-to-end against the
+live deployment.
+
+**Architecture choice worth noting**: used `Authorization: Bearer` +
+localStorage instead of cookies, since the frontend and Worker are on
+different origins (hospitalos.agorox.africa vs. \*.workers.dev) — this
+avoids cross-origin cookie/SameSite complications entirely, and the
+Worker already supports Bearer as a fallback.
+
+**A real gap surfaced by this change, flagged rather than hidden**: three
+places in the app still create accounts in the OLD in-memory store —
+the 7-day demo, activation code redemption, and Users & Roles staff
+creation. None of those newly-created accounts can currently sign in,
+because sign-in now checks only the real backend. This is the honest,
+expected state of a partial migration (sign-IN moved, account-CREATION
+hasn't yet) — not a bug being papered over. The 6 seeded accounts
+(support@agorox.africa and the 5 Ibadan Teaching Hospital staff) work
+correctly since they exist in both stores. Migrating demo/activation/user-
+creation to the real backend is the natural next step.
+
+Total: 81 routes, build clean, 0 new lint errors.

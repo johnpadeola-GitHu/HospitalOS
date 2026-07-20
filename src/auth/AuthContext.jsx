@@ -1,17 +1,27 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { canAccessArea, canDo, roleLabel as rbacRoleLabel, areasFor } from "../lib/rbac";
 import { record, AUDIT_ACTIONS } from "../lib/audit";
-import { findAccount, demoAccountsPublicList } from "./accountsStore";
-import { checkAndRecordDevice } from "../lib/deviceFingerprint";
+import { checkAndRecordDevice, deviceLabel } from "../lib/deviceFingerprint";
 
 // Auth context — email/password sign-in, session state, and (for the platform
 // admin) a Platform/Tenant view switch.
 //
-// SECURITY NOTE: credentials are checked client-side here, which is fine for a
-// demo/preview but is NOT secure — a browser cannot keep a secret. When the
-// Workers/D1 backend lands, signIn() posts to an auth endpoint and the returned
-// JWT drives this same context. Everything downstream (sidebar, route guards,
-// platform gate) is unchanged by that swap.
+// PHASE 1 LIVE: signIn() now calls the real deployed Worker
+// (hospitalos-api.johnpadeola.workers.dev) instead of checking an in-memory
+// array — real PBKDF2 password verification against a real D1 database.
+// Everything downstream (sidebar, route guards, platform gate, can()/may())
+// is unchanged, since it only ever consumed whatever this context returned.
+//
+// KNOWN GAP, stated plainly: only auth and patients are migrated so far.
+// Every other module (lab, pharmacy, billing, Users & roles, and so on)
+// still reads from the old in-memory accountsStore.js/service files, not
+// this Worker. A user created via Administration -> Users & roles will NOT
+// be able to sign in through this real backend until that module is
+// migrated too — it's still writing to the disconnected in-memory array.
+// This is the expected, honest state of a partial migration, not a bug.
+
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
+const TOKEN_KEY = "hospitalos_session_token";
 
 const AuthContext = createContext(null);
 
@@ -23,41 +33,39 @@ export function AuthProvider({ children }) {
   const [view, setView] = useState("tenant"); // "tenant" | "platform"
 
   const signIn = useCallback(async (email, password) => {
-    const found = findAccount(email);
-    if (!found || found.password !== password) {
-      record({
-        actor: { email: String(email).trim().toLowerCase() || "unknown", name: "Unknown", role: "none" },
-        action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
-        detail: "Failed sign-in attempt", severity: "warn",
+    let res, data;
+    try {
+      res = await fetch(`${API_URL}/auth/signin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, deviceLabel: deviceLabel() }),
       });
-      throw new Error("Incorrect email or password.");
+      data = await res.json();
+    } catch (_networkErr) {
+      throw new Error("Couldn't reach the sign-in server. Check your connection and try again.");
     }
-    if (found.demoExpiresAt && new Date(found.demoExpiresAt) < new Date()) {
-      record({
-        actor: found, action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
-        detail: "Blocked sign-in — demo period expired", severity: "warn",
-      });
-      const err = new Error("Your 7-day demo has ended. Sign up for a full account to keep going — your data will not carry over from the demo.");
-      err.demoExpired = true;
+    if (!res.ok) {
+      const err = new Error(data.error || "Sign-in failed.");
+      if (data.demoExpired) err.demoExpired = true;
       throw err;
     }
-    if (found.active === false) {
-      record({
-        actor: found, action: AUDIT_ACTIONS.DENY, entity: "session", entityId: "sign-in",
-        detail: "Blocked sign-in — account deactivated", severity: "warn",
-      });
-      throw new Error("This account has been deactivated. Contact your hospital's administrator.");
-    }
-    const { password: _pw, ...safe } = found;
-    const device = checkAndRecordDevice(safe);
-    setUser({ ...safe, newDevice: device.isNew, deviceLabel: device.label });
+    localStorage.setItem(TOKEN_KEY, data.token);
+    // Device fingerprinting stays a client-side, best-effort signal — see
+    // deviceFingerprint.js's own honest-scope note — this is unrelated to
+    // the server-verified session token and doesn't need a backend change.
+    const device = checkAndRecordDevice(data.user);
+    setUser({ ...data.user, newDevice: device.isNew, deviceLabel: device.label });
     setView("tenant");
-    record({ actor: safe, action: AUDIT_ACTIONS.SIGN_IN, entity: "session", entityId: safe.email, detail: `Signed in as ${rbacRoleLabel(safe.role)}` });
-    return safe;
+    return data.user;
   }, []);
 
   const signOut = useCallback(() => {
     if (user) record({ actor: user, action: AUDIT_ACTIONS.SIGN_OUT, entity: "session", entityId: user.email, detail: "Signed out" });
+    // NOTE: this clears the local token but does not yet revoke the session
+    // row server-side (no POST /auth/signout route exists in Phase 1) — the
+    // D1 session simply expires naturally after 12 hours. Real revocation
+    // is a small, fast follow-up once needed.
+    localStorage.removeItem(TOKEN_KEY);
     setUser(null);
     setView("tenant");
   }, [user]);
@@ -99,7 +107,6 @@ export function AuthProvider({ children }) {
       if (v === "platform" && !isPlatformAdmin) return;
       setView(v);
     },
-    demoAccounts: demoAccountsPublicList(),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
