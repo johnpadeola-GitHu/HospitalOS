@@ -4,14 +4,33 @@ import { priceFor } from "../../engines/pricing";
 // A report can be flagged with an urgent finding, which feeds the Alerts screen.
 // Each modality is priced, so completed studies become billable charges.
 //
-// Technical parameters (contrast, sequence, probe, etc.) are captured at the
-// "performed" stage via setTechnicalParams() — modality-specific, optional,
-// and shown on the modality-dedicated screens (Ultrasound/CT/MRI) without
-// forcing every study through the same generic fields.
-//
-// In-memory now; async API shaped for a later D1 swap.
+// PHASE 1 LIVE: fourth module migrated to the real deployed Worker, after
+// patients, lab, and pharmacy. MODALITIES/TECH_FIELDS stay entirely
+// client-side — static reference data, not tenant data, same reasoning as
+// the lab test catalogue.
 
-const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
+
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 export const MODALITIES = [
   { code: "CXR", name: "Chest X-ray", modality: "General Radiography", price: 4000 },
@@ -73,58 +92,6 @@ export const STATUS_LABELS = {
   reported: "Reported",
 };
 
-let _accession = 500;
-const _studies = [
-  {
-    id: "r1",
-    accession: "RAD-000501",
-    patientId: "p1",
-    patientName: "Okafor, Adaeze",
-    hospitalNo: "H001001",
-    code: "CXR",
-    name: "Chest X-ray",
-    modality: "General Radiography",
-    status: "requested",
-    priority: "routine",
-    requestedAt: new Date(Date.now() - 55 * 60000).toISOString(),
-    report: null,
-    urgentFinding: false,
-    tech: {},
-  },
-  {
-    id: "r2",
-    accession: "RAD-000502",
-    patientId: "p2",
-    patientName: "Eze, Chibuike",
-    hospitalNo: "H001002",
-    code: "USG-ABD",
-    name: "Abdominal Ultrasound",
-    modality: "Ultrasound",
-    status: "performed",
-    priority: "routine",
-    requestedAt: new Date(Date.now() - 200 * 60000).toISOString(),
-    report: null,
-    urgentFinding: false,
-    tech: { probe: "Curvilinear 3.5MHz", doppler: "None" },
-  },
-  {
-    id: "r3",
-    accession: "RAD-000503",
-    patientId: "p3",
-    patientName: "Bello, Fatima",
-    hospitalNo: "H001003",
-    code: "CT-HEAD",
-    name: "CT Head",
-    modality: "CT",
-    status: "scheduled",
-    priority: "urgent",
-    requestedAt: new Date(Date.now() - 40 * 60000).toISOString(),
-    report: null,
-    urgentFinding: false,
-    tech: {},
-  },
-];
-
 export function getModality(code) {
   return MODALITIES.find((m) => m.code === code) || null;
 }
@@ -133,97 +100,45 @@ export function modalitiesIn(group) {
   return MODALITIES.filter((m) => m.modality === group);
 }
 
-function accessionNo() {
-  _accession += 1;
-  return "RAD-" + String(_accession).padStart(6, "0");
-}
-
 export async function listStudies({ status = "all", query = "" } = {}) {
-  await delay();
-  const q = query.trim().toLowerCase();
-  return _studies
-
-    .filter((s) => (status === "all" ? true : s.status === status))
-    .filter((s) => {
-      if (!q) return true;
-      return (
-        s.patientName.toLowerCase().includes(q) ||
-        s.hospitalNo.toLowerCase().includes(q) ||
-        s.accession.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+  const params = new URLSearchParams();
+  if (status !== "all") params.set("status", status);
+  if (query.trim()) params.set("query", query.trim());
+  const qs = params.toString();
+  return apiCall(`/radiology/studies${qs ? `?${qs}` : ""}`);
 }
 
-export async function createStudy({ patientId, patientName, hospitalNo, code, priority = "routine" }) {
-  await delay();
+export async function createStudy({ patientId, code, priority = "routine" }) {
   const m = getModality(code);
   if (!m) throw new Error("Unknown study.");
-  const study = {
-    id: "r" + Date.now(),
-    accession: accessionNo(),
-    patientId,
-    patientName,
-    hospitalNo,
-    code: m.code,
-    name: m.name,
-    modality: m.modality,
-    status: "requested",
-    priority,
-    requestedAt: new Date().toISOString(),
-    report: null,
-    urgentFinding: false,
-    tech: {},
-  };
-  _studies.unshift(study);
-  return study;
+  return apiCall("/radiology/studies", {
+    method: "POST",
+    body: { patientId, code: m.code, name: m.name, modality: m.modality, priority },
+  });
 }
 
 export async function scheduleStudy(id) {
-  await delay(80);
-  const s = _studies.find((x) => x.id === id);
-  if (!s) throw new Error("Study not found");
-  if (s.status !== "requested") throw new Error("Study already scheduled.");
-  s.status = "scheduled";
-  return s;
+  return apiCall(`/radiology/studies/${encodeURIComponent(id)}/schedule`, { method: "PATCH" });
 }
 
 export async function markPerformed(id, tech = {}) {
-  await delay(80);
-  const s = _studies.find((x) => x.id === id);
-  if (!s) throw new Error("Study not found");
-  if (s.status !== "scheduled") throw new Error("Schedule the study first.");
-  s.status = "performed";
-  s.tech = { ...s.tech, ...tech };
-  return s;
+  return apiCall(`/radiology/studies/${encodeURIComponent(id)}/perform`, { method: "PATCH", body: tech });
 }
 
 export async function fileReport(id, { report, urgentFinding }) {
-  await delay();
-  const s = _studies.find((x) => x.id === id);
-  if (!s) throw new Error("Study not found");
-  if (s.status !== "performed" && s.status !== "reported") {
-    throw new Error("Study must be performed before reporting.");
-  }
-  if (!report || !report.trim()) throw new Error("Enter a report.");
-  s.report = report.trim();
-  s.urgentFinding = !!urgentFinding;
-  s.status = "reported";
-  s.reportedAt = new Date().toISOString();
-  return s;
+  return apiCall(`/radiology/studies/${encodeURIComponent(id)}/report`, { method: "PATCH", body: { report, urgentFinding } });
 }
 
 // Feed for Alerts: reported studies with an urgent finding.
 export async function listUrgentStudies() {
-  await delay(60);
-  return _studies.filter((s) => s.status === "reported" && s.urgentFinding);
+  const studies = await listStudies({ status: "reported" });
+  return studies.filter((s) => s.urgentFinding);
 }
 
 // Feed for Billing: performed or reported studies are billable.
 export async function listBillableStudies() {
-  await delay(60);
-  return _studies
-    .filter((s) => s.status === "performed" || s.status === "reported")
+  const [performed, reported] = await Promise.all([listStudies({ status: "performed" }), listStudies({ status: "reported" })]);
+  return [...performed, ...reported]
     .map((s) => {
       const m = getModality(s.code);
       return {
