@@ -2,9 +2,35 @@
 // Lifecycle: ordered -> collected -> resulted -> verified.
 // Results are auto-flagged against reference ranges (low / normal / high /
 // critical), which is what feeds the critical-value alerting concept.
-// In-memory now; async API shaped for a later D1 swap.
+//
+// PHASE 1 LIVE: the order lifecycle now calls the real deployed Worker.
+// The test catalogue stays entirely client-side (see the note in the
+// backend's routes/lab.js) — it's static reference data, not tenant data,
+// so flagValue()/orderHasCritical()/getTest() below still operate purely
+// on whatever data the Worker returns, no change to their own logic.
 
-const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
+
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 // Test catalogue. Each analyte carries a unit and a reference range.
 // crit low/high are the panic thresholds that raise a critical flag.
@@ -18,28 +44,6 @@ export const STATUS_LABELS = {
   resulted: "Resulted",
   verified: "Verified",
 };
-
-let _accession = 240;
-const _orders = [
-  {
-    id: "o1",
-    accession: "LAB-000241",
-    patientId: "p1",
-    patientName: "Okafor, Adaeze",
-    hospitalNo: "H001001",
-    testCode: "UE",
-    testName: "Urea & Electrolytes",
-    department: "Clinical Chemistry",
-    status: "ordered",
-    orderedAt: new Date(Date.now() - 40 * 60000).toISOString(),
-    results: null,
-  },
-];
-
-function accessionNo() {
-  _accession += 1;
-  return "LAB-" + String(_accession).padStart(6, "0");
-}
 
 export function getTest(code) {
   return TEST_CATALOGUE.find((t) => t.code === code) || null;
@@ -68,87 +72,46 @@ export function orderHasCritical(order) {
 }
 
 export async function listOrders({ status = "all", query = "" } = {}) {
-  await delay();
-  const q = query.trim().toLowerCase();
-  return _orders
-    .filter((o) => (status === "all" ? true : o.status === status))
-    .filter((o) => {
-      if (!q) return true;
-      return (
-        o.patientName.toLowerCase().includes(q) ||
-        o.hospitalNo.toLowerCase().includes(q) ||
-        o.accession.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => new Date(b.orderedAt) - new Date(a.orderedAt));
+  const params = new URLSearchParams();
+  if (status !== "all") params.set("status", status);
+  if (query.trim()) params.set("query", query.trim());
+  const qs = params.toString();
+  return apiCall(`/lab/orders${qs ? `?${qs}` : ""}`);
 }
 
-export async function createOrder({ patientId, patientName, hospitalNo, testCode }) {
-  await delay();
+export async function createOrder({ patientId, testCode }) {
   const test = getTest(testCode);
   if (!test) throw new Error("Unknown test.");
-  const order = {
-    id: "o" + Date.now(),
-    accession: accessionNo(),
-    patientId,
-    patientName,
-    hospitalNo,
-    testCode: test.code,
-    testName: test.name,
-    department: test.department,
-    status: "ordered",
-    orderedAt: new Date().toISOString(),
-    results: null,
-  };
-  _orders.unshift(order);
-  return order;
+  return apiCall("/lab/orders", {
+    method: "POST",
+    body: { patientId, testCode: test.code, testName: test.name, department: test.department },
+  });
 }
 
 export async function collectSample(id) {
-  await delay(80);
-  const o = _orders.find((x) => x.id === id);
-  if (!o) throw new Error("Order not found");
-  if (o.status !== "ordered") throw new Error("Sample already collected.");
-  o.status = "collected";
-  o.collectedAt = new Date().toISOString();
-  return o;
+  return apiCall(`/lab/orders/${encodeURIComponent(id)}/collect`, { method: "PATCH" });
 }
 
 export async function enterResults(id, results) {
-  await delay();
-  const o = _orders.find((x) => x.id === id);
-  if (!o) throw new Error("Order not found");
-  if (o.status !== "collected" && o.status !== "resulted") {
-    throw new Error("Collect the sample before entering results.");
-  }
-  o.results = results;
-  o.status = "resulted";
-  o.resultedAt = new Date().toISOString();
-  return o;
+  return apiCall(`/lab/orders/${encodeURIComponent(id)}/results`, { method: "PATCH", body: { results } });
 }
 
 export async function verifyOrder(id) {
-  await delay();
-  const o = _orders.find((x) => x.id === id);
-  if (!o) throw new Error("Order not found");
-  if (o.status !== "resulted") throw new Error("Enter results before verifying.");
-  o.status = "verified";
-  o.verifiedAt = new Date().toISOString();
-  return o;
+  return apiCall(`/lab/orders/${encodeURIComponent(id)}/verify`, { method: "PATCH" });
 }
 
 // Feed for the Alerts / critical-values screen later.
 export async function listCriticalOrders() {
-  await delay(60);
-  return _orders.filter(orderHasCritical);
+  const orders = await listOrders({});
+  return orders.filter(orderHasCritical);
 }
 
 // Feed for Billing: every order as a priced charge.
 import { priceFor } from "../../engines/pricing";
 
 export async function listBillableOrders() {
-  await delay(60);
-  return _orders.map((o) => {
+  const orders = await listOrders({});
+  return orders.map((o) => {
     const test = getTest(o.testCode);
     return {
       patientId: o.patientId,
