@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password, deviceLabel: deviceLabel() }),
       });
       data = await res.json();
-    } catch (_networkErr) {
+    } catch {
       throw new Error("Couldn't reach the sign-in server. Check your connection and try again.");
     }
     if (!res.ok) {

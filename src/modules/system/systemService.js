@@ -1,18 +1,39 @@
 // System service — users, roles, permissions for Administration -> Users &
-// roles. This now wraps the SAME account store every sign-in checks
-// (accountsStore.js) instead of keeping its own separate directory — a
-// staff account created here is immediately, genuinely sign-in capable,
-// scoped to the acting admin's own tenant. Enforcement of what a role can
-// actually do lives in src/lib/rbac.js; this module manages who holds which
-// role and whether their account is active.
+// roles. Phase 1 live: every function now calls the real deployed Worker
+// instead of the in-memory accountsStore.js — a staff account created here
+// is immediately, genuinely sign-in capable against the real database,
+// scoped server-side to the acting admin's own tenant (never trusted from
+// client input, the same principle as every other tenant-scoped route).
+// Enforcement of what a role can actually do still lives in src/lib/rbac.js;
+// this module manages who holds which role and whether their account is active.
 
-import { listAccountsByTenant, addAccount, setAccountRole, setAccountActive, getAccountById } from "../../auth/accountsStore";
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
 
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 // Permission keys align to nav groups (see navGroups.js) plus an admin key —
 // used only for the descriptive "what can this role see" summary on this
-// screen, not for enforcement.
+// screen, not for enforcement. Kept as static client-side metadata since
+// it never changes per-request and doesn't need a network round trip.
 export const PERMISSIONS = [
   { key: "overview", label: "Overview & alerts" },
   { key: "patient-care", label: "Patient care" },
@@ -47,54 +68,36 @@ export function permissionsFor(roleKey) {
   return ROLES[roleKey]?.permissions || [];
 }
 
-export async function listUsers({ tenantId, query = "" } = {}) {
-  await delay();
-  const q = query.trim().toLowerCase();
-  return listAccountsByTenant(tenantId)
-    .filter((u) => {
-      if (!q) return true;
-      return u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || roleLabel(u.role).toLowerCase().includes(q);
-    })
-    .sort((a, b) => a.name.localeCompare(b.name));
+export async function listUsers({ query = "" } = {}) {
+  // tenantId is deliberately no longer accepted as a parameter — the
+  // server derives it from the caller's own verified session, never from
+  // client input. Callers that used to pass { tenantId, query } can leave
+  // tenantId off entirely now; it's silently ignored if still present.
+  const q = query ? `?query=${encodeURIComponent(query)}` : "";
+  return apiCall(`/users${q}`);
 }
 
 /**
- * Creates a REAL, sign-in-capable account — this is the fix for a real gap:
- * staff "created" here used to land in a list-only directory disconnected
- * from the account store sign-in actually checks, meaning no one you added
- * here could ever log in. Now it calls the same addAccount() the
- * activation wizard uses.
+ * Creates a REAL, sign-in-capable account against the live database.
  */
-export async function createUser({ name, email, password, role, tenantId }) {
-  await delay();
-  if (!name || !name.trim()) throw new Error("Enter a name.");
-  if (!email || !/.+@.+\..+/.test(email)) throw new Error("Enter a valid email.");
-  if (!password || password.length < 12) throw new Error("Password must be at least 12 characters.");
-  if (!ROLES[role]) throw new Error("Choose a role.");
-  return addAccount({ email, password, name, role, tenantId });
+export async function createUser({ name, email, password, role }) {
+  return apiCall("/users", { method: "POST", body: { name, email, password, role } });
 }
 
 export async function updateUserRole(id, role) {
-  await delay(80);
-  if (!ROLES[role]) throw new Error("Unknown role");
-  return setAccountRole(id, role);
+  return apiCall(`/users/${encodeURIComponent(id)}/role`, { method: "PATCH", body: { role } });
 }
 
-export async function toggleUserActive(id, tenantId) {
-  await delay(80);
-  const u = getAccountById(id);
-  if (!u) throw new Error("User not found");
-  // Guard: never deactivate the last active super-admin for this tenant.
-  if (u.active !== false && u.role === "super-admin") {
-    const otherAdmins = listAccountsByTenant(tenantId).filter((x) => x.id !== id && x.role === "super-admin" && x.active !== false).length;
-    if (otherAdmins === 0) throw new Error("Cannot deactivate the last active Super Admin.");
-  }
-  return setAccountActive(id, u.active === false);
+export async function toggleUserActive(id) {
+  // tenantId no longer needed as a parameter — same reasoning as listUsers.
+  return apiCall(`/users/${encodeURIComponent(id)}/toggle-active`, { method: "PATCH" });
 }
 
-export async function roleSummary(tenantId) {
-  await delay(60);
-  const users = listAccountsByTenant(tenantId);
+export async function roleSummary() {
+  // Computed client-side from listUsers() rather than a dedicated route —
+  // it's pure aggregation of data the client already has to fetch anyway,
+  // so a second network round trip would add latency for no real benefit.
+  const users = await listUsers({});
   const counts = {};
   for (const u of users) counts[u.role] = (counts[u.role] || 0) + 1;
   return Object.entries(ROLES).map(([key, r]) => ({ key, label: r.label, count: counts[key] || 0, permissions: r.permissions }));

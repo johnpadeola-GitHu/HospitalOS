@@ -21,11 +21,10 @@
 // from Platform → Tenants once payment is confirmed, the same action already
 // used to reactivate a suspended tenant.
 
-import { addAccount, emailTaken } from "../../auth/accountsStore";
-import { addTenant } from "../../modules/platform/platformService";
-import { record, AUDIT_ACTIONS } from "../../lib/audit";
+// Phase 1 live: startDemo() now calls the real deployed Worker instead of
+// writing to the in-memory account/tenant stores directly.
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
 
-const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms));
 
 export const DEMO_DURATION_DAYS = 7;
 
@@ -66,45 +65,21 @@ export function suggestTier(bedCount) {
 export function getTier(key) {
   return ALL_TIERS.find((t) => t.key === key) || null;
 }
-export async function startDemo({ hospitalName, contactName, contactEmail, actor }) {
-  await delay();
-  if (!hospitalName || !hospitalName.trim()) throw new Error("Enter the hospital or organisation's name.");
-  if (!contactName || !contactName.trim()) throw new Error("Enter your name.");
-  if (!contactEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) throw new Error("Enter a valid email address.");
-  if (emailTaken(contactEmail)) throw new Error("An account with this email already exists. Sign in instead.");
-
-  const expiresAt = new Date(Date.now() + DEMO_DURATION_DAYS * 86400000).toISOString();
-
-  const tenant = await addTenant({
-    name: `${hospitalName.trim()} (Demo)`,
-    plan: "Demo", billingType: "commission", commissionPct: FREE_TIERS[0].commissionPct,
-    status: "demo",
-    address: "\u2014", phone: "\u2014", email: contactEmail.trim().toLowerCase(),
-    logoUrl: "", registrationNumber: "\u2014", seats: 5, demoExpiresAt: expiresAt,
-  });
-
-  const tempPassword = generateTempPassword();
-  const account = addAccount({
-    email: contactEmail.trim().toLowerCase(), password: tempPassword,
-    name: contactName.trim(), role: "super-admin", tenantId: tenant.id, demoExpiresAt: expiresAt,
-  });
-
-  record({
-    actor: actor || account, action: AUDIT_ACTIONS.CREATE, entity: "demo-signup", entityId: tenant.id,
-    detail: `Demo started for ${hospitalName.trim()} \u2014 expires ${new Date(expiresAt).toLocaleDateString()}`,
-    severity: "info",
-  });
-
-  return { tenant, account, password: tempPassword, expiresAt };
-}
-
-function generateTempPassword() {
-  // Demo-only, readable temp password — a real deployment emails a reset
-  // link through the server instead of ever generating a password client-side.
-  const words = ["hospital", "record", "ward", "chart", "clinic", "orbit", "harbor", "meadow"];
-  const w = words[Math.floor(Math.random() * words.length)];
-  const n = Math.floor(1000 + Math.random() * 9000);
-  return `${w}${n}`;
+export async function startDemo({ hospitalName, contactName, contactEmail }) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}/auth/demo`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hospitalName, contactName, contactEmail }),
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Couldn't start the demo.");
+  // Client field name kept as "password" (not the server's "tempPassword")
+  // so SignUp.jsx's result.password reference needs no change.
+  return { tenant: data.tenant, account: data.account, password: data.tempPassword, expiresAt: data.expiresAt };
 }
 
 export function daysRemaining(expiresAt) {
