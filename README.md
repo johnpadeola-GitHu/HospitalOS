@@ -1169,3 +1169,17 @@ Applied the standard fix at every level of the layout chain.
 (apple-touch-icon, manifest icons, 16/32px favicons) with white background
 and red plus — inverted from the red-background version used everywhere
 else in the app (footer, login page).
+
+## This round — Production Readiness Plan updated to v2.0
+
+Regenerated the Production Readiness Plan PDF to cover 13 items instead of
+5 — the original five foundational limitations (data persistence,
+sign-in, audit trail, instruments gateway, document upload) plus eight
+more identified from everything built since v1.0 was written: real
+payment processing, SMS/WhatsApp/email delivery, activation code
+concurrency safety, server-side RBAC enforcement, Tenant Service
+Agreement legal defensibility, forgot-password/email-verification/rate-
+limiting, data protection technical safeguards, and backup/disaster
+recovery. Updated route count references (67 → 81) and added a revised
+8-phase sequencing plan. Verified clean: 5 pages, no stale branding, all
+13 items present.
