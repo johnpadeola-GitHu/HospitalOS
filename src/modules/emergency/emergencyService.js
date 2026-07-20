@@ -3,9 +3,34 @@
 // non-urgent), and move through: waiting -> in-treatment -> observation ->
 // disposition (admitted / discharged / transferred). The board orders by acuity
 // first, then arrival time, so the sickest are surfaced.
-// In-memory now; async API shaped for a later D1 swap.
+//
+// PHASE 1 LIVE: eleventh module migrated. Unregistered patients (e.g. a
+// trauma arrival with no time to register first) are still genuinely
+// supported \u2014 the server accepts a null patientId and stores the name as
+// given, matching this file's original behaviour exactly.
 
-const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
+
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 // ESI-style acuity. Lower number = higher acuity.
 export const ACUITY = {
@@ -25,93 +50,24 @@ export const STAGE_LABELS = {
 
 export const DISPOSITIONS = ["admitted", "discharged", "transferred"];
 
-let _enc = 0;
-const _encounters = [
-  {
-    id: "e1",
-    encounterNo: "ED-0001",
-    patientId: "p2",
-    patientName: "Eze, Chibuike",
-    hospitalNo: "H001002",
-    complaint: "Chest pain",
-    acuity: 2,
-    stage: "in-treatment",
-    arrivedAt: new Date(Date.now() - 18 * 60000).toISOString(),
-    disposition: null,
-  },
-  {
-    id: "e2",
-    encounterNo: "ED-0002",
-    patientId: null,
-    patientName: "Unregistered — trauma",
-    hospitalNo: "—",
-    complaint: "RTA, multiple injuries",
-    acuity: 1,
-    stage: "waiting",
-    arrivedAt: new Date(Date.now() - 6 * 60000).toISOString(),
-    disposition: null,
-  },
-];
-
-function encNo() {
-  _enc += 1;
-  return "ED-" + String(_enc + 2).padStart(4, "0");
-}
-
 export async function listEncounters({ includeDisposed = false } = {}) {
-  await delay();
-  return _encounters
-    .filter((e) => (includeDisposed ? true : !e.disposition))
-    .sort((a, b) => {
-      if (a.acuity !== b.acuity) return a.acuity - b.acuity; // sickest first
-      return new Date(a.arrivedAt) - new Date(b.arrivedAt); // then earliest
-    });
+  return apiCall(`/emergency/encounters?includeDisposed=${includeDisposed}`);
 }
 
 export async function presentPatient({ patientId, patientName, hospitalNo, complaint, acuity }) {
-  await delay();
-  if (!complaint || !complaint.trim()) throw new Error("Enter a presenting complaint.");
-  const enc = {
-    id: "e" + Date.now(),
-    encounterNo: encNo(),
-    patientId: patientId || null,
-    patientName: patientName || "Unregistered patient",
-    hospitalNo: hospitalNo || "\u2014",
-    complaint: complaint.trim(),
-    acuity: Number(acuity) || 3,
-    stage: "waiting",
-    arrivedAt: new Date().toISOString(),
-    disposition: null,
-  };
-  _encounters.push(enc);
-  return enc;
+  return apiCall("/emergency/encounters", { method: "POST", body: { patientId, patientName, hospitalNo, complaint, acuity } });
 }
 
 export async function setStage(id, stage) {
-  await delay(80);
-  const e = _encounters.find((x) => x.id === id);
-  if (!e) throw new Error("Encounter not found");
-  if (!ED_STAGES.includes(stage)) throw new Error("Unknown stage");
-  e.stage = stage;
-  return e;
+  return apiCall(`/emergency/encounters/${encodeURIComponent(id)}/stage`, { method: "PATCH", body: { stage } });
 }
 
 export async function setAcuity(id, acuity) {
-  await delay(80);
-  const e = _encounters.find((x) => x.id === id);
-  if (!e) throw new Error("Encounter not found");
-  e.acuity = Number(acuity);
-  return e;
+  return apiCall(`/emergency/encounters/${encodeURIComponent(id)}/acuity`, { method: "PATCH", body: { acuity } });
 }
 
 export async function disposePatient(id, disposition) {
-  await delay();
-  const e = _encounters.find((x) => x.id === id);
-  if (!e) throw new Error("Encounter not found");
-  if (!DISPOSITIONS.includes(disposition)) throw new Error("Unknown disposition");
-  e.disposition = disposition;
-  e.disposedAt = new Date().toISOString();
-  return e;
+  return apiCall(`/emergency/encounters/${encodeURIComponent(id)}/dispose`, { method: "PATCH", body: { disposition } });
 }
 
 export function edWaitMinutes(arrivedAt) {
