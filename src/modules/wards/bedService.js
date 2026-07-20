@@ -1,10 +1,42 @@
-import { priceFor } from "../../engines/pricing";
 // Bed registry.
-// Source of truth for wards, beds, and occupancy. Both the bed board and the
-// ADT admit/transfer flows read and write here, so a bed cannot be assigned to
-// two patients. In-memory for now; async API shaped for a later D1 swap.
+// Source of truth for wards, beds, and occupancy. Both the bed board and
+// the ADT admit/transfer flows depend on this data being correct.
+//
+// PHASE 1 LIVE: seventh module migrated. Bed assignment during admit/
+// transfer/discharge now happens server-side, coordinated directly inside
+// the same Worker request as the patient status update (see
+// routes/patients.js) — a real improvement over the old in-memory version,
+// where the bed and the patient record were two separate function calls
+// that could, in principle, get out of step. assignBed()/releaseBedFor()
+// stay exported here for direct use, calling the same backend routes.
+//
+// TIERS (accommodation pricing) stays entirely client-side — same
+// reasoning as every other pricing table in this app.
 
-const delay = (ms = 110) => new Promise((r) => setTimeout(r, ms));
+import { priceFor } from "../../engines/pricing";
+
+const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
+
+function authHeaders() {
+  const token = localStorage.getItem("hospitalos_session_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiCall(path, { method = "GET", body } = {}) {
+  let res, data;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
+  }
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
 
 // Accommodation tiers — the six categories from the architecture, each with a
 // nightly rate. The tier drives bed charges, so a VIP suite bills differently
@@ -21,128 +53,48 @@ export const TIERS = {
 
 export const TIER_LIST = Object.values(TIERS);
 
-// Each ward has a fixed set of bed codes and an accommodation tier.
-const WARD_DEFS = [
-  { name: "Medical Ward A", code: "MA", beds: 8, tier: "general" },
-  { name: "Medical Ward B", code: "MB", beds: 8, tier: "general" },
-  { name: "Surgical Ward A", code: "SA", beds: 6, tier: "general" },
-  { name: "Surgical Ward B", code: "SB", beds: 6, tier: "general" },
-  { name: "Semi-Private Wing", code: "SPW", beds: 6, tier: "semi-private" },
-  { name: "Private Rooms", code: "PR", beds: 6, tier: "private" },
-  { name: "Private Suite", code: "PS", beds: 5, tier: "suite" },
-  { name: "VIP Suite", code: "VIP", beds: 3, tier: "vip" },
-  { name: "Executive Suite", code: "EXE", beds: 2, tier: "executive" },
-  { name: "ICU", code: "ICU", beds: 4, tier: "critical" },
-  { name: "HDU", code: "HDU", beds: 4, tier: "critical" },
-  { name: "Paediatric Ward", code: "PED", beds: 6, tier: "general" },
-  { name: "Maternity Ward", code: "MAT", beds: 6, tier: "general" },
-  { name: "Isolation Unit", code: "ISO", beds: 3, tier: "private" },
+export const WARD_NAMES = [
+  "Medical Ward A", "Medical Ward B", "Surgical Ward A", "Surgical Ward B",
+  "Semi-Private Wing", "Private Rooms", "Private Suite", "VIP Suite",
+  "Executive Suite", "ICU", "HDU", "Paediatric Ward", "Maternity Ward", "Isolation Unit",
 ];
 
-// Build the bed table.
-const _beds = [];
-for (const w of WARD_DEFS) {
-  for (let i = 1; i <= w.beds; i++) {
-    _beds.push({
-      id: `${w.code}-${String(i).padStart(2, "0")}`,
-      ward: w.name,
-      tier: w.tier,
-      occupantId: null,
-      occupantName: null,
-      since: null,
-    });
-  }
-}
-
-// Seed occupancy to match the two admitted sample patients in patientService.
-function seed(bedId, occupantId, occupantName) {
-  const b = _beds.find((x) => x.id === bedId);
-  if (b) {
-    b.occupantId = occupantId;
-    b.occupantName = occupantName;
-  }
-}
-seed("MA-04", "p1", "Okafor, Adaeze");
-seed("ICU-01", "p2", "Eze, Chibuike");
-
-export const WARD_NAMES = WARD_DEFS.map((w) => w.name);
-
 export async function listWards() {
-  await delay();
-  return WARD_DEFS.map((w) => {
-    const beds = _beds.filter((b) => b.ward === w.name);
-    const occupied = beds.filter((b) => b.occupantId).length;
-    return {
-      name: w.name,
-      code: w.code,
-      tier: w.tier,
-      tierLabel: TIERS[w.tier].label,
-      rate: TIERS[w.tier].rate,
-      total: beds.length,
-      occupied,
-      free: beds.length - occupied,
-      beds: beds.map((b) => ({ ...b })),
-    };
-  });
+  const wards = await apiCall("/wards");
+  return wards.map((w) => ({ ...w, tierLabel: TIERS[w.tier]?.label, rate: TIERS[w.tier]?.rate }));
 }
 
 export async function freeBedsForWard(wardName) {
-  await delay(60);
-  return _beds.filter((b) => b.ward === wardName && !b.occupantId).map((b) => b.id);
+  return apiCall(`/wards/free-beds?ward=${encodeURIComponent(wardName)}`);
 }
 
-// Assign a patient to a bed. Throws if the bed is taken by someone else.
-// Releases any bed the patient previously held (handles transfers cleanly).
-export async function assignBed(bedId, occupantId, occupantName) {
-  await delay();
-  const target = _beds.find((b) => b.id === bedId);
-  if (!target) throw new Error("That bed does not exist.");
-  if (target.occupantId && target.occupantId !== occupantId) {
-    throw new Error(`Bed ${bedId} is already occupied.`);
-  }
-  for (const b of _beds) {
-    if (b.occupantId === occupantId) {
-      b.occupantId = null;
-      b.occupantName = null;
-      b.since = null;
-    }
-  }
-  target.occupantId = occupantId;
-  target.occupantName = occupantName;
-  target.since = new Date().toISOString();
-  return { ...target };
+// Assign a patient to a bed directly (outside the admit/transfer flow,
+// which now does this coordination server-side on its own).
+export async function assignBed(bedCode, occupantId, occupantName) {
+  return apiCall("/wards/assign-bed", { method: "POST", body: { bedCode, occupantId, occupantName } });
 }
 
 export async function releaseBedFor(occupantId) {
-  await delay(60);
-  for (const b of _beds) {
-    if (b.occupantId === occupantId) {
-      b.occupantId = null;
-      b.occupantName = null;
-      b.since = null;
-    }
-  }
+  return apiCall(`/wards/release-bed/${encodeURIComponent(occupantId)}`, { method: "PATCH" });
 }
 
 // Feed for Billing: accommodation charges for currently occupied beds.
 // Bills whole nights, minimum one, at the tier rate for that ward.
 export async function listBillableBedNights() {
-  await delay(60);
-  return _beds
-    .filter((b) => b.occupantId && b.since)
-    .map((b) => {
-      const nights = Math.max(1, Math.ceil((Date.now() - new Date(b.since)) / 86400000));
-      const tier = TIERS[b.tier];
-      const nightlyRate = priceFor("accommodation", b.tier, tier.rate);
-      return {
-        patientId: b.occupantId,
-        patientName: b.occupantName,
-        hospitalNo: "\u2014",
-        source: "Accommodation",
-        description: `${tier.label} — ${b.ward} ${b.id} (${nights} night${nights > 1 ? "s" : ""})`,
-        reference: b.id,
-        amount: nightlyRate * nights,
-        at: b.since,
-      };
-    });
+  const occupied = await apiCall("/wards/billable-bed-nights");
+  return occupied.map((b) => {
+    const nights = Math.max(1, Math.ceil((Date.now() - new Date(b.since)) / 86400000));
+    const tier = TIERS[b.tier];
+    const nightlyRate = priceFor("accommodation", b.tier, tier.rate);
+    return {
+      patientId: b.patientId,
+      patientName: b.patientName,
+      hospitalNo: b.hospitalNo,
+      source: "Accommodation",
+      description: `${tier.label} \u2014 ${b.ward} ${b.bedId} (${nights} night${nights > 1 ? "s" : ""})`,
+      reference: b.bedId,
+      amount: nightlyRate * nights,
+      at: b.since,
+    };
+  });
 }
