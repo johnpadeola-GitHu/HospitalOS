@@ -23,10 +23,15 @@ export default function Platform() {
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
-    const [tenants, summary, services, flags, deployments] = await Promise.all([
-      listTenants(), platformSummary(), listServices(), listFlags(), listDeployments(),
-    ]);
-    setData({ tenants, summary, services, flags, deployments });
+    setErr("");
+    try {
+      const [tenants, summary, services, flags, deployments] = await Promise.all([
+        listTenants(), platformSummary(), listServices(), listFlags(), listDeployments(),
+      ]);
+      setData({ tenants, summary, services, flags, deployments });
+    } catch (e) {
+      setErr(e.message);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -46,7 +51,9 @@ export default function Platform() {
     return (
       <div>
         <PageHeader group="Platform" title="Platform admin" icon="ShieldCheck" />
-        <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading platform…</div>
+        <div style={{ color: err ? "var(--bad)" : "var(--muted)", fontSize: 13 }}>
+          {err || "Loading platform…"}
+        </div>
       </div>
     );
   }

@@ -8,8 +8,13 @@ export default function Facilities() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setSites(await listSites());
-    setLoading(false);
+    try {
+      setSites(await listSites());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

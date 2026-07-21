@@ -1,15 +1,15 @@
 // Data import — bringing patient records in from an existing EMR/paper
-// system. This is the honest, concrete answer to "can we migrate our data
-// in": the mapping and validation logic below is real and works today. What
-// is NOT yet real is persistent storage on the receiving end — imported
-// patients land in the same in-memory patient list every other patient in
-// this preview build lives in, and reset on reload, same as everything else.
-// A production migration needs this same mapper wired to Cloudflare D1
-// instead (see the Production Readiness Plan) — the parsing, column
-// matching, and validation rules do not change when the storage does.
+// system. The mapping, parsing, and validation logic below was always
+// real and needed no migration itself.
+//
+// UPDATE, PHASE 1 LIVE by inheritance: this file's own comment used to
+// describe imported patients as landing in an in-memory list that resets
+// on reload — that's no longer true. registerPatient() was migrated to
+// the real backend early in this whole effort, so persistence has
+// already been genuinely working since then; this file just needed its
+// stale documentation corrected, not a data-layer change.
 
 import { registerPatient } from "../patients/patientService";
-import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
 const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
 
@@ -119,7 +119,7 @@ export function validateRows(rows, columnMap) {
  * silently dropped into the patient list \u2014 they are excluded and reported
  * back so the operator can fix the source file and re-run just those.
  */
-export async function importValidRows(validatedRows, actor) {
+export async function importValidRows(validatedRows, _actor) {
   await delay(200);
   const toImport = validatedRows.filter((r) => r.valid);
   const created = [];
@@ -127,10 +127,8 @@ export async function importValidRows(validatedRows, actor) {
     const patient = await registerPatient({ firstName: r.firstName, lastName: r.lastName, sex: r.sex, dob: r.dob, phone: r.phone });
     created.push(patient);
   }
-  record({
-    actor, action: AUDIT_ACTIONS.CREATE, entity: "data-import", entityId: `${created.length}-patients`,
-    detail: `Imported ${created.length} patient record(s) from CSV \u2014 ${validatedRows.length - toImport.length} row(s) skipped for validation errors`,
-    severity: "info",
-  });
+  // Each registerPatient() call above already wrote its own real
+  // server-side audit entry — no separate bulk-summary log call needed
+  // here the way the old client-side version had.
   return created;
 }

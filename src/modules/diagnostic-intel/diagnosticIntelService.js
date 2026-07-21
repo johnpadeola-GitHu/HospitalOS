@@ -3,15 +3,19 @@
 // single module shows on its own: turnaround performance, positivity rates,
 // test utilisation, and where critical values are actually coming from.
 // This is read-only intelligence; it owns no data of its own.
+//
+// PHASE 1 LIVE by inheritance — every function this module calls
+// (listOrders, listStudies, listRequests) already hits the real backend
+// from earlier migrations, so this needed no data-layer changes, just
+// removing the artificial delay() wrapper that's redundant now the
+// underlying calls are genuinely async network requests with their own
+// real latency.
 
 import { listOrders, TEST_CATALOGUE } from "../lab/labService";
 import { listStudies } from "../radiology/radiologyService";
 import { listRequests as listBloodRequests } from "../blood-bank/bloodBankService";
 
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
-
 export async function diagnosticSummary() {
-  await delay();
   const [labOrders, studies, bloodReqs] = await Promise.all([
     listOrders({ status: "all" }), listStudies({}), listBloodRequests({ includeCompleted: true }),
   ]);
@@ -46,7 +50,6 @@ export async function diagnosticSummary() {
 // Turnaround performance — declared TAT vs. what actually happened, per test
 // that has at least one resulted order.
 export async function turnaroundReport() {
-  await delay(80);
   const orders = await listOrders({ status: "all" });
   const byCode = {};
   for (const o of orders) {
@@ -64,7 +67,6 @@ export async function turnaroundReport() {
 
 // Positivity rate for qualitative tests (infectious disease screens etc).
 export async function positivityReport() {
-  await delay(80);
   const orders = await listOrders({ status: "all" });
   const qualCodes = TEST_CATALOGUE.filter((t) => t.analytes.some((a) => a.qualitative)).map((t) => t.code);
   const rows = [];

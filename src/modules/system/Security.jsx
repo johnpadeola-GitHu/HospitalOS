@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
 import * as Icons from "lucide-react";
-import { listAudit, verifyChain, auditStats, auditActors, AUDIT_ACTIONS } from "../../lib/audit";
+import { AUDIT_ACTIONS } from "../../lib/audit";
+import { listAuditEntries, verifyChain, auditStats, auditActors } from "./securityAuditService";
+import { listUsers } from "./systemService";
 import { listKnownDevices } from "../../lib/deviceFingerprint";
-import { listAccountsByTenant } from "../../auth/accountsStore";
 import { PageHeader, StatCard, Card, Pill, Button, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -18,7 +19,7 @@ function when(iso) {
 }
 
 export default function Security() {
-  const { may, user } = useAuth();
+  const { may } = useAuth();
   const [rows, setRows] = useState([]);
   const [stats, setStats] = useState(null);
   const [chain, setChain] = useState(null);
@@ -28,14 +29,28 @@ export default function Security() {
   const [actors, setActors] = useState([]);
   const [devices, setDevices] = useState([]);
 
-  const refresh = useCallback(() => {
-    setRows(listAudit({ limit: 200, action, actor, query }));
-    setStats(auditStats());
-    setChain(verifyChain());
-    setActors(auditActors());
-    const tenantEmails = listAccountsByTenant(user.tenantId).map((a) => a.email);
-    setDevices(listKnownDevices(tenantEmails));
-  }, [action, actor, query, user.tenantId]);
+  const [loadErr, setLoadErr] = useState("");
+
+  const refresh = useCallback(async () => {
+    setLoadErr("");
+    try {
+      const [rowsRes, statsRes, chainRes, actorsRes] = await Promise.all([
+        listAuditEntries({ limit: 200, action, actor, query }),
+        auditStats(),
+        verifyChain(),
+        auditActors(),
+      ]);
+      setRows(rowsRes);
+      setStats(statsRes);
+      setChain(chainRes);
+      setActors(actorsRes);
+      const staff = await listUsers();
+      const tenantEmails = staff.map((a) => a.email);
+      setDevices(listKnownDevices(tenantEmails));
+    } catch (e) {
+      setLoadErr(e.message);
+    }
+  }, [action, actor, query]);
 
   useEffect(() => {
     const t = setTimeout(refresh, 120);
@@ -60,6 +75,13 @@ export default function Security() {
         subtitle="Append-only, hash-chained record of every consequential action"
         actions={<Button icon="RefreshCw" onClick={refresh}>Refresh</Button>}
       />
+
+      {loadErr && (
+        <div style={{ ...chainBar, ...chainBad }}>
+          <Icons.ShieldAlert size={15} />
+          <span>{loadErr}</span>
+        </div>
+      )}
 
       {chain && (
         <div style={{ ...chainBar, ...(chain.valid ? chainOk : chainBad) }}>

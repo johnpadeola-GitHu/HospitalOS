@@ -5,15 +5,19 @@ import { PageHeader, StatCard, Card, EmptyState } from "../../lib/ui";
 
 export default function DiagnosticIntel() {
   const [data, setData] = useState(null);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     let alive = true;
-    Promise.all([diagnosticSummary(), turnaroundReport(), positivityReport()]).then(([sum, tat, pos]) => {
-      if (alive) setData({ sum, tat, pos });
-    });
+    Promise.all([diagnosticSummary(), turnaroundReport(), positivityReport()])
+      .then(([sum, tat, pos]) => { if (alive) setData({ sum, tat, pos }); })
+      .catch((e) => { if (alive) setErr(e.message); });
     return () => { alive = false; };
   }, []);
 
+  if (err) {
+    return (<div><PageHeader group="Diagnostics" title="Diagnostic intelligence" icon="Brain" /><div style={{ color: "var(--bad)", fontSize: 13 }}>{err}</div></div>);
+  }
   if (!data) {
     return (<div><PageHeader group="Diagnostics" title="Diagnostic intelligence" icon="Brain" /><div style={{ color: "var(--muted)", fontSize: 13 }}>Compiling…</div></div>);
   }

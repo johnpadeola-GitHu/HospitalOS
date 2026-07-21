@@ -7,7 +7,9 @@ export default function Settings() {
 
   useEffect(() => {
     let alive = true;
-    getSettings().then((v) => alive && setS(v));
+    getSettings()
+      .then((v) => { if (alive) setS(v); })
+      .catch((e) => console.error(e));
     return () => { alive = false; };
   }, []);
 
