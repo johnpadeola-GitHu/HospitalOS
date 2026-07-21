@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import * as Icons from "lucide-react";
-import { listDocuments, listCategories, uploadDocument, renameDocument, deleteDocument, formatSize } from "./documentsService";
+import { listDocuments, listCategories, uploadDocument, downloadDocument, renameDocument, deleteDocument, formatSize } from "./documentsService";
 import { PageHeader, Card, Button, Modal, Field, inputStyle, EmptyState } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -19,8 +19,15 @@ export default function Documents() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [d, c] = await Promise.all([listDocuments({ category: cat, query }), listCategories()]);
-    setDocs(d); setCats(c); setLoading(false);
+    setErr("");
+    try {
+      const [d, c] = await Promise.all([listDocuments({ category: cat, query }), listCategories()]);
+      setDocs(d); setCats(c);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
   }, [cat, query]);
 
   useEffect(() => { const t = setTimeout(refresh, 150); return () => clearTimeout(t); }, [refresh]);
@@ -82,9 +89,7 @@ export default function Documents() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  <a href={d.url} download={d.name} style={{ textDecoration: "none" }}>
-                    <Button icon="Download">Download</Button>
-                  </a>
+                  <Button icon="Download" onClick={() => downloadDocument(d.id, d.name)}>Download</Button>
                   <Button onClick={() => setEditDoc(d)}>Rename</Button>
                   <Button onClick={() => del(d.id)}>Delete</Button>
                 </div>

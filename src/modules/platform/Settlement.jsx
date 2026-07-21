@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import * as Icons from "lucide-react";
 import {
-  PLATFORM_FEE_RATE, STATUS_TONE, listSettlements, advanceSettlement,
+  PLATFORM_FEE_RATE, STATUS_TONE, listSettlements, closeCurrentCycle, advanceSettlement,
   settlementSummary, payoutAccount, listUsage, usageSummary, revenueMix,
 } from "./settlementService";
 import { StatCard, Card, Pill, Button } from "../../lib/ui";
@@ -15,10 +15,15 @@ export default function Settlement() {
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
-    const [settlements, sum, payout, usage, uSum, mix] = await Promise.all([
-      listSettlements(), settlementSummary(), payoutAccount(), listUsage(), usageSummary(), revenueMix(),
-    ]);
-    setData({ settlements, sum, payout, usage, uSum, mix });
+    setErr("");
+    try {
+      const [settlements, sum, payout, usage, uSum, mix] = await Promise.all([
+        listSettlements(), settlementSummary(), payoutAccount(), listUsage(), usageSummary(), revenueMix(),
+      ]);
+      setData({ settlements, sum, payout, usage, uSum, mix });
+    } catch (e) {
+      setErr(e.message);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -28,14 +33,22 @@ export default function Settlement() {
     try { await advanceSettlement(id); await refresh(); } catch (e) { setErr(e.message); }
   };
 
-  if (!data) return <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading settlement…</div>;
+  if (!data) return <div style={{ color: err ? "var(--bad)" : "var(--muted)", fontSize: 13 }}>{err || "Loading settlement…"}</div>;
   const { sum, uSum } = data;
 
   return (
     <div>
       {err && <div style={errBanner}>{err}</div>}
 
-      <div style={sectionTitle}>Settlement centre</div>
+      <div style={{ ...sectionTitle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>Settlement centre</span>
+        <Button
+          icon="CircleCheck"
+          onClick={async () => { setErr(""); try { await closeCurrentCycle(); await refresh(); } catch (e) { setErr(e.message); } }}
+        >
+          Close completed cycle
+        </Button>
+      </div>
       <div style={statGrid}>
         <StatCard label="Fees earned" value={naira(sum.lifetimeFees)} tone="good" sub="settled to date" />
         <StatCard label="Fees pending" value={naira(sum.pendingFees)} tone="warn" sub={`${sum.pendingCount} cycle(s)`} />
@@ -164,20 +177,28 @@ export default function Settlement() {
         </Card>
 
         <Card title="Where hospital revenue comes from">
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {data.mix.map((m) => {
-              const max = Math.max(...data.mix.map((x) => x.amount));
-              return (
-                <div key={m.source}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-                    <span style={{ color: "var(--ink)", fontWeight: 500 }}>{m.source}</span>
-                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--muted)" }}>{naira(m.amount)}</span>
+          {data.mix.length === 0 ? (
+            <div style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6 }}>
+              Not yet available. Payments don't currently record which module they were
+              for, so an honest per-source breakdown isn't computable yet \u2014 this needs a
+              schema change to how payments are recorded, not just an estimate.
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {data.mix.map((m) => {
+                const max = Math.max(...data.mix.map((x) => x.amount));
+                return (
+                  <div key={m.source}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
+                      <span style={{ color: "var(--ink)", fontWeight: 500 }}>{m.source}</span>
+                      <span style={{ fontFamily: "var(--font-mono)", color: "var(--muted)" }}>{naira(m.amount)}</span>
+                    </div>
+                    <div style={track}><div style={{ ...fill, width: `${(m.amount / max) * 100}%` }} /></div>
                   </div>
-                  <div style={track}><div style={{ ...fill, width: `${(m.amount / max) * 100}%` }} /></div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
           <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, lineHeight: 1.5 }}>
             The platform fee is charged on total collections, but this mix shows which
             modules generate the revenue that fee is taken from.
