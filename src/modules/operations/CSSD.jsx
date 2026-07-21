@@ -16,8 +16,13 @@ export default function CSSD() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setBatches(await listCssd());
-    setLoading(false);
+    try {
+      setBatches(await listCssd());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

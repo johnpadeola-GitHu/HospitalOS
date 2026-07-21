@@ -9,8 +9,13 @@ export default function Scheduling() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setShifts(await listShifts());
-    setLoading(false);
+    try {
+      setShifts(await listShifts());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

@@ -10,8 +10,13 @@ export default function Fleet() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setFleet(await listFleet());
-    setLoading(false);
+    try {
+      setFleet(await listFleet());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

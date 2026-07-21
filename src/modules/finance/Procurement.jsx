@@ -8,7 +8,16 @@ export default function Procurement() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
-  const refresh = useCallback(async () => { setLoading(true); setRows(await listPOs()); setLoading(false); }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRows(await listPOs());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   useEffect(() => { refresh(); }, [refresh]);
   const advance = async (id) => { await advancePO(id); await refresh(); };
   return (

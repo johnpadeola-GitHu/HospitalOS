@@ -10,8 +10,13 @@ export default function Biomedical() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setEquipment(await listEquipment());
-    setLoading(false);
+    try {
+      setEquipment(await listEquipment());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

@@ -5,7 +5,14 @@ import { PageHeader } from "../../lib/ui";
 export default function Stores() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { let a = true; listStores().then((r) => { if (a) { setRows(r); setLoading(false); } }); return () => { a = false; }; }, []);
+  useEffect(() => {
+    let a = true;
+    listStores()
+      .then((r) => { if (a) setRows(r); })
+      .catch((e) => console.error(e))
+      .finally(() => { if (a) setLoading(false); });
+    return () => { a = false; };
+  }, []);
   return (
     <div>
       <PageHeader group="Finance & trade" title={<>Stores &amp; assets</>} icon="Boxes" />

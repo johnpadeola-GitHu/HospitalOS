@@ -14,8 +14,13 @@ export default function Visitor() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listVisitors({ activeOnly: true }));
-    setLoading(false);
+    try {
+      setRows(await listVisitors({ activeOnly: true }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

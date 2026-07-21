@@ -8,7 +8,10 @@ export default function Support() {
 
   useEffect(() => {
     let alive = true;
-    listSupport().then((r) => { if (alive) { setRows(r); setLoading(false); } });
+    listSupport()
+      .then((r) => { if (alive) setRows(r); })
+      .catch((e) => console.error(e))
+      .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
 
