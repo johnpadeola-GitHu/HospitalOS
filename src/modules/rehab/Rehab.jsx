@@ -6,7 +6,16 @@ export default function Rehab() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const refresh = useCallback(async () => { setLoading(true); setRows(await listRehab()); setLoading(false); }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRows(await listRehab());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   useEffect(() => { refresh(); }, [refresh]);
   const log = async (id) => { setErr(""); try { await logSession(id); await refresh(); } catch (e) { setErr(e.message); } };
   return (
