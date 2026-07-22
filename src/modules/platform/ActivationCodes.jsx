@@ -23,8 +23,13 @@ export default function ActivationCodes() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setCodes(await listActivationCodes());
-    setLoading(false);
+    try {
+      setCodes(await listActivationCodes());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

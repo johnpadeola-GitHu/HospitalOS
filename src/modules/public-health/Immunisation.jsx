@@ -19,8 +19,14 @@ export default function Immunisation() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [c, cov, s] = await Promise.all([listChildren({ query, onlyOverdue }), coverageBySeries(), immunisationSummary()]);
-    setChildren(c); setCoverage(cov); setSummary(s); setLoading(false);
+    try {
+      const [c, cov, s] = await Promise.all([listChildren({ query, onlyOverdue }), coverageBySeries(), immunisationSummary()]);
+      setChildren(c); setCoverage(cov); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [query, onlyOverdue]);
 
   useEffect(() => { const t = setTimeout(refresh, 150); return () => clearTimeout(t); }, [refresh]);

@@ -15,8 +15,13 @@ export default function Training() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listTraining());
-    setLoading(false);
+    try {
+      setRows(await listTraining());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

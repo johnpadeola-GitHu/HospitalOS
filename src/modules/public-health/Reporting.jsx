@@ -11,8 +11,13 @@ export default function Reporting() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listReports());
-    setLoading(false);
+    try {
+      setRows(await listReports());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

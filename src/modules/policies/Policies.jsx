@@ -129,11 +129,18 @@ function ReviewModal({ policy, actor, onClose, onDone }) {
   const [version, setVersion] = useState(policy.version);
   const [approvedBy, setApprovedBy] = useState(policy.approvedBy);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true);
-    await markReviewed(policy.id, { version, approvedBy, actor });
-    await onDone();
+    setErr("");
+    try {
+      await markReviewed(policy.id, { version, approvedBy, actor });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -141,6 +148,7 @@ function ReviewModal({ policy, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving\u2026" : "Confirm review"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <p style={{ fontSize: 12, color: "var(--muted)", marginBottom: 14 }}>
         This resets the review clock to today, using this policy's existing review cycle.
       </p>

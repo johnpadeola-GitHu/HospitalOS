@@ -16,8 +16,14 @@ export default function VipServices() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [p, s] = await Promise.all([listProfiles({}), vipSummary()]);
-    setProfiles(p); setSummary(s); setLoading(false);
+    try {
+      const [p, s] = await Promise.all([listProfiles({}), vipSummary()]);
+      setProfiles(p); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -128,11 +134,18 @@ function EditModal({ profile, actor, onClose, onDone }) {
   const [dietaryPreference, setDiet] = useState(profile.dietaryPreference);
   const [notes, setNotes] = useState(profile.notes);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true);
-    await updateProfile(profile.id, { consultantOfChoice, conciergeContact, dietaryPreference, notes }, actor);
-    await onDone();
+    setErr("");
+    try {
+      await updateProfile(profile.id, { consultantOfChoice, conciergeContact, dietaryPreference, notes }, actor);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -140,6 +153,7 @@ function EditModal({ profile, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <Field label="Consultant of choice"><input style={inputStyle} value={consultantOfChoice} onChange={(e) => setConsultant(e.target.value)} /></Field>
       <Field label="Concierge contact"><input style={inputStyle} value={conciergeContact} onChange={(e) => setConcierge(e.target.value)} /></Field>
       <Field label="Dietary preference"><input style={inputStyle} value={dietaryPreference} onChange={(e) => setDiet(e.target.value)} /></Field>

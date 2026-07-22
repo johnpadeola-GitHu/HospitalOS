@@ -25,8 +25,13 @@ export default function Maternity() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listAdmissions());
-    setLoading(false);
+    try {
+      setRows(await listAdmissions());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

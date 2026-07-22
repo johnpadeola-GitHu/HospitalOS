@@ -8,7 +8,7 @@ export default function Reports() {
 
   useEffect(() => {
     let alive = true;
-    analytics().then((a) => alive && setData(a));
+    analytics().then((a) => { if (alive) setData(a); }).catch((e) => console.error(e));
     return () => { alive = false; };
   }, []);
 

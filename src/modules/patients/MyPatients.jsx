@@ -13,11 +13,13 @@ export default function MyPatients() {
 
   useEffect(() => {
     let a = true;
-    listPatients({ status: "all" }).then((p) => {
-      if (!a) return;
-      setRows(p.filter((x) => x.status !== "discharged"));
-      setLoading(false);
-    });
+    listPatients({ status: "all" })
+      .then((p) => {
+        if (!a) return;
+        setRows(p.filter((x) => x.status !== "discharged"));
+      })
+      .catch((e) => console.error(e))
+      .finally(() => { if (a) setLoading(false); });
     return () => { a = false; };
   }, []);
 

@@ -25,8 +25,13 @@ export default function CriticalCare() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listCriticalCare());
-    setLoading(false);
+    try {
+      setRows(await listCriticalCare());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

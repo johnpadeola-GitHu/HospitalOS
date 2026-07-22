@@ -15,8 +15,13 @@ export default function CME() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listCME());
-    setLoading(false);
+    try {
+      setRows(await listCME());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

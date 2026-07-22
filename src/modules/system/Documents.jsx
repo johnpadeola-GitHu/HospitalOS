@@ -161,11 +161,18 @@ function EditModal({ doc, actor, onClose, onDone }) {
   const [name, setName] = useState(doc.name);
   const [category, setCategory] = useState(doc.category);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true);
-    await renameDocument(doc.id, { name, category, actor });
-    await onDone();
+    setErr("");
+    try {
+      await renameDocument(doc.id, { name, category, actor });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -173,6 +180,7 @@ function EditModal({ doc, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <Field label="File name"><input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} /></Field>
       <Field label="Category"><input style={inputStyle} value={category} onChange={(e) => setCategory(e.target.value)} /></Field>
     </Modal>

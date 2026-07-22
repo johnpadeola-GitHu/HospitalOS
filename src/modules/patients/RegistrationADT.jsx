@@ -264,11 +264,13 @@ function AdtModal({ patient, action, onClose, onDone, actor }) {
   useEffect(() => {
     if (action === "discharge") return;
     let alive = true;
-    freeBedsForWard(ward).then((beds) => {
-      if (!alive) return;
-      setFreeBeds(beds);
-      setBed(beds[0] || "");
-    });
+    freeBedsForWard(ward)
+      .then((beds) => {
+        if (!alive) return;
+        setFreeBeds(beds);
+        setBed(beds[0] || "");
+      })
+      .catch((e) => console.error(e));
     return () => {
       alive = false;
     };

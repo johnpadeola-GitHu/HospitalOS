@@ -26,8 +26,14 @@ export default function SickleCell() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [p, c, s] = await Promise.all([listPatients({}), listCrises({}), scdSummary()]);
-    setPatients(p); setCrises(c); setSummary(s); setLoading(false);
+    try {
+      const [p, c, s] = await Promise.all([listPatients({}), listCrises({}), scdSummary()]);
+      setPatients(p); setCrises(c); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

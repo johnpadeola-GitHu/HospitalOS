@@ -14,8 +14,13 @@ export default function Research() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listResearch());
-    setLoading(false);
+    try {
+      setRows(await listResearch());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

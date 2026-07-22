@@ -15,8 +15,14 @@ export default function MentalHealth() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [p, s] = await Promise.all([listPatients(), mhuSummary()]);
-    setPatients(p); setSummary(s); setLoading(false);
+    try {
+      const [p, s] = await Promise.all([listPatients(), mhuSummary()]);
+      setPatients(p); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -117,12 +123,19 @@ function AdmitModal({ actor, onClose, onDone }) {
 function RiskModal({ patient, actor, onClose, onDone }) {
   const [flags, setFlags] = useState(patient.riskFlags);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
   const toggleFlag = (f) => setFlags((x) => (x.includes(f) ? x.filter((y) => y !== f) : [...x, f]));
 
   const submit = async () => {
     setBusy(true);
-    await updateRiskFlags(patient.id, flags, actor);
-    await onDone();
+    setErr("");
+    try {
+      await updateRiskFlags(patient.id, flags, actor);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -130,6 +143,7 @@ function RiskModal({ patient, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {RISK_FLAGS.map((f) => (
           <button key={f} type="button" onClick={() => toggleFlag(f)} style={{ ...flagChip, ...(flags.includes(f) ? flagChipActive : null) }}>{f}</button>

@@ -18,8 +18,13 @@ export default function Alerts() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setAlerts(await listAlerts({ includeAcknowledged: showAcknowledged }));
-    setLoading(false);
+    try {
+      setAlerts(await listAlerts({ includeAcknowledged: showAcknowledged }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [showAcknowledged]);
 
   useEffect(() => {

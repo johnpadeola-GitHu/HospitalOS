@@ -9,7 +9,7 @@ export default function Analytics() {
 
   useEffect(() => {
     let alive = true;
-    analytics().then((d) => alive && setData(d));
+    analytics().then((d) => { if (alive) setData(d); }).catch((e) => console.error(e));
     return () => {
       alive = false;
     };

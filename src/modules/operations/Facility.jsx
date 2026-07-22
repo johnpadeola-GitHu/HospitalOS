@@ -27,8 +27,12 @@ export default function Facility() {
 
   const cycle = async (f) => {
     const next = f.status === "operational" ? "attention" : f.status === "attention" ? "down" : "operational";
-    await setFacilityStatus(f.id, next);
-    await refresh();
+    try {
+      await setFacilityStatus(f.id, next);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

@@ -161,7 +161,7 @@ function AddLicenseModal({ actor, tenantId, onClose, onDone }) {
     listUsers({ tenantId }).then((all) => {
       const licensable = all.filter((u) => ROLE_OPTIONS.includes(u.role));
       setStaff(licensable);
-    });
+    }).catch((e) => console.error(e));
   }, [tenantId]);
 
   const pickStaff = (e) => {

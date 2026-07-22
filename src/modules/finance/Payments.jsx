@@ -19,12 +19,14 @@ export default function Payments() {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([listPayments(), billingSummary()]).then(([p, s]) => {
-      if (!alive) return;
-      setPayments(p);
-      setSummary(s);
-      setLoading(false);
-    });
+    Promise.all([listPayments(), billingSummary()])
+      .then(([p, s]) => {
+        if (!alive) return;
+        setPayments(p);
+        setSummary(s);
+      })
+      .catch((e) => console.error(e))
+      .finally(() => { if (alive) setLoading(false); });
     return () => {
       alive = false;
     };
@@ -99,7 +101,7 @@ export default function Payments() {
 
 function PaymentPrintWrapper({ payment, onClose }) {
   const [account, setAccount] = useState(null);
-  useEffect(() => { getAccount(payment.patientId).then(setAccount); }, [payment.patientId]);
+  useEffect(() => { getAccount(payment.patientId).then(setAccount).catch((e) => console.error(e)); }, [payment.patientId]);
   return <ReceiptPrint payment={payment} account={account} onClose={onClose} actor={useAuth().user} />;
 }
 

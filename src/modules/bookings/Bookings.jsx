@@ -17,8 +17,14 @@ export default function Bookings() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [b, s] = await Promise.all([listBookings({ status }), bookingsSummary()]);
-    setRows(b); setSummary(s); setLoading(false);
+    try {
+      const [b, s] = await Promise.all([listBookings({ status }), bookingsSummary()]);
+      setRows(b); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [status]);
 
   useEffect(() => { refresh(); }, [refresh]);

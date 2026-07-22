@@ -9,7 +9,7 @@ export default function Forecasting() {
 
   useEffect(() => {
     let alive = true;
-    forecasts().then((f) => alive && setData(f));
+    forecasts().then((f) => { if (alive) setData(f); }).catch((e) => console.error(e));
     return () => { alive = false; };
   }, []);
 

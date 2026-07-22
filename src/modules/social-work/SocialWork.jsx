@@ -105,11 +105,18 @@ function EditModal({ caseItem, actor, onClose, onDone }) {
   const [status, setStatus] = useState(caseItem.status);
   const [notes, setNotes] = useState(caseItem.notes);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true);
-    await updateCase(caseItem.id, { status, notes, actor });
-    await onDone();
+    setErr("");
+    try {
+      await updateCase(caseItem.id, { status, notes, actor });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -117,6 +124,7 @@ function EditModal({ caseItem, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <Field label="Status"><select style={inputStyle} value={status} onChange={(e) => setStatus(e.target.value)}>{CASE_STATUS.map((s) => <option key={s}>{s}</option>)}</select></Field>
       <Field label="Notes"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={notes} onChange={(e) => setNotes(e.target.value)} /></Field>
     </Modal>

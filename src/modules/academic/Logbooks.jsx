@@ -6,7 +6,16 @@ export default function Logbooks() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const refresh = useCallback(async () => { setLoading(true); setRows(await listLogs()); setLoading(false); }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRows(await listLogs());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   useEffect(() => { refresh(); }, [refresh]);
 
   return (

@@ -22,8 +22,14 @@ export default function Privacy() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [c, d, s] = await Promise.all([listConsents({}), listDsars({}), privacySummary()]);
-    setConsents(c); setDsars(d); setSummary(s); setLoading(false);
+    try {
+      const [c, d, s] = await Promise.all([listConsents({}), listDsars({}), privacySummary()]);
+      setConsents(c); setDsars(d); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

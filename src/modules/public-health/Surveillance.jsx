@@ -16,8 +16,13 @@ export default function Surveillance() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listSurveillance());
-    setLoading(false);
+    try {
+      setRows(await listSurveillance());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

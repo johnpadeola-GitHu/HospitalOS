@@ -115,11 +115,18 @@ function EditModal({ patient, actor, onClose, onDone }) {
   const [frailty, setFrailty] = useState(patient.frailty);
   const [notes, setNotes] = useState(patient.notes);
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   const submit = async () => {
     setBusy(true);
-    await updateAssessment(patient.id, { fallsRiskScore: parseInt(fallsRiskScore, 10), medicationCount: parseInt(medicationCount, 10), frailty, notes }, actor);
-    await onDone();
+    setErr("");
+    try {
+      await updateAssessment(patient.id, { fallsRiskScore: parseInt(fallsRiskScore, 10), medicationCount: parseInt(medicationCount, 10), frailty, notes }, actor);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -127,6 +134,7 @@ function EditModal({ patient, actor, onClose, onDone }) {
       <Button variant="ghost" onClick={onClose}>Cancel</Button>
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save"}</Button>
     </>}>
+      {err && <div style={errBox}>{err}</div>}
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><Field label="Falls risk score"><input type="number" min="0" max="5" style={inputStyle} value={fallsRiskScore} onChange={(e) => setFallsRiskScore(e.target.value)} /></Field></div>
         <div style={{ flex: 1 }}><Field label="Medication count"><input type="number" style={inputStyle} value={medicationCount} onChange={(e) => setMedicationCount(e.target.value)} /></Field></div>

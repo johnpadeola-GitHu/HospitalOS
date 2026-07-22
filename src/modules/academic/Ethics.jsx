@@ -15,8 +15,13 @@ export default function Ethics() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listEthics({ status }));
-    setLoading(false);
+    try {
+      setRows(await listEthics({ status }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [status]);
 
   useEffect(() => { refresh(); }, [refresh]);

@@ -18,8 +18,14 @@ export default function Dental() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [q, s] = await Promise.all([listQueue({}), dentalSummary()]);
-    setQueue(q); setSummary(s); setLoading(false);
+    try {
+      const [q, s] = await Promise.all([listQueue({}), dentalSummary()]);
+      setQueue(q); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

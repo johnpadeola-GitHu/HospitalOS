@@ -13,7 +13,7 @@ export function useLetterhead() {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
     let alive = true;
-    getSettings().then((s) => alive && setSettings(s));
+    getSettings().then((s) => { if (alive) setSettings(s); }).catch((e) => console.error(e));
     return () => { alive = false; };
   }, []);
   return settings;

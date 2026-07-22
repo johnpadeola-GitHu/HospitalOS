@@ -22,8 +22,12 @@ export default function NotificationBell() {
 
   const refresh = useCallback(async () => {
     if (!canSeeBookings) return;
-    const rows = await listBookings({ status: "requested" });
-    setPending(rows);
+    try {
+      const rows = await listBookings({ status: "requested" });
+      setPending(rows);
+    } catch (e) {
+      console.error(e);
+    }
   }, [canSeeBookings]);
 
   useEffect(() => {
@@ -44,9 +48,14 @@ export default function NotificationBell() {
 
   const act = async (fn, id) => {
     setBusyId(id);
-    await fn(id);
-    setBusyId(null);
-    await refresh();
+    try {
+      await fn(id);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusyId(null);
+    }
   };
 
   return (

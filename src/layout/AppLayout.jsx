@@ -105,10 +105,10 @@ export default function AppLayout() {
                 <span style={footerBy}>powered by AgoroX Africa</span>
               </div>
               <nav style={footerLinks}>
-                <a href="#" style={footLink}>Privacy Policy</a>
-                <a href="#" style={footLink}>EULA</a>
-                <a href="#" style={footLink}>IP Policy</a>
-                <a href="#" style={footLink}>Contact Support</a>
+                <a href="/legal/HospitalOS-Privacy-Policy.pdf" download style={footLink}>Privacy Policy</a>
+                <a href="/legal/HospitalOS-EULA.pdf" download style={footLink}>EULA</a>
+                <a href="/legal/HospitalOS-IP-Policy.pdf" download style={footLink}>IP Policy</a>
+                <a href="mailto:support@agorox.africa" style={footLink}>Contact Support</a>
               </nav>
               <div style={footerMeta}>v1.0.0 &nbsp;&middot;&nbsp; &copy; 2026 AgoroX Africa. All rights reserved.</div>
             </div>

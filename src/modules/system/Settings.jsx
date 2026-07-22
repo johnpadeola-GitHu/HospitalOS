@@ -13,9 +13,16 @@ export default function Settings() {
     return () => { alive = false; };
   }, []);
 
+  const [err, setErr] = useState("");
+
   const patch = async (p) => {
-    const next = await updateSettings(p);
-    setS(next);
+    setErr("");
+    try {
+      const next = await updateSettings(p);
+      setS(next);
+    } catch (e) {
+      setErr(e.message);
+    }
   };
 
   if (!s) {
@@ -25,6 +32,7 @@ export default function Settings() {
   return (
     <div>
       <Head />
+      {err && <div style={{ background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 }}>{err}</div>}
       <div style={sheet}>
         <Field label="Hospital name — shown top-right on every screen">
           <input style={{ ...inputStyle, maxWidth: 320 }} value={s.hospitalName} onChange={(e) => patch({ hospitalName: e.target.value })} />

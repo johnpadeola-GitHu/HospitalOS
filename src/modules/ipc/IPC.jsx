@@ -24,8 +24,14 @@ export default function IPC() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [c, iso, ob, s] = await Promise.all([listHaiCases({}), listIsolations({}), checkOutbreakThreshold(), ipcSummary()]);
-    setCases(c); setIsolations(iso); setOutbreaks(ob); setSummary(s); setLoading(false);
+    try {
+      const [c, iso, ob, s] = await Promise.all([listHaiCases({}), listIsolations({}), checkOutbreakThreshold(), ipcSummary()]);
+      setCases(c); setIsolations(iso); setOutbreaks(ob); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

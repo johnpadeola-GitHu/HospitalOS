@@ -20,8 +20,14 @@ export default function Communication() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [m, s] = await Promise.all([listMessages({ channel, status, query }), commsSummary()]);
-    setRows(m); setSummary(s); setLoading(false);
+    try {
+      const [m, s] = await Promise.all([listMessages({ channel, status, query }), commsSummary()]);
+      setRows(m); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [channel, status, query]);
 
   useEffect(() => { const t = setTimeout(refresh, 150); return () => clearTimeout(t); }, [refresh]);

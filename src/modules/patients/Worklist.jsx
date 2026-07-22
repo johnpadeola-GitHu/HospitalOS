@@ -11,17 +11,19 @@ export default function Worklist() {
 
   useEffect(() => {
     let a = true;
-    Promise.all([listOrders({ status: "all" }), listStudies({})]).then(([orders, studies]) => {
-      if (!a) return;
-      const labTasks = orders.filter((o) => o.status !== "verified").map((o) => ({
-        id: "lab-" + o.id, area: "Laboratory", ref: o.accession, patient: o.patientName, task: o.testName, state: o.status,
-      }));
-      const radTasks = studies.filter((s) => s.status !== "reported").map((s) => ({
-        id: "rad-" + s.id, area: "Radiology", ref: s.accession, patient: s.patientName, task: s.name, state: s.status,
-      }));
-      setItems([...labTasks, ...radTasks]);
-      setLoading(false);
-    });
+    Promise.all([listOrders({ status: "all" }), listStudies({})])
+      .then(([orders, studies]) => {
+        if (!a) return;
+        const labTasks = orders.filter((o) => o.status !== "verified").map((o) => ({
+          id: "lab-" + o.id, area: "Laboratory", ref: o.accession, patient: o.patientName, task: o.testName, state: o.status,
+        }));
+        const radTasks = studies.filter((s) => s.status !== "reported").map((s) => ({
+          id: "rad-" + s.id, area: "Radiology", ref: s.accession, patient: s.patientName, task: s.name, state: s.status,
+        }));
+        setItems([...labTasks, ...radTasks]);
+      })
+      .catch((e) => console.error(e))
+      .finally(() => { if (a) setLoading(false); });
     return () => { a = false; };
   }, []);
 

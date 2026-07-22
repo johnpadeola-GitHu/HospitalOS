@@ -218,7 +218,7 @@ export default function Laboratory() {
 
 function PrintWrapper({ order, onClose }) {
   const [release, setRelease] = useState(null);
-  useEffect(() => { releaseStatus("lab", order.id).then(setRelease); }, [order.id]);
+  useEffect(() => { releaseStatus("lab", order.id).then(setRelease).catch((e) => console.error(e)); }, [order.id]);
   return <LabReportPrint order={order} release={release} onClose={onClose} actor={useAuth().user} />;
 }
 
@@ -233,9 +233,9 @@ function ReleaseModal({ order, actor, onClose, onDone }) {
   useEffect(() => {
     let alive = true;
     if (order.patientId) {
-      import("../patients/patientService").then(({ getPatient }) =>
-        getPatient(order.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); })
-      );
+      import("../patients/patientService")
+        .then(({ getPatient }) => getPatient(order.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); }))
+        .catch((e) => console.error(e));
     }
     return () => { alive = false; };
   }, [order.patientId]);

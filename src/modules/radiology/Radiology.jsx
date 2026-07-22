@@ -190,7 +190,7 @@ export default function Radiology() {
 
 function ImagingPrintWrapper({ study, onClose }) {
   const [release, setRelease] = useState(null);
-  useEffect(() => { releaseStatus("imaging", study.id).then(setRelease); }, [study.id]);
+  useEffect(() => { releaseStatus("imaging", study.id).then(setRelease).catch((e) => console.error(e)); }, [study.id]);
   return <ImagingReportPrint study={study} release={release} onClose={onClose} actor={useAuth().user} />;
 }
 
@@ -203,7 +203,7 @@ function ReleaseModal({ study, actor, onClose, onDone }) {
 
   useEffect(() => {
     let alive = true;
-    if (study.patientId) getPatient(study.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); });
+    if (study.patientId) getPatient(study.patientId).then((p) => { if (alive) setPatientPhone(p?.phone || null); }).catch((e) => console.error(e));
     return () => { alive = false; };
   }, [study.patientId]);
 

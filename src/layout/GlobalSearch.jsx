@@ -91,6 +91,7 @@ export default function GlobalSearch() {
     if (e.key === "ArrowDown") { e.preventDefault(); setActive((i) => Math.min(i + 1, flat.length - 1)); }
     if (e.key === "ArrowUp") { e.preventDefault(); setActive((i) => Math.max(i - 1, 0)); }
     if (e.key === "Enter") { e.preventDefault(); choose(flat[active]); }
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); setOpen(false); }
   };
 
   return (

@@ -178,12 +178,21 @@ function DispenseModal({ drug, onClose, onDone }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [allergies, setAllergies] = useState([]);
+  const [allergyCheckFailed, setAllergyCheckFailed] = useState(false);
 
   // Safety: warn if the selected patient has a recorded allergy to this drug.
+  // If the check itself fails to load, fail closed (block dispensing) rather
+  // than silently showing an empty allergy list as if the check passed.
   useEffect(() => {
-    if (!selected) { setAllergies([]); return; }
+    if (!selected) { setAllergies([]); setAllergyCheckFailed(false); return; }
     let alive = true;
-    checkAllergy(selected.id, drug.name).then((a) => alive && setAllergies(a));
+    setAllergyCheckFailed(false);
+    checkAllergy(selected.id, drug.name)
+      .then((a) => { if (alive) setAllergies(a); })
+      .catch((e) => {
+        console.error(e);
+        if (alive) { setAllergies([]); setAllergyCheckFailed(true); }
+      });
     return () => { alive = false; };
   }, [selected, drug.name]);
 
@@ -234,7 +243,7 @@ function DispenseModal({ drug, onClose, onDone }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={submit} disabled={busy || !selected || overStock || n < 1 || allergies.some((a) => a.severity === "severe")}>
+          <Button variant="primary" onClick={submit} disabled={busy || !selected || overStock || n < 1 || allergyCheckFailed || allergies.some((a) => a.severity === "severe")}>
             {busy ? "Dispensing…" : "Dispense"}
           </Button>
         </>
@@ -277,6 +286,15 @@ function DispenseModal({ drug, onClose, onDone }) {
           </div>
         )}
       </div>
+
+      {allergyCheckFailed && (
+        <div style={allergyWarn}>
+          <span style={{ fontWeight: 700 }}>⚠ Allergy check unavailable</span>
+          <div style={{ marginTop: 3 }}>
+            Couldn't verify this patient's allergies. Dispensing is blocked until the check succeeds — try again.
+          </div>
+        </div>
+      )}
 
       {allergies.length > 0 && (
         <div style={allergyWarn}>

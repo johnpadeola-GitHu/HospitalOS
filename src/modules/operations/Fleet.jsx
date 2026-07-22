@@ -24,8 +24,12 @@ export default function Fleet() {
   }, [refresh]);
 
   const change = async (id, status) => {
-    await setVehicleStatus(id, status);
-    await refresh();
+    try {
+      await setVehicleStatus(id, status);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const counts = fleet.reduce((a, v) => {

@@ -24,8 +24,12 @@ export default function Biomedical() {
   }, [refresh]);
 
   const change = async (id, status) => {
-    await setEquipmentStatus(id, status);
-    await refresh();
+    try {
+      await setEquipmentStatus(id, status);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const counts = equipment.reduce((a, e) => {

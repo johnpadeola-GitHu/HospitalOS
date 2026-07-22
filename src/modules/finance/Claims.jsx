@@ -33,10 +33,15 @@ export default function Claims() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [c, s] = await Promise.all([listClaims({ status }), claimsSummary()]);
-    setClaims(c);
-    setSummary(s);
-    setLoading(false);
+    try {
+      const [c, s] = await Promise.all([listClaims({ status }), claimsSummary()]);
+      setClaims(c);
+      setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [status]);
 
   useEffect(() => {

@@ -16,8 +16,14 @@ export default function OccupationalHealth() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [s, i, sum] = await Promise.all([listStaff({}), listInjuries(), occHealthSummary()]);
-    setStaff(s); setInjuries(i); setSummary(sum); setLoading(false);
+    try {
+      const [s, i, sum] = await Promise.all([listStaff({}), listInjuries(), occHealthSummary()]);
+      setStaff(s); setInjuries(i); setSummary(sum);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

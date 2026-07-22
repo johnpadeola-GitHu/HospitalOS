@@ -15,8 +15,13 @@ export default function Outreach() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setRows(await listOutreach());
-    setLoading(false);
+    try {
+      setRows(await listOutreach());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
 

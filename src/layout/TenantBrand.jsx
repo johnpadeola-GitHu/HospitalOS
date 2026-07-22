@@ -12,7 +12,7 @@ export default function TenantBrand() {
 
   useEffect(() => {
     let alive = true;
-    const load = () => getSettings().then((s) => alive && setSettings(s));
+    const load = () => getSettings().then((s) => { if (alive) setSettings(s); }).catch((e) => console.error(e));
     load();
     const t = setInterval(load, 4000);
     return () => { alive = false; clearInterval(t); };

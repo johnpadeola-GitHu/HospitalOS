@@ -16,8 +16,14 @@ export default function Chaplaincy() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [r, s] = await Promise.all([listRequests({}), chaplaincySummary()]);
-    setRequests(r); setSummary(s); setLoading(false);
+    try {
+      const [r, s] = await Promise.all([listRequests({}), chaplaincySummary()]);
+      setRequests(r); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);

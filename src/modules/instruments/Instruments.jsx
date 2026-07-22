@@ -35,12 +35,18 @@ export default function Instruments() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const [d, m, s] = await Promise.all([
-      listInstruments({ category: cat }),
-      listMessages({ limit: 14, category: cat }),
-      gatewaySummary(),
-    ]);
-    setDevices(d); setMessages(m); setSummary(s); setLoading(false);
+    try {
+      const [d, m, s] = await Promise.all([
+        listInstruments({ category: cat }),
+        listMessages({ limit: 14, category: cat }),
+        gatewaySummary(),
+      ]);
+      setDevices(d); setMessages(m); setSummary(s);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }, [cat]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -48,8 +54,12 @@ export default function Instruments() {
   const cycleStatus = async (d) => {
     setErr("");
     const order = ["online", "idle", "offline", "error"];
-    await setInstrumentStatus(d.id, order[(order.indexOf(d.status) + 1) % order.length]);
-    await refresh();
+    try {
+      await setInstrumentStatus(d.id, order[(order.indexOf(d.status) + 1) % order.length]);
+      await refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
   };
 
   const actionLabel = { analyzer: "Receive result", imaging: "Receive DICOM study", radiotherapy: "Confirm fraction", printer: "Send print job" };
@@ -295,7 +305,9 @@ function AnalyzerAction({ device, onClose, onDone }) {
 
   useEffect(() => {
     let alive = true;
-    pendingForInstrument(device.id).then((p) => { if (alive) { setPending(p); setOrderId(p[0]?.id || ""); } });
+    pendingForInstrument(device.id)
+      .then((p) => { if (alive) { setPending(p); setOrderId(p[0]?.id || ""); } })
+      .catch((e) => { if (alive) { setErr(e.message); setPending([]); } });
     return () => { alive = false; };
   }, [device.id]);
 
@@ -345,7 +357,9 @@ function ImagingAction({ device, onClose, onDone }) {
 
   useEffect(() => {
     let alive = true;
-    pendingForModality(device.id).then((p) => { if (alive) { setPending(p); setStudyId(p[0]?.id || ""); } });
+    pendingForModality(device.id)
+      .then((p) => { if (alive) { setPending(p); setStudyId(p[0]?.id || ""); } })
+      .catch((e) => { if (alive) { setErr(e.message); setPending([]); } });
     return () => { alive = false; };
   }, [device.id]);
 
@@ -398,7 +412,9 @@ function RtAction({ device, onClose, onDone }) {
 
   useEffect(() => {
     let alive = true;
-    pendingForRtMachine().then((p) => { if (alive) { setPending(p); setCourseId(p[0]?.id || ""); } });
+    pendingForRtMachine()
+      .then((p) => { if (alive) { setPending(p); setCourseId(p[0]?.id || ""); } })
+      .catch((e) => { if (alive) { setErr(e.message); setPending([]); } });
     return () => { alive = false; };
   }, []);
 

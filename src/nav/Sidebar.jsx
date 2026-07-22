@@ -24,7 +24,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
 
   useEffect(() => {
     let alive = true;
-    const load = () => alertCount().then((n) => alive && setAlerts(n));
+    const load = () => alertCount().then((n) => { if (alive) setAlerts(n); }).catch((e) => console.error(e));
     load();
     const t = setInterval(load, 8000);
     return () => { alive = false; clearInterval(t); };
