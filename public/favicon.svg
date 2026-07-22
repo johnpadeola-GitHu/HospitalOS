@@ -1,8 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- The HospitalOS mark: a bold red rounded square with a big, bold
-       white plus sign — matches the footer, login page, and every other
-       brand occurrence exactly. -->
-  <rect width="100" height="100" rx="20" fill="#D6241C"/>
-  <rect x="39" y="13" width="22" height="74" rx="6" fill="#FFFFFF"/>
-  <rect x="13" y="39" width="74" height="22" rx="6" fill="#FFFFFF"/>
+  <!-- The HospitalOS mark: matches AppLayout.jsx's actual footer logo
+       exactly — a red rounded square (27.8% corner radius, matching the
+       footer's 18px box / 5px radius proportions) with Lucide's "Cross"
+       icon in white (72.2% of the box, strokeWidth 3), not a separately
+       drawn plus sign. This file previously used solid overlapping
+       rectangles, which did not actually match the footer's rendered
+       icon despite an earlier comment here claiming they were identical. -->
+  <rect width="100" height="100" rx="27.8" fill="#D6241C"/>
+  <g transform="translate(13.9, 13.9)">
+    <svg width="72.2" height="72.2" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a1 1 0 0 1 1 1v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a1 1 0 0 1 1-1h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-4a1 1 0 0 1-1-1V4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4a1 1 0 0 1-1 1z"/>
+    </svg>
+  </g>
 </svg>
