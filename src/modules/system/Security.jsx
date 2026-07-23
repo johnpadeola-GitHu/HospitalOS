@@ -182,7 +182,7 @@ export default function Security() {
         <div style={{ ...note, borderTop: "1px solid var(--border)", borderRadius: 0, margin: 0 }}>
           <Icons.Info size={13} style={{ flexShrink: 0, marginTop: 1 }} />
           <span>
-            A best-effort browser fingerprint, not a hardware-verified one \u2014 good enough to notice an
+            A best-effort browser fingerprint, not a hardware-verified one — good enough to notice an
             unfamiliar sign-in and log it, not a hard security boundary. A first-ever sign-in for an
             account is not flagged as "new"; every device after that is.
           </span>

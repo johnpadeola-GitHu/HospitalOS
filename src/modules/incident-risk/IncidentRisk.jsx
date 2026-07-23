@@ -41,7 +41,7 @@ export default function IncidentRisk() {
   return (
     <div>
       <PageHeader group="Compliance" title="Incident &amp; risk management" icon="TriangleAlert"
-        subtitle="Adverse events, near-misses, and sentinel events \u2014 with a real root-cause and corrective-action trail"
+        subtitle="Adverse events, near-misses, and sentinel events — with a real root-cause and corrective-action trail"
         actions={<Button variant="primary" icon="Plus" onClick={() => setShowReport(true)}>Report incident</Button>} />
 
       {err && <div style={errBanner}>{err}</div>}
@@ -62,7 +62,7 @@ export default function IncidentRisk() {
       </div>
 
       <Card title="Incidents" pad={false}>
-        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading\u2026</div> : incidents.length === 0 ? (
+        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : incidents.length === 0 ? (
           <div style={{ padding: 22 }}><EmptyState icon="TriangleAlert" title="No incidents match" /></div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column" }}>

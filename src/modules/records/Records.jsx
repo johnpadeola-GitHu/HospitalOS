@@ -277,7 +277,7 @@ export default function Records() {
                     </table>
                   )}
                   <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, lineHeight: 1.5 }}>
-                    Report text is filed and released from Diagnostics \u2014 Radiology, Ultrasound, CT, or MRI. Release
+                    Report text is filed and released from Diagnostics — Radiology, Ultrasound, CT, or MRI. Release
                     notifies the ordering clinician and, if a phone number is on file, the patient.
                   </div>
                 </Card>

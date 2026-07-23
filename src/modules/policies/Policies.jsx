@@ -31,7 +31,7 @@ export default function Policies() {
   return (
     <div>
       <PageHeader group="Compliance" title="Policies &amp; SOPs" icon="FileText"
-        subtitle="Policy documents with a real review cycle \u2014 an out-of-date policy is its own compliance risk"
+        subtitle="Policy documents with a real review cycle — an out-of-date policy is its own compliance risk"
         actions={<Button variant="primary" icon="Plus" onClick={() => setShowAdd(true)}>Add policy</Button>} />
 
       {err && <div style={errBanner}>{err}</div>}
@@ -51,7 +51,7 @@ export default function Policies() {
       </div>
 
       <Card title="Policies" pad={false}>
-        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading\u2026</div> : policies.length === 0 ? (
+        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : policies.length === 0 ? (
           <div style={{ padding: 22 }}><EmptyState icon="FileText" title="No policies match" /></div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column" }}>

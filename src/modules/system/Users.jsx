@@ -207,7 +207,7 @@ function AddUserModal({ tenantId, onClose, onDone }) {
         Grants access to: {areasFor(form.role).map((k) => AREAS.find((a) => a.key === k)?.label).filter(Boolean).join(", ")}
       </div>
       <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10, lineHeight: 1.5 }}>
-        You are setting this staff member's own sign-in credentials directly \u2014 share the email and
+        You are setting this staff member's own sign-in credentials directly — share the email and
         password with them yourself; there is no automated invite email.
       </div>
     </Modal>

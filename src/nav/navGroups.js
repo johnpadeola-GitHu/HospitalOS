@@ -80,6 +80,7 @@ export const NAV_GROUPS = [
       { id: "claims", label: "Insurance & NHIA claims", path: "/finance/claims" , icon: "FileCheck" },
       { id: "procurement", label: "Procurement & suppliers", path: "/finance/procurement" , icon: "ShoppingCart" },
       { id: "stores", label: "Stores & assets", path: "/finance/stores" , icon: "Boxes" },
+      { id: "bank-reconciliation", label: "Bank reconciliation", path: "/finance/bank-reconciliation" , icon: "Landmark" },
     ],
   },
   {

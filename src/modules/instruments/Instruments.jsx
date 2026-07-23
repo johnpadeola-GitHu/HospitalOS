@@ -241,7 +241,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
         <div style={warnBox}>
           <Icons.AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
           <span>
-            WebUSB and Web Serial \u2014 the browser features that let this page detect connected devices \u2014
+            WebUSB and Web Serial — the browser features that let this page detect connected devices —
             aren't available in this browser. Use Chrome or Edge on desktop, or add this device manually below.
           </span>
         </div>
@@ -251,7 +251,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
         <>
           <p style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.6, marginBottom: 14 }}>
             Connect the device to this computer, then choose how it's connected. Your browser will show its own
-            device picker \u2014 select the device there to grant this page access.
+            device picker — select the device there to grant this page access.
           </p>
           <div style={{ display: "flex", gap: 10, marginBottom: 6 }}>
             <Button variant="primary" onClick={() => runDetect("usb")} disabled={busy || !isWebUsbSupported()}>
@@ -269,13 +269,13 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
             <div>
               <div style={{ fontWeight: 600, color: "var(--ink-strong)", fontSize: 13 }}>{detected.manufacturerName}</div>
               <div style={{ fontSize: 11.5, color: "var(--muted)", fontFamily: "var(--font-mono)", marginTop: 2 }}>
-                {detected.connectionType.toUpperCase()} \u00b7 vendor {detected.vendorId} \u00b7 product {detected.productId}
+                {detected.connectionType.toUpperCase()} · vendor {detected.vendorId} · product {detected.productId}
               </div>
               {detected.matched ? (
-                <div style={{ fontSize: 11.5, color: "var(--good)", marginTop: 4 }}>Recognised \u2014 category suggested below.</div>
+                <div style={{ fontSize: 11.5, color: "var(--good)", marginTop: 4 }}>Recognised — category suggested below.</div>
               ) : (
                 <div style={{ fontSize: 11.5, color: "var(--warn)", marginTop: 4 }}>
-                  Not in the known-device list yet \u2014 confirm the category yourself; it'll be recognised automatically next time.
+                  Not in the known-device list yet — confirm the category yourself; it'll be recognised automatically next time.
                 </div>
               )}
             </div>
@@ -288,7 +288,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
           </Field>
           <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>
             Network-based devices (most analyzers, imaging modalities) still need their host/AE title configured
-            after registering \u2014 detection confirms what's physically connected, not network setup.
+            after registering — detection confirms what's physically connected, not network setup.
           </div>
         </>
       )}
@@ -380,7 +380,7 @@ function ImagingAction({ device, onClose, onDone }) {
           <div><span style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700 }}>{result.series}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>series</div></div>
           <div><span style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700 }}>{result.images}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>images</div></div>
         </div>
-        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>Study status moved to Performed \u2014 ready for reporting.</div>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>Study status moved to Performed — ready for reporting.</div>
       </Modal>
     );
   }
@@ -473,7 +473,7 @@ function PrinterAction({ device, onClose, onDone }) {
     return (
       <Modal title="Print job sent" onClose={onDone} footer={<Button variant="primary" onClick={onDone}>Done</Button>}>
         <div style={{ fontSize: 13, color: "var(--ink-strong)" }}>{result.message.detail}</div>
-        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>via {device.name} \u00b7 {device.protocol}</div>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>via {device.name} · {device.protocol}</div>
       </Modal>
     );
   }

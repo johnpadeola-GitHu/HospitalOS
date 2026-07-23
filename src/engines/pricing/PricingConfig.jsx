@@ -159,7 +159,7 @@ function EditModal({ item, category, onClose, onDone }) {
       <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 14 }}>
         Catalogue default: {naira(item.defaultPrice)}
       </div>
-      <Field label="Price (\u20a6)">
+      <Field label="Price (₦)">
         <input type="number" min="0" style={inputStyle} value={price} onChange={(e) => setPriceVal(e.target.value)} autoFocus />
       </Field>
     </Modal>

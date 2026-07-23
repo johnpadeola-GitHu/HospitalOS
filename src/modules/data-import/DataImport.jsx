@@ -70,7 +70,7 @@ export default function DataImport() {
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
         <span>
           The mapping and validation logic here is real. What is not yet real is permanent storage on
-          the receiving end \u2014 imported patients land in the same in-memory list every patient in this
+          the receiving end — imported patients land in the same in-memory list every patient in this
           preview build lives in, and reset on reload. A production migration wires this same mapper to
           Cloudflare D1 instead; nothing about the mapping or validation changes when the storage does.
         </span>
@@ -89,7 +89,7 @@ export default function DataImport() {
           <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: "none" }} onChange={onFile} />
           <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12, lineHeight: 1.6 }}>
             Required columns: {REQUIRED_FIELDS.map((f) => FIELD_LABEL[f]).join(", ")}. Common header names
-            (First Name, Surname, DOB, Gender, MRN, etc.) are recognised automatically \u2014 you will get a
+            (First Name, Surname, DOB, Gender, MRN, etc.) are recognised automatically — you will get a
             chance to fix the mapping before anything imports.
           </div>
         </Card>
@@ -167,7 +167,7 @@ export default function DataImport() {
             <Icons.CheckCircle2 size={32} color="var(--good)" style={{ marginBottom: 10 }} />
             <div style={{ fontSize: 20, fontWeight: 700, color: "var(--ink-strong)" }}>{imported.length} patients imported</div>
             <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 4 }}>
-              Each was assigned a new HospitalOS hospital number and now appears in Patient care \u2192 Registration & ADT.
+              Each was assigned a new HospitalOS hospital number and now appears in Patient care → Registration & ADT.
             </div>
             {errorCount > 0 && (
               <div style={{ fontSize: 12.5, color: "var(--warn)", marginTop: 10 }}>

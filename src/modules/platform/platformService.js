@@ -59,6 +59,18 @@ export async function setTenantStatus(id, status) {
   return apiCall(`/platform/tenants/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } });
 }
 
+// Commercial plans — richer commercial terms than the simple
+// flat/percentage split on the tenant record itself. Absence of a plan
+// (getCommercialPlan returning null) means "just use the tenant's own
+// billing_type/commission_pct", fully backward compatible.
+export async function getCommercialPlan(tenantId) {
+  return apiCall(`/platform/tenants/${encodeURIComponent(tenantId)}/commercial-plan`);
+}
+
+export async function setCommercialPlan(tenantId, plan) {
+  return apiCall(`/platform/tenants/${encodeURIComponent(tenantId)}/commercial-plan`, { method: "PUT", body: plan });
+}
+
 export async function platformSummary() {
   return apiCall("/platform/summary");
 }

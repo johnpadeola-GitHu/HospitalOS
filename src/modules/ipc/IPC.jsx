@@ -58,7 +58,7 @@ export default function IPC() {
         <div style={outbreakBanner}>
           <Icons.TriangleAlert size={15} style={{ flexShrink: 0, marginTop: 1 }} />
           <div>
-            <b>Outbreak signal</b> \u2014 three or more open cases of the same infection type:
+            <b>Outbreak signal</b> — three or more open cases of the same infection type:
             {" "}{outbreaks.map((o) => `${o.type} (${o.count})`).join(", ")}
           </div>
         </div>

@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import Login from "./auth/Login";
+import { loadPriceCache } from "./engines/pricing";
 import AppLayout from "./layout/AppLayout";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import NoAccess from "./pages/NoAccess";
@@ -76,6 +78,8 @@ import Instruments from "./modules/instruments/Instruments";
 import Formulary from "./modules/pharmacy/Formulary";
 import Procurement from "./modules/finance/Procurement";
 import Stores from "./modules/finance/Stores";
+import BankReconciliation from "./modules/finance/BankReconciliation";
+import PaymentCallback from "./modules/finance/PaymentCallback";
 import MyPatients from "./modules/patients/MyPatients";
 import Worklist from "./modules/patients/Worklist";
 import Theatre from "./modules/theatre/Theatre";
@@ -154,6 +158,7 @@ const MODULES = {
   "/pharmacy/formulary": Formulary,
   "/finance/procurement": Procurement,
   "/finance/stores": Stores,
+  "/finance/bank-reconciliation": BankReconciliation,
   "/patients/mine": MyPatients,
   "/worklist": Worklist,
   "/wards": WardsBoard,
@@ -183,6 +188,9 @@ function Guarded({ route }) {
 
 function Shell() {
   const { signedIn } = useAuth();
+  useEffect(() => {
+    if (signedIn) loadPriceCache();
+  }, [signedIn]);
   if (!signedIn) return <Login />;
   return (
     <BrowserRouter>
@@ -193,6 +201,12 @@ function Shell() {
                 link) and is never permission-gated. Every signed-in role can
                 read the documentation regardless of which areas they can reach. */}
             <Route path="/help" element={<Help />} />
+            {/* Payment callback is a redirect target from the payment provider's
+                checkout page, not a workflow-group screen — like Help, it lives
+                outside NAV_GROUPS. Any signed-in user can land here (whoever
+                initiated the payment); the actual status data it displays is
+                already gated server-side by the finance area regardless. */}
+            <Route path="/finance/payment-callback" element={<PaymentCallback />} />
             {ALL_ROUTES.map((r) => (
               <Route key={r.id} path={r.path} element={<Guarded route={r} />} />
             ))}

@@ -51,7 +51,7 @@ export default function ActivationCodes() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div style={note}>
           <Icons.KeyRound size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
-          <span>Registration is invite-only \u2014 a hospital cannot sign up without one of these codes. Issue one per new tenant, with the plan already decided.</span>
+          <span>Registration is invite-only — a hospital cannot sign up without one of these codes. Issue one per new tenant, with the plan already decided.</span>
         </div>
         <Button variant="primary" icon="Plus" onClick={() => setShowGenerate(true)}>Generate code</Button>
       </div>
@@ -66,7 +66,7 @@ export default function ActivationCodes() {
       </div>
 
       <Card title="All activation codes" pad={false}>
-        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading\u2026</div> : codes.length === 0 ? (
+        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : codes.length === 0 ? (
           <div style={{ padding: 22, color: "var(--muted)", fontSize: 13 }}>No codes issued yet.</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -120,7 +120,7 @@ function GenerateModal({ actor, onClose, onDone }) {
           <Icons.CheckCircle2 size={28} color="var(--good)" style={{ marginBottom: 10 }} />
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "0.03em" }}>{created.code}</div>
           <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6 }}>
-            For {created.tenantName} \u2014 send this code directly to the hospital's administrator.
+            For {created.tenantName} — send this code directly to the hospital's administrator.
           </div>
         </div>
       </Modal>
@@ -138,7 +138,7 @@ function GenerateModal({ actor, onClose, onDone }) {
         <select style={inputStyle} value={planTier} onChange={(e) => setPlanTier(e.target.value)}>
           {ALL_TIERS.map((t) => (
             <option key={t.key} value={t.key}>
-              {t.label} \u2014 {t.key === "enterprise" ? `\u20a6${t.priceNaira.toLocaleString()}/yr flat` : `${t.commissionPct}% commission`}
+              {t.label} — {t.key === "enterprise" ? `\u20a6${t.priceNaira.toLocaleString()}/yr flat` : `${t.commissionPct}% commission`}
             </option>
           ))}
         </select>

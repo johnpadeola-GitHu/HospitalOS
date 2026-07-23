@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import {
   STATUS_TONE, listSettlements, closeCurrentCycle, advanceSettlement,
   settlementSummary, payoutAccount, listUsage, usageSummary, revenueMix,
+  listPlatformInvoices, markPlatformInvoicePaid,
 } from "./settlementService";
 import { StatCard, Card, Pill, Button } from "../../lib/ui";
 
@@ -17,10 +18,12 @@ export default function Settlement() {
   const refresh = useCallback(async () => {
     setErr("");
     try {
-      const [settlements, sum, payout, usage, uSum, mix] = await Promise.all([
-        listSettlements(), settlementSummary(), payoutAccount(), listUsage(), usageSummary(), revenueMix(),
+      const ninetyDaysAgo = new Date(Date.now() - 90 * 86400000).toISOString();
+      const now = new Date().toISOString();
+      const [settlements, sum, payout, usage, uSum, mix, invoices] = await Promise.all([
+        listSettlements(), settlementSummary(), payoutAccount(), listUsage(), usageSummary(), revenueMix(ninetyDaysAgo, now), listPlatformInvoices(),
       ]);
-      setData({ settlements, sum, payout, usage, uSum, mix });
+      setData({ settlements, sum, payout, usage, uSum, mix, invoices });
     } catch (e) {
       setErr(e.message);
     }
@@ -31,6 +34,11 @@ export default function Settlement() {
   const advance = async (id) => {
     setErr("");
     try { await advanceSettlement(id); await refresh(); } catch (e) { setErr(e.message); }
+  };
+
+  const markPaid = async (invoiceId) => {
+    setErr("");
+    try { await markPlatformInvoicePaid(invoiceId); await refresh(); } catch (e) { setErr(e.message); }
   };
 
   if (!data) return <div style={{ color: err ? "var(--bad)" : "var(--muted)", fontSize: 13 }}>{err || "Loading settlement…"}</div>;
@@ -182,16 +190,16 @@ export default function Settlement() {
         </Card>
 
         <Card title="Where hospital revenue comes from">
-          {data.mix.length === 0 ? (
+          {data.mix.bySource.length === 0 ? (
             <div style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6 }}>
-              Not yet available. Payments don't currently record which module they were
-              for, so an honest per-source breakdown isn't computable yet \u2014 this needs a
-              schema change to how payments are recorded, not just an estimate.
+              No invoice-linked payments in the last 90 days yet. Revenue mix can only be
+              attributed to a module when a payment is routed through the invoice system —
+              a direct payment with no invoice can't be traced back to a specific source.
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {data.mix.map((m) => {
-                const max = Math.max(...data.mix.map((x) => x.amount));
+              {data.mix.bySource.map((m) => {
+                const max = Math.max(...data.mix.bySource.map((x) => x.amount));
                 return (
                   <div key={m.source}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
@@ -205,16 +213,48 @@ export default function Settlement() {
             </div>
           )}
           <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, lineHeight: 1.5 }}>
-            The platform fee is charged on total collections, but this mix shows which
-            modules generate the revenue that fee is taken from.
+            {naira(data.mix.unattributedGross)} in the same period came from payments with no
+            invoice attached, so it can't be broken down by module — shown here honestly
+            rather than guessed at. The platform fee is charged on total collections either way.
           </div>
         </Card>
+      </div>
+
+      <div style={{ ...sectionTitle, marginTop: 24 }}>Platform invoices</div>
+      <div style={tableWrap}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>{["Invoice", "Hospital", "Cycle", "Amount", "Status", "Issued", ""].map((h) => (
+              <th key={h} style={{ ...th, textAlign: h === "Amount" ? "right" : "left" }}>{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {data.invoices.length === 0 ? (
+              <tr><td colSpan={7} style={{ padding: "20px 14px", textAlign: "center", color: "var(--muted)", fontSize: 12.5 }}>No platform invoices yet — one is generated automatically for each hospital when a settlement cycle closes.</td></tr>
+            ) : (
+              data.invoices.map((inv) => (
+                <tr key={inv.id} style={{ borderTop: "1px solid var(--border)" }}>
+                  <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{inv.invoiceNo}</td>
+                  <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{inv.tenantName}</td>
+                  <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--muted)" }}>{inv.settlementCycleId.slice(0, 10)}</td>
+                  <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)", fontWeight: 600 }}>{naira(inv.amount)}</td>
+                  <td style={td}><Pill tone={inv.status === "paid" ? "good" : "warn"}>{inv.status}</Pill></td>
+                  <td style={{ ...td, fontSize: 11.5, color: "var(--muted)" }}>{new Date(inv.issuedAt).toLocaleDateString()}</td>
+                  <td style={{ ...td, textAlign: "right" }}>
+                    {inv.status === "pending" && <Button variant="primary" onClick={() => markPaid(inv.id)}>Mark paid</Button>}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
 
 const sectionTitle = { fontSize: 15, fontWeight: 700, color: "var(--ink-strong)", marginBottom: 12, letterSpacing: "-0.015em" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 14 };
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" };

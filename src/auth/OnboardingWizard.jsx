@@ -222,7 +222,7 @@ function FrontDoorAlternatives({ onSwitchToDemo, onSignedIn, prefillEmail }) {
         />
         <input
           style={{ ...inputStyle, marginBottom: 12 }} type="password" value={password}
-          onChange={(e) => setPassword(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autoComplete="current-password"
+          onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password"
         />
         <button type="submit" style={{ ...signInBtn, opacity: busy ? 0.7 : 1 }} disabled={busy}>
           {busy ? "Signing in\u2026" : "Sign in"}
@@ -247,11 +247,11 @@ function WizardResult({ result, onDone }) {
     <div>
       <div style={successIcon}><Icons.CheckCircle2 size={26} color="#fff" /></div>
       <h1 style={title}>{tenant.name} is activated</h1>
-      <p style={subtitle}>{tier.label} plan \u2014 your administrator account is ready.</p>
+      <p style={subtitle}>{tier.label} plan — your administrator account is ready.</p>
       {requiresPayment && (
         <div style={pendingBox}>
           <Icons.Clock size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>Enterprise is a flat annual plan \u2014 your account is marked <b>pending payment</b> until AgoroX confirms billing.</span>
+          <span>Enterprise is a flat annual plan — your account is marked <b>pending payment</b> until AgoroX confirms billing.</span>
         </div>
       )}
       <div style={credBox}>
@@ -363,7 +363,7 @@ function Step2Identity({ data, patch, onNext, setErr }) {
       {data.validatedCode && (
         <div style={codePreview}>
           <Icons.CheckCircle2 size={13} color="var(--good)" style={{ flexShrink: 0 }} />
-          Code valid for <b>{data.validatedCode.tier.label}</b> \u2014 issued for "{data.validatedCode.tenantName}"
+          Code valid for <b>{data.validatedCode.tier.label}</b> — issued for "{data.validatedCode.tenantName}"
         </div>
       )}
       <Row><F label="Hospital name">
@@ -373,7 +373,7 @@ function Step2Identity({ data, patch, onNext, setErr }) {
         </div>
       </F></Row>
       <p style={lockedNote}>
-        Set by your activation code, and cannot be changed here \u2014 this stops a stolen code being
+        Set by your activation code, and cannot be changed here — this stops a stolen code being
         redeemed under a different hospital's name. Contact AgoroX if this is wrong.
       </p>
       <Row><F label="Hospital type">
@@ -413,7 +413,7 @@ function Step4Roles({ data, patch, onNext }) {
   const toggle = (key) => patch({ roles: data.roles.includes(key) ? data.roles.filter((r) => r !== key) : [...data.roles, key] });
   return (
     <div>
-      <p style={helpText}>Which staff roles will you be onboarding? This just pre-shapes Administration \u2192 Users & roles \u2014 any role can be added or removed later.</p>
+      <p style={helpText}>Which staff roles will you be onboarding? This just pre-shapes Administration → Users & roles — any role can be added or removed later.</p>
       <div style={chipGrid}>
         {ROLE_OPTIONS.map((r) => (
           <button key={r.key} type="button" onClick={() => toggle(r.key)} style={{ ...chip, ...(data.roles.includes(r.key) ? chipActive : null) }}>
@@ -429,8 +429,8 @@ function Step4Roles({ data, patch, onNext }) {
 function Step5Branding({ data, patch, onNext }) {
   return (
     <div>
-      <p style={helpText}>All of this can be changed later in Administration \u2192 Settings \u2014 nothing here is locked in.</p>
-      <Row><F label="Logo URL (optional)"><input style={inputStyle} value={data.logoUrl} onChange={(e) => patch({ logoUrl: e.target.value })} placeholder="https://\u2026/logo.png" /></F></Row>
+      <p style={helpText}>All of this can be changed later in Administration → Settings — nothing here is locked in.</p>
+      <Row><F label="Logo URL (optional)"><input style={inputStyle} value={data.logoUrl} onChange={(e) => patch({ logoUrl: e.target.value })} placeholder="https://…/logo.png" /></F></Row>
       <Row cols={2}>
         <F label="Phone"><input style={inputStyle} value={data.phone} onChange={(e) => patch({ phone: e.target.value })} /></F>
         <F label="Registration number"><input style={inputStyle} value={data.registrationNumber} onChange={(e) => patch({ registrationNumber: e.target.value })} placeholder="CAC / state MoH number" /></F>
@@ -442,11 +442,11 @@ function Step5Branding({ data, patch, onNext }) {
 
 function Step6Plan({ data, onNext }) {
   const tier = data.validatedCode?.tier;
-  if (!tier) return <div style={helpText}>No plan on file \u2014 go back to Step 1.</div>;
+  if (!tier) return <div style={helpText}>No plan on file — go back to Step 1.</div>;
   const isEnterprise = tier.key === "enterprise";
   return (
     <div>
-      <p style={helpText}>Your plan was set when this activation code was issued \u2014 shown here for confirmation, not a choice.</p>
+      <p style={helpText}>Your plan was set when this activation code was issued — shown here for confirmation, not a choice.</p>
       <div style={planCard}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "var(--ink-strong)" }}>{tier.label}</div>
         {isEnterprise ? (
@@ -518,7 +518,7 @@ function Step7Agreement({ data, patch, onNext, setErr }) {
           </div>
         ))}
         <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "center", paddingTop: 10 }}>
-          \u2014 End of agreement \u2014
+          — End of agreement —
         </div>
       </div>
 

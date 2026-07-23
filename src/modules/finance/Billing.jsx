@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { listAccounts, recordPayment, billingSummary } from "./billingService";
+import { listAccounts, recordPayment, billingSummary, createInvoice, initializeOnlinePayment } from "./billingService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 import ReceiptPrint from "./ReceiptPrint";
@@ -89,7 +89,7 @@ export default function Billing() {
                     <div style={{ display: "inline-flex", gap: 6 }}>
                       <Button onClick={() => setDetailFor(a)}>View</Button>
                       {a.balance > 0 && may("finance:take-payment") && (
-                        <Button variant="primary" onClick={() => setPayFor(a)}>Take payment</Button>
+                        <Button variant="primary" onClick={() => setPayFor({ account: a, invoice: null })}>Take payment</Button>
                       )}
                     </div>
                   </td>
@@ -104,13 +104,14 @@ export default function Billing() {
         <DetailModal
           account={detailFor}
           onClose={() => setDetailFor(null)}
-          onPay={() => setPayFor(detailFor)}
+          onPay={(invoice) => setPayFor({ account: detailFor, invoice })}
         />
       )}
 
       {payFor && (
         <PaymentModal
-          account={payFor}
+          account={payFor.account}
+          invoice={payFor.invoice}
           onClose={() => setPayFor(null)}
           onDone={async () => {
             setPayFor(null);
@@ -142,6 +143,23 @@ function Stat({ label, value, accent }) {
 }
 
 function DetailModal({ account, onClose, onPay }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [invoice, setInvoice] = useState(null);
+
+  const generateInvoice = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      const inv = await createInvoice(account.patientId, account.charges);
+      setInvoice(inv);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <Modal
       title={`Account — ${account.patientName}`}
@@ -151,14 +169,24 @@ function DetailModal({ account, onClose, onPay }) {
           <Button variant="ghost" onClick={onClose}>
             Close
           </Button>
+          {!invoice && account.charges.length > 0 && (
+            <Button onClick={generateInvoice} disabled={busy}>{busy ? "Generating…" : "Generate invoice"}</Button>
+          )}
           {account.balance > 0 && (
-            <Button variant="primary" onClick={onPay}>
+            <Button variant="primary" onClick={() => onPay(invoice)}>
               Take payment
             </Button>
           )}
         </>
       }
     >
+      {err && <div style={errBox}>{err}</div>}
+      {invoice && (
+        <div style={invoiceBanner}>
+          Invoice <span style={mono}>{invoice.invoiceNo}</span> generated for {naira(invoice.totalAmount)} {"\u2014"}
+          a permanent record of these charges, finalized and immutable from here.
+        </div>
+      )}
       <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>
         {account.hospitalNo}
       </div>
@@ -193,9 +221,10 @@ function DetailModal({ account, onClose, onPay }) {
   );
 }
 
-function PaymentModal({ account, onClose, onDone }) {
+function PaymentModal({ account, invoice, onClose, onDone }) {
   const { user: actor } = useAuth();
-  const [amount, setAmount] = useState(String(Math.round(account.balance)));
+  const defaultAmount = invoice ? invoice.totalAmount : account.balance;
+  const [amount, setAmount] = useState(String(Math.round(defaultAmount)));
   const [method, setMethod] = useState("Cash");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -206,8 +235,26 @@ function PaymentModal({ account, onClose, onDone }) {
     setBusy(true);
     setErr("");
     try {
-      const r = await recordPayment(account.patientId, amount, method);
+      const r = await recordPayment(account.patientId, amount, method, invoice?.id || null);
       setReceipt(r);
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  // Online payment is fundamentally different from the other methods:
+  // instead of recording something that already happened, this starts a
+  // transaction with the provider and sends the browser to their
+  // checkout page. Nothing is recorded here at all \u2014 confirmation
+  // happens server-to-server via webhook once the patient actually
+  // pays, handled by PaymentCallback.jsx when the browser returns.
+  const submitOnline = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      const r = await initializeOnlinePayment(account.patientId, amount, invoice?.id || null);
+      window.location.href = r.authorizationUrl;
     } catch (e) {
       setErr(e.message);
       setBusy(false);
@@ -255,36 +302,59 @@ function PaymentModal({ account, onClose, onDone }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={submit} disabled={busy}>
-            {busy ? "Recording…" : "Record payment"}
-          </Button>
+          {method === "Online Payment" ? (
+            <Button variant="primary" onClick={submitOnline} disabled={busy}>
+              {busy ? "Starting…" : "Pay online"}
+            </Button>
+          ) : (
+            <Button variant="primary" onClick={submit} disabled={busy}>
+              {busy ? "Recording…" : "Record payment"}
+            </Button>
+          )}
         </>
       }
     >
       {err && <div style={errBox}>{err}</div>}
-      <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>
-        Outstanding balance:{" "}
-        <span style={{ fontFamily: "var(--font-mono)", color: "#8A5A17", fontWeight: 600 }}>
-          {naira(account.balance)}
-        </span>
-      </div>
+      {invoice ? (
+        <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>
+          Against invoice <span style={{ fontFamily: "var(--font-mono)" }}>{invoice.invoiceNo}</span>:{" "}
+          <span style={{ fontFamily: "var(--font-mono)", color: "#8A5A17", fontWeight: 600 }}>
+            {naira(invoice.totalAmount)}
+          </span>
+        </div>
+      ) : (
+        <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>
+          Outstanding balance:{" "}
+          <span style={{ fontFamily: "var(--font-mono)", color: "#8A5A17", fontWeight: 600 }}>
+            {naira(account.balance)}
+          </span>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}>
-          <Field label="Amount (\u20a6)">
+          <Field label="Amount (₦)">
             <input type="number" min="1" style={inputStyle} value={amount} onChange={(e) => setAmount(e.target.value)} />
           </Field>
         </div>
-        <div style={{ width: 140 }}>
+        <div style={{ width: 160 }}>
           <Field label="Method">
             <select style={inputStyle} value={method} onChange={(e) => setMethod(e.target.value)}>
               <option>Cash</option>
               <option>Card</option>
-              <option>Transfer</option>
+              <option>POS</option>
+              <option>Bank Transfer</option>
+              <option>Online Payment</option>
               <option>NHIA</option>
             </select>
           </Field>
         </div>
       </div>
+      {method === "Online Payment" && (
+        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10, lineHeight: 1.4 }}>
+          This will send this browser to the payment provider's own checkout page. Nothing is
+          recorded until the payment is confirmed {"\u2014"} you'll be brought back here automatically.
+        </p>
+      )}
     </Modal>
   );
 }
@@ -316,6 +386,15 @@ const totalRow = {
   padding: "7px 0",
   borderTop: "1px solid var(--border)",
   marginTop: 0,
+};
+const invoiceBanner = {
+  background: "#EEF3EA",
+  color: "#3D5A2A",
+  fontSize: 12.5,
+  padding: "10px 13px",
+  borderRadius: 8,
+  marginBottom: 14,
+  lineHeight: 1.5,
 };
 const errBox = {
   background: "#F7E9E9",

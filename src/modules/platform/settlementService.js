@@ -87,9 +87,23 @@ export async function usageSummary() {
   return apiCall("/platform/usage/summary");
 }
 
-// Honestly empty — see the file header for why this can't be computed
-// from real data yet without either a schema change or duplicating every
-// module's pricing catalogue server-side.
-export async function revenueMix() {
-  return [];
+// Real now: prorates invoice-linked payments across their invoice's own
+// line-item sources. Only meaningful for payments actually routed
+// through the invoice system — a direct payment with no invoice stays
+// honestly bucketed as unattributedGross rather than guessed at. See
+// the backend route's own comment for the full reasoning.
+export async function revenueMix(from, to) {
+  return apiCall(`/platform/settlements/revenue-mix?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+}
+
+// PlatformInvoice — a real, generated-automatically bill for what a
+// tenant owes for a settlement cycle. "Mark paid" is a manual
+// confirmation, not automated collection — see routes/settlement.js's
+// own comment for exactly why that boundary is honest, not a shortcut.
+export async function listPlatformInvoices(status = "all") {
+  return apiCall(`/platform/invoices${status !== "all" ? `?status=${encodeURIComponent(status)}` : ""}`);
+}
+
+export async function markPlatformInvoicePaid(invoiceId) {
+  return apiCall(`/platform/invoices/${encodeURIComponent(invoiceId)}/mark-paid`, { method: "PATCH" });
 }

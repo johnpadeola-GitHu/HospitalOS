@@ -40,7 +40,7 @@ export default function Compliance() {
   return (
     <div>
       <PageHeader group="Compliance" title="Compliance &amp; accreditation" icon="ShieldCheck"
-        subtitle="Practitioner licenses, facility accreditation, and regulatory inspections \u2014 the legal basis for operating"
+        subtitle="Practitioner licenses, facility accreditation, and regulatory inspections — the legal basis for operating"
         actions={
           tab === "licenses" ? <Button variant="primary" icon="Plus" onClick={() => setShowAddLicense(true)}>Add license</Button>
             : tab === "accreditation" ? <Button variant="primary" icon="Plus" onClick={() => setShowAddAcc(true)}>Add accreditation</Button>
@@ -67,7 +67,7 @@ export default function Compliance() {
 
       {tab === "licenses" && (
         <Card title="Practitioner licenses" pad={false}>
-          {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading\u2026</div> : licenses.length === 0 ? (
+          {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : licenses.length === 0 ? (
             <div style={{ padding: 22 }}><EmptyState icon="ShieldCheck" title="No licenses tracked" /></div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -183,14 +183,14 @@ function AddLicenseModal({ actor, tenantId, onClose, onDone }) {
       {err && <div style={errBox}>{err}</div>}
       <Field label="Staff member">
         <select style={inputStyle} value={form.staffId} onChange={pickStaff}>
-          <option value="">Choose a staff account\u2026</option>
-          {staff.map((s) => <option key={s.id} value={s.id}>{s.name} \u2014 {s.role}</option>)}
+          <option value="">Choose a staff account…</option>
+          {staff.map((s) => <option key={s.id} value={s.id}>{s.name} — {s.role}</option>)}
         </select>
       </Field>
       {staff.length === 0 && (
         <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 12, lineHeight: 1.5 }}>
           No staff accounts with a licensable role (doctor, nurse, lab scientist, radiographer, pharmacist)
-          exist yet \u2014 add one in Administration \u2192 Users &amp; roles first.
+          exist yet — add one in Administration → Users &amp; roles first.
         </div>
       )}
       {form.role && (

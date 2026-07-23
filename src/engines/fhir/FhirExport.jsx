@@ -52,7 +52,7 @@ export default function FhirExport() {
       <div style={note}>
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
         <span>
-          A browser cannot host a live FHIR REST endpoint \u2014 that is server territory, same
+          A browser cannot host a live FHIR REST endpoint — that is server territory, same
           limitation as the instruments gateway's device listeners. What this screen produces is
           the real substance of interoperability: a correctly mapped, standards-compliant FHIR
           Bundle for a patient, ready to hand to another system today by file, and identical to

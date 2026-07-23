@@ -45,7 +45,7 @@ export default function VipServices() {
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
         <span>
           Private Suite, VIP Suite, and Executive Suite are accommodation tiers set in
-          Administration \u2192 Pricing \u2014 that is what a patient is billed. This screen is the
+          Administration → Pricing — that is what a patient is billed. This screen is the
           service that comes with the room: a named consultant, a concierge contact, and a
           privacy flag that actually changes how the patient is handled, not just what they pay.
         </span>

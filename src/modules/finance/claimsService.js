@@ -42,8 +42,12 @@ export async function listClaims({ status = "all" } = {}) {
   return apiCall(`/finance/claims?status=${status}`);
 }
 
-export async function createClaim({ patientId, insurer, amount }) {
-  return apiCall("/finance/claims", { method: "POST", body: { patientId, insurer, amount } });
+export async function createClaim({ patientId, insurer, amount, copayAmount = 0 }) {
+  return apiCall("/finance/claims", { method: "POST", body: { patientId, insurer, amount, copayAmount } });
+}
+
+export async function collectCopay(id, method = "Cash") {
+  return apiCall(`/finance/claims/${encodeURIComponent(id)}/collect-copay`, { method: "POST", body: { method } });
 }
 
 export async function setClaimStatus(id, status) {

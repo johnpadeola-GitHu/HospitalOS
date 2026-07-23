@@ -28,7 +28,7 @@ export function DemoForm({ onBack, onDone }) {
       <div>
         <div style={successIcon}><Icons.Sparkles size={24} color="#fff" /></div>
         <h1 style={title}>Your demo is ready</h1>
-        <p style={subtitle}>Full access to HospitalOS for {DEMO_DURATION_DAYS} days \u2014 no payment, no commitment.</p>
+        <p style={subtitle}>Full access to HospitalOS for {DEMO_DURATION_DAYS} days — no payment, no commitment.</p>
 
         <div style={credBox}>
           <div style={credLabel}>Your sign-in email</div>

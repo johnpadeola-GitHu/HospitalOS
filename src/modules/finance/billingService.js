@@ -92,19 +92,45 @@ export async function getAccount(patientId) {
   return accounts.find((a) => a.patientId === patientId) || null;
 }
 
-// Balance-exceeded validation stays client-side (see routes/billing.js's
-// header note for exactly why) — genuinely the same check the in-memory
-// version always ran, just still computed from all five sources here
-// rather than something the server can fully see yet.
-export async function recordPayment(patientId, amount, method = "Cash") {
+// Balance-exceeded validation stays client-side as a first check (fast,
+// no round-trip) but is now ALSO genuinely re-validated server-side —
+// see routes/billing.js's recordPayment and lib/balance.js. This client
+// check catches the common case immediately; the server is the actual
+// authority now, not just a trusting pass-through.
+export async function recordPayment(patientId, amount, method = "Cash", invoiceId = null) {
   const amt = parseFloat(amount);
   if (!amt || amt <= 0) throw new Error("Enter a payment amount greater than zero.");
   const account = await getAccount(patientId);
   if (!account) throw new Error("No account for this patient.");
-  if (amt > account.balance + 0.001) {
+  if (!invoiceId && amt > account.balance + 0.001) {
     throw new Error(`Payment exceeds the outstanding balance of \u20a6${account.balance.toLocaleString()}.`);
   }
-  return apiCall("/billing/payments", { method: "POST", body: { patientId, amount: amt, method } });
+  return apiCall("/billing/payments", { method: "POST", body: { patientId, amount: amt, method, invoiceId } });
+}
+
+// Maps a charge's display source ("Laboratory", "Pharmacy", etc.) to the
+// lowercase category key the backend's invoice_items/pricing catalogue
+// use — the one place this mapping lives, so a new billable source only
+// needs updating here, not everywhere an invoice gets built.
+const SOURCE_TO_CATEGORY = {
+  Laboratory: "lab", Pharmacy: "pharmacy", Radiology: "radiology", Theatre: "theatre", Accommodation: "accommodation",
+};
+
+// Finalizes an account's current charges into a real, persisted,
+// immutable invoice (Phase 3) — a genuine snapshot the server keeps
+// forever, not the live-recomputed balance this screen shows day to
+// day. Once generated, payments taken against this account should link
+// to the invoice (see PaymentModal) so the amount is treated as
+// already-agreed rather than re-validated against a balance that may
+// have moved since.
+export async function createInvoice(patientId, charges) {
+  const items = charges.map((c) => ({
+    source: SOURCE_TO_CATEGORY[c.source] || "other",
+    description: c.description,
+    amount: c.amount,
+    sourceRef: c.reference,
+  }));
+  return apiCall("/billing/invoices", { method: "POST", body: { patientId, items } });
 }
 
 // PHASE 4 (financial architecture review): cash sessions and refunds.
@@ -145,6 +171,43 @@ export async function createRefund(paymentId, amount, reason) {
 
 export async function listRefundsForPayment(paymentId) {
   return apiCall(`/finance/refunds/payment/${paymentId}`);
+}
+
+// Chargebacks — genuinely distinct from a refund (issuer-initiated,
+// adversarial, only affects revenue once resolved). See
+// routes/chargebacks.js for the full reasoning.
+export async function createChargeback(paymentId, amount, reason) {
+  const amt = parseFloat(amount);
+  if (!amt || amt <= 0) throw new Error("Enter a chargeback amount greater than zero.");
+  if (!reason || !reason.trim()) throw new Error("Record the reason the issuer gave.");
+  return apiCall("/finance/chargebacks", { method: "POST", body: { paymentId, amount: amt, reason: reason.trim() } });
+}
+
+export async function listChargebacksForPayment(paymentId) {
+  return apiCall(`/finance/chargebacks?paymentId=${encodeURIComponent(paymentId)}`);
+}
+
+export async function listChargebacks(status = "all") {
+  return apiCall(`/finance/chargebacks${status !== "all" ? `?status=${encodeURIComponent(status)}` : ""}`);
+}
+
+export async function resolveChargeback(chargebackId, outcome, note = "") {
+  return apiCall(`/finance/chargebacks/${encodeURIComponent(chargebackId)}/resolve`, { method: "PATCH", body: { outcome, note } });
+}
+
+// PHASE 5: starts an online payment — redirects the browser to the
+// provider's own checkout page. The actual confirmation happens
+// server-to-server via webhook, never trusted from the redirect alone;
+// see PaymentCallback.jsx for how the return trip is handled.
+export async function initializeOnlinePayment(patientId, amount, invoiceId = null) {
+  const amt = parseFloat(amount);
+  if (!amt || amt <= 0) throw new Error("Enter a payment amount greater than zero.");
+  const callbackUrl = `${window.location.origin}/finance/payment-callback`;
+  return apiCall("/billing/online-payment/initialize", { method: "POST", body: { patientId, amount: amt, invoiceId, callbackUrl } });
+}
+
+export async function getOnlinePaymentStatus(reference) {
+  return apiCall(`/billing/online-payment/status/${encodeURIComponent(reference)}`);
 }
 
 // Flat ledger of all payments across patients, most recent first.

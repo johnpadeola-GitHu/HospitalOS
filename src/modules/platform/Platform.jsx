@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import * as Icons from "lucide-react";
 import {
   PLAN_TONE, SERVICE_TONE, listTenants, setTenantStatus, platformSummary,
-  listServices, listFlags, toggleFlag, listDeployments,
+  listServices, listFlags, toggleFlag, listDeployments, getCommercialPlan, setCommercialPlan,
 } from "./platformService";
 import { daysRemaining } from "../../engines/onboarding";
-import { PageHeader, StatCard, Card, Pill, Button } from "../../lib/ui";
+import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle } from "../../lib/ui";
 import Settlement from "./Settlement";
 import ActivationCodes from "./ActivationCodes";
 
@@ -21,6 +21,7 @@ export default function Platform() {
   const [tab, setTab] = useState("overview");
   const [data, setData] = useState(null);
   const [err, setErr] = useState("");
+  const [planFor, setPlanFor] = useState(null);
 
   const refresh = useCallback(async () => {
     setErr("");
@@ -138,6 +139,7 @@ export default function Platform() {
                     <Pill tone={STATUS_TONE[t.status] || "muted"}>{t.status}</Pill>
                   </td>
                   <td style={{ ...td, textAlign: "right" }}>
+                    <Button onClick={() => setPlanFor(t)} style={{ marginRight: 6 }}>Plan</Button>
                     <Button onClick={() => cycleTenant(t)}>
                       {t.status === "pending-payment" ? "Confirm payment" : "Change"}
                     </Button>
@@ -199,6 +201,13 @@ export default function Platform() {
         </Card>
       </div>
       </>}
+      {planFor && (
+        <CommercialPlanModal
+          tenant={planFor}
+          onClose={() => setPlanFor(null)}
+          onDone={async () => { setPlanFor(null); await refresh(); }}
+        />
+      )}
     </div>
   );
 }
@@ -221,3 +230,132 @@ const dot = { width: 7, height: 7, borderRadius: "50%", flexShrink: 0 };
 const track = { width: 36, height: 20, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", flexShrink: 0 };
 const knob = { width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "transform .15s" };
 const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
+
+function CommercialPlanModal({ tenant, onClose, onDone }) {
+  const [loading, setLoading] = useState(true);
+  const [planType, setPlanType] = useState("simple");
+  const [minMonthlyFee, setMinMonthlyFee] = useState("");
+  const [maxMonthlyFee, setMaxMonthlyFee] = useState("");
+  const [promoPct, setPromoPct] = useState("");
+  const [promoStart, setPromoStart] = useState("");
+  const [promoEnd, setPromoEnd] = useState("");
+  const [tiers, setTiers] = useState([]);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    getCommercialPlan(tenant.id).then((plan) => {
+      if (!alive || !plan) { setLoading(false); return; }
+      setPlanType(plan.planType || "simple");
+      setMinMonthlyFee(plan.minMonthlyFee ?? "");
+      setMaxMonthlyFee(plan.maxMonthlyFee ?? "");
+      setPromoPct(plan.promoPct ?? "");
+      setPromoStart(plan.promoStart ? plan.promoStart.slice(0, 10) : "");
+      setPromoEnd(plan.promoEnd ? plan.promoEnd.slice(0, 10) : "");
+      setTiers(plan.tiers && plan.tiers.length ? plan.tiers : []);
+      setLoading(false);
+    }).catch((e) => { console.error(e); setLoading(false); });
+    return () => { alive = false; };
+  }, [tenant]);
+
+  const addTier = () => setTiers((t) => [...t, { minVolume: "", maxVolume: "", pct: "" }]);
+  const updateTier = (i, field, value) => setTiers((t) => t.map((row, idx) => (idx === i ? { ...row, [field]: value } : row)));
+  const removeTier = (i) => setTiers((t) => t.filter((_, idx) => idx !== i));
+
+  const submit = async () => {
+    setErr("");
+    if (planType === "tiered" && tiers.some((t) => t.minVolume === "" || t.pct === "")) {
+      setErr("Every tier needs at least a starting volume and a rate.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await setCommercialPlan(tenant.id, {
+        planType,
+        minMonthlyFee: minMonthlyFee === "" ? null : parseFloat(minMonthlyFee),
+        maxMonthlyFee: maxMonthlyFee === "" ? null : parseFloat(maxMonthlyFee),
+        promoPct: promoPct === "" ? null : parseFloat(promoPct),
+        promoStart: promoStart || null,
+        promoEnd: promoEnd || null,
+        tiers: planType === "tiered" ? tiers.map((t) => ({
+          minVolume: parseFloat(t.minVolume), maxVolume: t.maxVolume === "" ? null : parseFloat(t.maxVolume), pct: parseFloat(t.pct),
+        })) : [],
+      });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  if (loading) {
+    return <Modal title={`Commercial plan — ${tenant.name}`} onClose={onClose} footer={<Button variant="ghost" onClick={onClose}>Close</Button>}>
+      <div style={{ fontSize: 13, color: "var(--muted)" }}>Loading…</div>
+    </Modal>;
+  }
+
+  return (
+    <Modal
+      title={`Commercial plan — ${tenant.name}`}
+      onClose={onClose}
+      footer={<>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Save plan"}</Button>
+      </>}
+    >
+      {err && <div style={errBanner}>{err}</div>}
+      <p style={{ fontSize: 12, color: "var(--muted)", marginBottom: 14, lineHeight: 1.5 }}>
+        This is a true-up applied at settlement close, on top of {tenant.name}'s own {tenant.billingType === "flat" ? "flat" : `${tenant.commissionPct}%`} rate — leave everything blank to just use that rate as-is.
+      </p>
+
+      <Field label="Plan type">
+        <select style={inputStyle} value={planType} onChange={(e) => setPlanType(e.target.value)}>
+          <option value="simple">Simple (use the rate above, with optional floor/cap/promo)</option>
+          <option value="tiered">Tiered (progressive rate by volume)</option>
+        </select>
+      </Field>
+
+      {planType === "tiered" && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", marginBottom: 6 }}>Tiers (progressive, like tax brackets)</div>
+          {tiers.map((t, i) => (
+            <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 6 }}>
+              <input style={{ ...inputStyle, flex: 1 }} type="number" placeholder="From ₦" value={t.minVolume} onChange={(e) => updateTier(i, "minVolume", e.target.value)} />
+              <input style={{ ...inputStyle, flex: 1 }} type="number" placeholder="To ₦ (blank = no limit)" value={t.maxVolume} onChange={(e) => updateTier(i, "maxVolume", e.target.value)} />
+              <input style={{ ...inputStyle, width: 90 }} type="number" placeholder="%" value={t.pct} onChange={(e) => updateTier(i, "pct", e.target.value)} />
+              <Button onClick={() => removeTier(i)}>✕</Button>
+            </div>
+          ))}
+          <Button onClick={addTier}>+ Add tier</Button>
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <Field label="Minimum monthly fee (₦, optional)">
+            <input style={inputStyle} type="number" min="0" value={minMonthlyFee} onChange={(e) => setMinMonthlyFee(e.target.value)} placeholder="No floor" />
+          </Field>
+        </div>
+        <div style={{ flex: 1 }}>
+          <Field label="Maximum monthly fee (₦, optional)">
+            <input style={inputStyle} type="number" min="0" value={maxMonthlyFee} onChange={(e) => setMaxMonthlyFee(e.target.value)} placeholder="No cap" />
+          </Field>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", margin: "14px 0 6px" }}>Promotional rate (optional, overrides everything above while active)</div>
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ width: 100 }}>
+          <Field label="Rate %"><input style={inputStyle} type="number" min="0" value={promoPct} onChange={(e) => setPromoPct(e.target.value)} /></Field>
+        </div>
+        <div style={{ flex: 1 }}>
+          <Field label="From"><input style={inputStyle} type="date" value={promoStart} onChange={(e) => setPromoStart(e.target.value)} /></Field>
+        </div>
+        <div style={{ flex: 1 }}>
+          <Field label="Until"><input style={inputStyle} type="date" value={promoEnd} onChange={(e) => setPromoEnd(e.target.value)} /></Field>
+        </div>
+      </div>
+    </Modal>
+  );
+}

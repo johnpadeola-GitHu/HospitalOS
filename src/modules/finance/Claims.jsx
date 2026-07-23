@@ -5,6 +5,7 @@ import {
   listClaims,
   createClaim,
   setClaimStatus,
+  collectCopay,
   claimsSummary,
 } from "./claimsService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
@@ -29,6 +30,7 @@ export default function Claims() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("all");
   const [showNew, setShowNew] = useState(false);
+  const [copayFor, setCopayFor] = useState(null);
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
@@ -90,8 +92,8 @@ export default function Claims() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              {["Ref", "Patient", "Insurer", "Amount", "Status", ""].map((h) => (
-                <th key={h} style={{ ...th, textAlign: h === "Amount" ? "right" : "left" }}>
+              {["Ref", "Patient", "Insurer", "Amount", "Co-pay", "Status", ""].map((h) => (
+                <th key={h} style={{ ...th, textAlign: h === "Amount" || h === "Co-pay" ? "right" : "left" }}>
                   {h}
                 </th>
               ))}
@@ -100,13 +102,13 @@ export default function Claims() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={emptyCell}>
+                <td colSpan={7} style={emptyCell}>
                   Loading claims…
                 </td>
               </tr>
             ) : claims.length === 0 ? (
               <tr>
-                <td colSpan={6} style={emptyCell}>
+                <td colSpan={7} style={emptyCell}>
                   No claims match.
                 </td>
               </tr>
@@ -117,11 +119,25 @@ export default function Claims() {
                   <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{c.patientName}</td>
                   <td style={td}>{c.insurer}</td>
                   <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)" }}>{naira(c.amount)}</td>
+                  <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12 }}>
+                    {c.copayAmount > 0 ? (
+                      c.copayPaymentId ? (
+                        <span style={{ color: "var(--good)" }}>{naira(c.copayAmount)} {"\u2713"}</span>
+                      ) : (
+                        <span style={{ color: "var(--warn)" }}>{naira(c.copayAmount)}</span>
+                      )
+                    ) : (
+                      <span style={{ color: "var(--muted)" }}>{"\u2014"}</span>
+                    )}
+                  </td>
                   <td style={td}>
                     <ClaimStatus status={c.status} />
                   </td>
                   <td style={{ ...td, textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: 6 }}>
+                      {c.copayAmount > 0 && !c.copayPaymentId && (
+                        <Button onClick={() => setCopayFor(c)}>Collect co-pay</Button>
+                      )}
                       {c.status === "submitted" && may("finance:approve-claim") && (
                         <>
                           <Button onClick={() => act(c.id, "approved")}>Approve</Button>
@@ -151,6 +167,16 @@ export default function Claims() {
           }}
         />
       )}
+      {copayFor && (
+        <CopayModal
+          claim={copayFor}
+          onClose={() => setCopayFor(null)}
+          onDone={async () => {
+            setCopayFor(null);
+            await refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -169,8 +195,50 @@ function ClaimStatus({ status }) {
   );
 }
 
+function CopayModal({ claim, onClose, onDone }) {
+  const [method, setMethod] = useState("Cash");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const submit = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await collectCopay(claim.id, method);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      title={`Collect co-payment \u2014 ${claim.patientName}`}
+      onClose={onClose}
+      footer={<>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Recording…" : "Collect payment"}</Button>
+      </>}
+    >
+      {err && <div style={errBox}>{err}</div>}
+      <p style={{ fontSize: 13, marginBottom: 14 }}>
+        Co-payment of <strong>{naira(claim.copayAmount)}</strong> against claim <span style={{ fontFamily: "var(--font-mono)" }}>{claim.ref}</span>.
+      </p>
+      <Field label="Method">
+        <select style={inputStyle} value={method} onChange={(e) => setMethod(e.target.value)}>
+          <option>Cash</option>
+          <option>Card</option>
+          <option>POS</option>
+          <option>Bank Transfer</option>
+        </select>
+      </Field>
+    </Modal>
+  );
+}
+
 function NewClaimModal({ onClose, onDone }) {
-  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", insurer: "NHIA", amount: "" });
+  const [form, setForm] = useState({ patientId: null, patientName: "", hospitalNo: "", insurer: "NHIA", amount: "", copayAmount: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -209,8 +277,13 @@ function NewClaimModal({ onClose, onDone }) {
       </Field>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ width: 150 }}>
-          <Field label="Amount (\u20a6)">
+          <Field label="Amount (₦)">
             <input type="number" min="1" style={inputStyle} value={form.amount} onChange={set("amount")} />
+          </Field>
+        </div>
+        <div style={{ width: 150 }}>
+          <Field label="Co-pay (₦, optional)">
+            <input type="number" min="0" style={inputStyle} value={form.copayAmount} onChange={set("copayAmount")} placeholder="0" />
           </Field>
         </div>
       </div>

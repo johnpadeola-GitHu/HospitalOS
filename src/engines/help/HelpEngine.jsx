@@ -173,7 +173,7 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
         <div style={guideIcon}><Icons.FileDown size={18} color="#fff" /></div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)" }}>Download the full Tenant Guide (PDF)</div>
-          <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>Every module, your role's permissions, pricing, branding, and current limitations \u2014 in one document</div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>Every module, your role's permissions, pricing, branding, and current limitations — in one document</div>
         </div>
         <Icons.Download size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
       </a>

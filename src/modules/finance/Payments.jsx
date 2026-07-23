@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   listPayments, billingSummary, getAccount,
   getMyCashSession, openCashSession, closeCashSession, createRefund, listRefundsForPayment,
+  createChargeback, listChargebacksForPayment, listChargebacks, resolveChargeback,
 } from "./billingService";
 import { PageHeader, Button, Modal, Field } from "../../lib/ui";
 import ReceiptPrint from "./ReceiptPrint";
@@ -22,11 +23,13 @@ export default function Payments() {
   const [showOpen, setShowOpen] = useState(false);
   const [showClose, setShowClose] = useState(false);
   const [refundFor, setRefundFor] = useState(null);
+  const [chargebackFor, setChargebackFor] = useState(null);
+  const [openChargebacks, setOpenChargebacks] = useState([]);
   const { may } = useAuth();
 
   const refresh = () => {
-    return Promise.all([listPayments(), billingSummary(), getMyCashSession()])
-      .then(([p, s, sess]) => { setPayments(p); setSummary(s); setSession(sess); })
+    return Promise.all([listPayments(), billingSummary(), getMyCashSession(), listChargebacks("open")])
+      .then(([p, s, sess, cbs]) => { setPayments(p); setSummary(s); setSession(sess); setOpenChargebacks(cbs); })
       .catch((e) => console.error(e));
   };
 
@@ -54,10 +57,10 @@ export default function Payments() {
         {session ? (
           <>
             <span style={sessionDot} />
-            <span><strong>{session.tillLabel}</strong> open since {when(session.openedAt)} \u2014 opening balance {naira(session.openingBalance)}</span>
+            <span><strong>{session.tillLabel}</strong> open since {when(session.openedAt)} — opening balance {naira(session.openingBalance)}</span>
           </>
         ) : (
-          <span style={{ color: "var(--muted)" }}>No cash session open \u2014 open one before taking a Cash payment. Other payment methods don't need one.</span>
+          <span style={{ color: "var(--muted)" }}>No cash session open — open one before taking a Cash payment. Other payment methods don't need one.</span>
         )}
       </div>
 
@@ -66,6 +69,25 @@ export default function Payments() {
           <Stat label="Collected" value={naira(summary.collected)} />
           <Stat label="Outstanding" value={naira(summary.outstanding)} accent={summary.outstanding > 0} />
           <Stat label="Receipts" value={payments.length} />
+        </div>
+      )}
+
+      {openChargebacks.length > 0 && (
+        <div style={chargebackPanel}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--warn)", marginBottom: 8 }}>
+            {openChargebacks.length} open chargeback{openChargebacks.length > 1 ? "s" : ""} awaiting resolution
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {openChargebacks.map((cb) => (
+              <div key={cb.id} style={chargebackRow}>
+                <span style={{ flex: 1, minWidth: 0, fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {naira(cb.amount)} — {cb.reason}
+                </span>
+                <span style={{ fontSize: 11, color: "var(--muted)", marginRight: 8 }}>{when(cb.raisedAt)}</span>
+                <ResolveChargebackButtons chargeback={cb} onDone={refresh} />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -118,7 +140,12 @@ export default function Payments() {
                   <td style={{ ...td, textAlign: "right", whiteSpace: "nowrap" }}>
                     <Button onClick={() => setPrintFor(p)}>Reprint</Button>
                     {may("finance:refund") && (
-                      <Button variant="ghost" onClick={() => setRefundFor(p)} style={{ marginLeft: 6 }}>Refund</Button>
+                      <>
+                        <Button variant="ghost" onClick={() => setRefundFor(p)} style={{ marginLeft: 6 }}>Refund</Button>
+                        {["Card", "POS", "Online Payment"].includes(p.method) && (
+                          <Button variant="ghost" onClick={() => setChargebackFor(p)} style={{ marginLeft: 6 }}>Chargeback</Button>
+                        )}
+                      </>
                     )}
                   </td>
                 </tr>
@@ -132,6 +159,7 @@ export default function Payments() {
       {showOpen && <OpenSessionModal onClose={() => setShowOpen(false)} onDone={() => { setShowOpen(false); refresh(); }} />}
       {showClose && session && <CloseSessionModal session={session} onClose={() => setShowClose(false)} onDone={() => { setShowClose(false); refresh(); }} />}
       {refundFor && <RefundModal payment={refundFor} onClose={() => setRefundFor(null)} onDone={() => { setRefundFor(null); refresh(); }} />}
+      {chargebackFor && <ChargebackModal payment={chargebackFor} onClose={() => setChargebackFor(null)} onDone={() => { setChargebackFor(null); refresh(); }} />}
     </div>
   );
 }
@@ -163,7 +191,7 @@ function OpenSessionModal({ onClose, onDone }) {
       <Field label="Till"><input style={inputStyle} value={tillLabel} onChange={(e) => setTillLabel(e.target.value)} /></Field>
       <Field label="Opening balance"><input style={inputStyle} type="number" min="0" value={openingBalance} onChange={(e) => setOpeningBalance(e.target.value)} /></Field>
       <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
-        Count the float in the drawer before you start and enter it here \u2014 this is what expected cash gets measured against when you close out.
+        Count the float in the drawer before you start and enter it here — this is what expected cash gets measured against when you close out.
       </p>
     </Modal>
   );
@@ -208,7 +236,7 @@ function CloseSessionModal({ session, onClose, onDone }) {
       {err && <div style={errBox}>{err}</div>}
       <Field label="Actual cash counted"><input style={inputStyle} type="number" min="0" value={actualCash} onChange={(e) => setActualCash(e.target.value)} autoFocus /></Field>
       <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
-        Count every note and coin in the drawer right now and enter the total \u2014 expected cash is calculated automatically from this session's own Cash payments.
+        Count every note and coin in the drawer right now and enter the total — expected cash is calculated automatically from this session's own Cash payments.
       </p>
     </Modal>
   );
@@ -251,11 +279,75 @@ function RefundModal({ payment, onClose, onDone }) {
       <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>
         Original payment of {naira(payment.amount)} ({payment.method}).
         {alreadyRefunded > 0 && ` ${naira(alreadyRefunded)} already refunded \u2014 ${naira(remaining)} left to refund.`}
-        {" "}This creates a new refund record \u2014 the original payment stays exactly as it was.
+        {" "}This creates a new refund record — the original payment stays exactly as it was.
       </p>
       <Field label="Refund amount"><input style={inputStyle} type="number" min="0" max={remaining} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
       <Field label="Reason"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this being refunded?" /></Field>
     </Modal>
+  );
+}
+
+function ChargebackModal({ payment, onClose, onDone }) {
+  const [amount, setAmount] = useState(String(payment.amount));
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [prior, setPrior] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    listChargebacksForPayment(payment.id).then((c) => { if (alive) setPrior(c); }).catch((e) => console.error(e));
+    return () => { alive = false; };
+  }, [payment]);
+
+  const submit = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await createChargeback(payment.id, amount, reason);
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal title={`Raise chargeback — ${payment.receipt}`} onClose={onClose} footer={<>
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Recording…" : "Raise chargeback"}</Button>
+    </>}>
+      {err && <div style={errBox}>{err}</div>}
+      <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>
+        Original payment of {naira(payment.amount)} ({payment.method}). Record this when the
+        card issuer notifies you of a dispute — the amount stays with the hospital until this
+        is actually resolved against the hospital.
+      </p>
+      {prior && prior.length > 0 && (
+        <p style={{ fontSize: 12, color: "var(--warn)", marginBottom: 10 }}>
+          This payment already has {prior.length} chargeback record(s) on file.
+        </p>
+      )}
+      <Field label="Chargeback amount"><input style={inputStyle} type="number" min="0" max={payment.amount} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
+      <Field label="Issuer's reason"><textarea style={{ ...inputStyle, minHeight: 60, resize: "vertical", fontFamily: "var(--font-sans)" }} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="What did the card issuer cite?" /></Field>
+    </Modal>
+  );
+}
+
+function ResolveChargebackButtons({ chargeback, onDone }) {
+  const [busy, setBusy] = useState(false);
+
+  const resolve = async (outcome) => {
+    setBusy(true);
+    try { await resolveChargeback(chargeback.id, outcome); await onDone(); }
+    catch (e) { console.error(e); setBusy(false); }
+  };
+
+  return (
+    <div style={{ display: "inline-flex", gap: 6, flexShrink: 0 }}>
+      <Button onClick={() => resolve("won")} disabled={busy}>Won</Button>
+      <Button onClick={() => resolve("lost")} disabled={busy}>Lost</Button>
+    </div>
   );
 }
 
