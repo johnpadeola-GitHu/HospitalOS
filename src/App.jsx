@@ -80,6 +80,7 @@ import Procurement from "./modules/finance/Procurement";
 import Stores from "./modules/finance/Stores";
 import BankReconciliation from "./modules/finance/BankReconciliation";
 import PaymentCallback from "./modules/finance/PaymentCallback";
+import AcademyPlaceholder from "./modules/academy/AcademyPlaceholder";
 import MyPatients from "./modules/patients/MyPatients";
 import Worklist from "./modules/patients/Worklist";
 import Theatre from "./modules/theatre/Theatre";
@@ -158,6 +159,7 @@ const MODULES = {
   "/pharmacy/formulary": Formulary,
   "/finance/procurement": Procurement,
   "/finance/stores": Stores,
+  "/academy": AcademyPlaceholder,
   "/finance/bank-reconciliation": BankReconciliation,
   "/patients/mine": MyPatients,
   "/worklist": Worklist,

@@ -24,7 +24,9 @@ export default function GlobalSearch() {
   const { can } = useAuth();
   const { openHelp } = useHelp();
 
-  // Ctrl+K / Cmd+K opens; Escape closes.
+  // Ctrl+K / Cmd+K opens; Escape closes. Capture phase, not bubble — so
+  // this fires before any other component's own keydown handler could
+  // stop propagation and prevent it from being seen.
   useEffect(() => {
     const onKey = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
@@ -33,8 +35,8 @@ export default function GlobalSearch() {
       }
       if (e.key === "Escape") setOpen(false);
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, []);
 
   useEffect(() => {
@@ -118,6 +120,14 @@ export default function GlobalSearch() {
                 onChange={(e) => { setQuery(e.target.value); setActive(0); }}
                 onKeyDown={onKeyDown}
               />
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close search"
+                style={closeButton}
+              >
+                <Icons.X size={14} />
+              </button>
               <kbd style={kbd}>Esc</kbd>
             </div>
 
@@ -202,6 +212,11 @@ const kbd = {
   fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--muted)",
   background: "var(--surface-2)", border: "1px solid var(--border)",
   borderRadius: 4, padding: "2px 5px", flexShrink: 0,
+};
+const closeButton = {
+  display: "flex", alignItems: "center", justifyContent: "center",
+  width: 26, height: 26, borderRadius: 6, border: "1px solid var(--border)",
+  background: "var(--surface)", color: "var(--muted)", cursor: "pointer", flexShrink: 0,
 };
 const kbdInline = { fontFamily: "var(--font-mono)", color: "var(--charcoal)" };
 const overlay = {

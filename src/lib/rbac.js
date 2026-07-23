@@ -13,6 +13,7 @@
 
 export const AREAS = [
   { key: "overview", label: "Overview & alerts" },
+  { key: "academy", label: "Academy" },
   { key: "patient-care", label: "Patient care" },
   { key: "diagnostics", label: "Diagnostics" },
   { key: "pharmacy", label: "Pharmacy" },
@@ -60,7 +61,7 @@ export const ROLES = {
   },
   doctor: {
     label: "Doctor",
-    areas: ["overview", "patient-care", "diagnostics", "pharmacy", "specialty-services"],
+    areas: ["overview", "academy", "patient-care", "diagnostics", "pharmacy", "specialty-services"],
     grants: [
       "patient-care:*", "diagnostics:order", "diagnostics:result", "diagnostics:verify",
       "diagnostics:transfuse", "pharmacy:dispense",
@@ -68,35 +69,35 @@ export const ROLES = {
   },
   nurse: {
     label: "Nurse",
-    areas: ["overview", "patient-care", "specialty-services"],
+    areas: ["overview", "academy", "patient-care", "specialty-services"],
     // Nurses admit and record vitals, but do not discharge.
     grants: ["patient-care:register", "patient-care:admit", "patient-care:record-vitals", "patient-care:record-delivery", "patient-care:note"],
   },
   "lab-scientist": {
     label: "Lab Scientist",
-    areas: ["overview", "diagnostics"],
+    areas: ["overview", "academy", "diagnostics"],
     // Can collect and result; verification is a separate responsibility.
     grants: ["diagnostics:collect", "diagnostics:result", "diagnostics:verify"],
   },
   radiographer: {
     label: "Radiographer",
-    areas: ["overview", "diagnostics"],
+    areas: ["overview", "academy", "diagnostics"],
     grants: ["diagnostics:order", "diagnostics:result"],
   },
   pharmacist: {
     label: "Pharmacist",
-    areas: ["overview", "pharmacy"],
+    areas: ["overview", "academy", "pharmacy"],
     grants: ["pharmacy:dispense", "pharmacy:restock"],
   },
   cashier: {
     label: "Cashier",
-    areas: ["overview", "finance"],
+    areas: ["overview", "academy", "finance"],
     // Takes payments and files claims, but cannot approve them (separation of duties).
     grants: ["finance:take-payment", "finance:claim"],
   },
   "records-officer": {
     label: "Records Officer",
-    areas: ["overview", "patient-care"],
+    areas: ["overview", "academy", "patient-care"],
     grants: ["patient-care:register"],
   },
 };

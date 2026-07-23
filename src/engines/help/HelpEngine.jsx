@@ -177,6 +177,15 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
         </div>
         <Icons.Download size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
       </a>
+
+      <a href="/guides/HospitalOS-Academy.pdf" download style={{ ...guideBanner, marginTop: 10 }}>
+        <div style={guideIcon}><Icons.GraduationCap size={18} color="#fff" /></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)" }}>Download the HospitalOS Academy (PDF)</div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>A structured curriculum, organised by role — start with Course 1, work through your own track, finish with the Capstone</div>
+        </div>
+        <Icons.Download size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
+      </a>
     </>
   );
 }

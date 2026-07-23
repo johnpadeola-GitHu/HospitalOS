@@ -20,6 +20,15 @@ export const NAV_GROUPS = [
     ],
   },
   {
+    id: "academy",
+    label: "Academy",
+    icon: "GraduationCap",
+    comingSoon: true,
+    items: [
+      { id: "academy-home", label: "HospitalOS Academy", path: "/academy" , icon: "GraduationCap" },
+    ],
+  },
+  {
     id: "patient-care",
     label: "Patient care",
     icon: "HeartPulse",
@@ -112,7 +121,7 @@ export const NAV_GROUPS = [
   {
     id: "public-health",
     label: "Public health",
-    icon: "Globe",
+    icon: "ShieldPlus",
     items: [
       { id: "surveillance", label: "Disease surveillance", path: "/public-health/surveillance" , icon: "Radar" },
       { id: "immunisation", label: "Immunisation programmes", path: "/public-health/immunisation" , icon: "Syringe" },
@@ -123,7 +132,7 @@ export const NAV_GROUPS = [
   {
     id: "specialty-services",
     label: "Specialty services",
-    icon: "HeartHandshake",
+    icon: "Layers",
     items: [
       { id: "nutrition", label: "Nutrition & dietetics", path: "/nutrition" , icon: "Apple" },
       { id: "sickle-cell", label: "Sickle cell centre", path: "/sickle-cell" , icon: "Droplet" },
@@ -137,7 +146,7 @@ export const NAV_GROUPS = [
   {
     id: "intelligence",
     label: "Intelligence",
-    icon: "ChartNoAxesCombined",
+    icon: "Gauge",
     items: [
       { id: "analytics", label: "Analytics & KPIs", path: "/intelligence/analytics" , icon: "ChartLine" },
       { id: "forecasting", label: "Forecasting", path: "/intelligence/forecasting" , icon: "TrendingUp" },
