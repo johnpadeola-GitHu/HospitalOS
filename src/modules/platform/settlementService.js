@@ -8,6 +8,16 @@
 // Usage metering is real per-tenant counts from the actual patients,
 // lab_orders, radiology_studies, dispenses, and accounts tables.
 //
+// PHASE 1 FIX (financial architecture review): commission is now genuinely
+// per-tenant, read from tenants.billing_type/commission_pct instead of one
+// hardcoded 3.25% applied to every tenant's payments regardless of their
+// actual contract. Ibadan Teaching Hospital is seeded billing_type='flat'
+// — under the old logic it was being charged 3.25% it never should have
+// owed; it now correctly contributes zero commission. Tested directly
+// against a flat tenant, a commission tenant, a mixed batch, and a
+// misconfigured commission tenant with no rate set (fails safe to zero,
+// not a crash or an arbitrary default) before shipping.
+//
 // DELIBERATELY NOT REAL: revenue mix by module. Payments don't capture
 // what they were for at recording time — a single payment can cover a
 // mix of theatre, lab, pharmacy, and bed charges at once, an
@@ -40,7 +50,10 @@ async function apiCall(path, { method = "GET", body } = {}) {
   return data;
 }
 
-export const PLATFORM_FEE_RATE = 0.0325; // 3.25%
+// Reference default for new commission-tier tenants — no longer applied
+// as a blanket rate. Real commission is now genuinely per-tenant; see
+// summary().blendedEffectiveRate for the actual honest figure.
+export const PLATFORM_FEE_RATE = 0.0325;
 export const SETTLEMENT_STATUS = ["pending", "processing", "settled", "failed"];
 export const STATUS_TONE = { pending: "warn", processing: "info", settled: "good", failed: "bad", "in-progress": "muted" };
 

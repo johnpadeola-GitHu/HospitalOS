@@ -42,8 +42,8 @@ export async function listClaims({ status = "all" } = {}) {
   return apiCall(`/finance/claims?status=${status}`);
 }
 
-export async function createClaim({ patientName, hospitalNo, insurer, amount }) {
-  return apiCall("/finance/claims", { method: "POST", body: { patientName, hospitalNo, insurer, amount } });
+export async function createClaim({ patientId, insurer, amount }) {
+  return apiCall("/finance/claims", { method: "POST", body: { patientId, insurer, amount } });
 }
 
 export async function setClaimStatus(id, status) {

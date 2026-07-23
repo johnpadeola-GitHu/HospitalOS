@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import * as Icons from "lucide-react";
 import {
-  PLATFORM_FEE_RATE, STATUS_TONE, listSettlements, closeCurrentCycle, advanceSettlement,
+  STATUS_TONE, listSettlements, closeCurrentCycle, advanceSettlement,
   settlementSummary, payoutAccount, listUsage, usageSummary, revenueMix,
 } from "./settlementService";
 import { StatCard, Card, Pill, Button } from "../../lib/ui";
@@ -53,7 +53,12 @@ export default function Settlement() {
         <StatCard label="Fees earned" value={naira(sum.lifetimeFees)} tone="good" sub="settled to date" />
         <StatCard label="Fees pending" value={naira(sum.pendingFees)} tone="warn" sub={`${sum.pendingCount} cycle(s)`} />
         <StatCard label="Gross processed" value={naira(sum.lifetimeGross)} sub="hospital collections" />
-        <StatCard label="Platform fee" value={(PLATFORM_FEE_RATE * 100).toFixed(2) + "%"} tone="accent" sub="of gross collections" />
+        <StatCard
+          label="Blended fee rate"
+          value={sum.blendedEffectiveRate === null ? "\u2014" : sum.blendedEffectiveRate.toFixed(2) + "%"}
+          tone="accent"
+          sub="commission now varies per tenant"
+        />
       </div>
 
       <div style={row2}>

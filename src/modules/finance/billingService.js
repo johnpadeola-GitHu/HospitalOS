@@ -107,6 +107,46 @@ export async function recordPayment(patientId, amount, method = "Cash") {
   return apiCall("/billing/payments", { method: "POST", body: { patientId, amount: amt, method } });
 }
 
+// PHASE 4 (financial architecture review): cash sessions and refunds.
+// A Cash payment requires an open session server-side (routes/billing.js
+// enforces this) — these functions are what the UI uses to open, check,
+// and close one, and to issue a refund against an existing payment.
+
+export async function getMyCashSession() {
+  return apiCall("/finance/cash-sessions/mine");
+}
+
+export async function openCashSession(openingBalance, tillLabel = "Main till") {
+  const bal = parseFloat(openingBalance);
+  if (isNaN(bal) || bal < 0) throw new Error("Enter an opening balance of zero or more.");
+  return apiCall("/finance/cash-sessions", { method: "POST", body: { openingBalance: bal, tillLabel } });
+}
+
+export async function closeCashSession(sessionId, actualCash) {
+  const amt = parseFloat(actualCash);
+  if (isNaN(amt) || amt < 0) throw new Error("Enter the actual counted cash amount.");
+  return apiCall(`/finance/cash-sessions/${sessionId}/close`, { method: "PATCH", body: { actualCash: amt } });
+}
+
+export async function listCashSessions() {
+  return apiCall("/finance/cash-sessions");
+}
+
+export async function reviewCashSession(sessionId, note = "") {
+  return apiCall(`/finance/cash-sessions/${sessionId}/review`, { method: "PATCH", body: { note } });
+}
+
+export async function createRefund(paymentId, amount, reason) {
+  const amt = parseFloat(amount);
+  if (!amt || amt <= 0) throw new Error("Enter a refund amount greater than zero.");
+  if (!reason || !reason.trim()) throw new Error("A refund needs a reason on record.");
+  return apiCall("/finance/refunds", { method: "POST", body: { paymentId, amount: amt, reason: reason.trim() } });
+}
+
+export async function listRefundsForPayment(paymentId) {
+  return apiCall(`/finance/refunds/payment/${paymentId}`);
+}
+
 // Flat ledger of all payments across patients, most recent first.
 export async function listPayments() {
   return apiCall("/billing/payments");

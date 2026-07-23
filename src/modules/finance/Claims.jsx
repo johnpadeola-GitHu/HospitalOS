@@ -176,6 +176,7 @@ function NewClaimModal({ onClose, onDone }) {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async () => {
+    if (!form.patientId) { setErr("Select the patient this claim is for."); return; }
     setBusy(true);
     setErr("");
     try {

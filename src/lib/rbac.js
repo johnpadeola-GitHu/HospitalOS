@@ -46,6 +46,7 @@ export const ACTIONS = [
   { key: "finance:take-payment", label: "Take payments" },
   { key: "finance:claim", label: "Manage claims" },
   { key: "finance:approve-claim", label: "Approve claims" },
+  { key: "finance:refund", label: "Issue refunds" },
   { key: "system:manage-users", label: "Manage users" },
   { key: "system:configure", label: "Change settings" },
   { key: "system:view-audit", label: "View audit log" },
