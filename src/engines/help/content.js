@@ -26,7 +26,7 @@ export const ARTICLES = [
     title: "How HospitalOS is organised",
     lead: "The sidebar follows how work moves through a hospital, not the org chart.",
     body: [
-      { p: "HospitalOS is arranged by workflow. The twelve sidebar groups run roughly in the order work happens: Overview, Patient care, Diagnostics, Pharmacy, Finance & trade, Operations, Academic, Public health, Specialty services, Intelligence, Compliance, and Administration." },
+      { p: "HospitalOS is arranged by workflow. The thirteen sidebar groups run roughly in the order work happens: Overview, Patient care, Diagnostics, Pharmacy, Specialty services, Finance & trade, Operations, Academic, Public health, Intelligence, Compliance, Administration, and Academy." },
       { h: "Why groups, not departments" },
       { p: "A cardiologist and a geriatrician do the same thing from the software's point of view: run a clinic, see referrals, order tests. So all 21 specialties live inside one Specialist clinics module as filterable departments rather than 21 sidebar rows. The department is context, not a different screen." },
       { h: "You only see what your role grants" },
@@ -969,7 +969,7 @@ export const ARTICLES = [
     body: [
       { table: { head: ["Guide", "Audience", "Where to find it"], rows: [
         ["Tenant Guide", "Hospital staff \u2014 everyone", "Help & documentation landing page"],
-        ["HospitalOS Academy", "New staff \u2014 a structured, sequential curriculum with checks for understanding", "Help & documentation landing page"],
+        ["HospitalOS Academy Certification Blueprint", "New staff, and anyone evaluating the certification framework \u2014 five credentials across four tiers", "Help & documentation landing page"],
         ["Tenant Service Agreement", "Every hospital, signed once at activation", "Step 7 of the activation wizard, and Help & documentation"],
         ["Platform Admin Guide", "AgoroX staff only", "Platform view (support@agorox.africa account only)"],
         ["Production Readiness Plan", "AgoroX engineering", "Platform view, alongside the Platform Admin Guide"],

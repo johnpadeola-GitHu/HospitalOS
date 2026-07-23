@@ -20,15 +20,6 @@ export const NAV_GROUPS = [
     ],
   },
   {
-    id: "academy",
-    label: "Academy",
-    icon: "GraduationCap",
-    comingSoon: true,
-    items: [
-      { id: "academy-home", label: "HospitalOS Academy", path: "/academy" , icon: "GraduationCap" },
-    ],
-  },
-  {
     id: "patient-care",
     label: "Patient care",
     icon: "HeartPulse",
@@ -77,6 +68,20 @@ export const NAV_GROUPS = [
       { id: "dispensing", label: "Dispensing", path: "/pharmacy/dispensing" , icon: "Pill" },
       { id: "inventory", label: "Drug inventory", path: "/pharmacy/inventory" , icon: "Package" },
       { id: "formulary", label: "Formulary & NAFDAC", path: "/pharmacy/formulary" , icon: "BookMarked" },
+    ],
+  },
+  {
+    id: "specialty-services",
+    label: "Specialty services",
+    icon: "Layers",
+    items: [
+      { id: "nutrition", label: "Nutrition & dietetics", path: "/nutrition" , icon: "Apple" },
+      { id: "sickle-cell", label: "Sickle cell centre", path: "/sickle-cell" , icon: "Droplet" },
+      { id: "dental", label: "Dental & oral health", path: "/dental" , icon: "Smile" },
+      { id: "ipc", label: "Infection prevention & control", path: "/ipc" , icon: "ShieldAlert" },
+      { id: "social-work", label: "Medical social services", path: "/social-work" , icon: "HeartHandshake" },
+      { id: "occ-health", label: "Occupational health", path: "/occupational-health" , icon: "ShieldPlus" },
+      { id: "chaplaincy", label: "Chaplaincy & pastoral care", path: "/chaplaincy" , icon: "Church" },
     ],
   },
   {
@@ -130,20 +135,6 @@ export const NAV_GROUPS = [
     ],
   },
   {
-    id: "specialty-services",
-    label: "Specialty services",
-    icon: "Layers",
-    items: [
-      { id: "nutrition", label: "Nutrition & dietetics", path: "/nutrition" , icon: "Apple" },
-      { id: "sickle-cell", label: "Sickle cell centre", path: "/sickle-cell" , icon: "Droplet" },
-      { id: "dental", label: "Dental & oral health", path: "/dental" , icon: "Smile" },
-      { id: "ipc", label: "Infection prevention & control", path: "/ipc" , icon: "ShieldAlert" },
-      { id: "social-work", label: "Medical social services", path: "/social-work" , icon: "HeartHandshake" },
-      { id: "occ-health", label: "Occupational health", path: "/occupational-health" , icon: "ShieldPlus" },
-      { id: "chaplaincy", label: "Chaplaincy & pastoral care", path: "/chaplaincy" , icon: "Church" },
-    ],
-  },
-  {
     id: "intelligence",
     label: "Intelligence",
     icon: "Gauge",
@@ -178,6 +169,15 @@ export const NAV_GROUPS = [
       { id: "security", label: "Security & audit", path: "/system/security" , icon: "ShieldCheck" },
       { id: "data-import", label: "Data import", path: "/system/data-import" , icon: "UploadCloud" },
       { id: "settings", label: "Settings", path: "/system/settings" , icon: "Settings" },
+    ],
+  },
+  {
+    id: "academy",
+    label: "Academy",
+    icon: "GraduationCap",
+    comingSoon: true,
+    items: [
+      { id: "academy-home", label: "HospitalOS Academy", path: "/academy" , icon: "GraduationCap" },
     ],
   },
 ];
