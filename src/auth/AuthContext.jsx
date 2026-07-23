@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback } from "react";
 import { canAccessArea, canDo, roleLabel as rbacRoleLabel, areasFor } from "../lib/rbac";
 import { record, AUDIT_ACTIONS } from "../lib/audit";
 import { checkAndRecordDevice, deviceLabel } from "../lib/deviceFingerprint";
+import { rememberEmail } from "./rememberedEmail";
 
 // Auth context — email/password sign-in, session state, and (for the platform
 // admin) a Platform/Tenant view switch.
@@ -50,6 +51,7 @@ export function AuthProvider({ children }) {
       throw err;
     }
     localStorage.setItem(TOKEN_KEY, data.token);
+    rememberEmail(email);
     // Device fingerprinting stays a client-side, best-effort signal — see
     // deviceFingerprint.js's own honest-scope note — this is unrelated to
     // the server-verified session token and doesn't need a backend change.
@@ -66,6 +68,11 @@ export function AuthProvider({ children }) {
     // D1 session simply expires naturally after 12 hours. Real revocation
     // is a small, fast follow-up once needed.
     localStorage.removeItem(TOKEN_KEY);
+    // The remembered email (see rememberedEmail.js) is deliberately NOT
+    // cleared here — the whole point is that the same person (or the
+    // next person on a shared device) sees a pre-filled email on the
+    // sign-in screen afterward. It's cleared only by an explicit
+    // "not you?" action, never automatically on sign-out.
     setUser(null);
     setView("tenant");
   }, [user]);

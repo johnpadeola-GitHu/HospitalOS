@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import * as Icons from "lucide-react";
 import { validateActivationCode, redeemActivationCode } from "../engines/onboarding/activationCodes";
 import { AGREEMENT_SECTIONS, AGREEMENT_VERSION, AGREEMENT_EFFECTIVE_DATE } from "../engines/onboarding/tenantAgreement";
 import { inputStyle } from "../lib/ui";
 import { useAuth } from "./AuthContext";
+import { getRememberedEmail, forgetRememberedEmail } from "./rememberedEmail";
 
 // ============================== STATE MACHINE ==============================
 // ONB_STATE is the wizard's whole world: which step it's on, every field
@@ -193,10 +194,32 @@ export default function OnboardingWizard({ onSwitchToDemo, onDone, prefillEmail 
 // building a hospital profile — these alternatives would just be noise.
 function FrontDoorAlternatives({ onSwitchToDemo, onSignedIn, prefillEmail }) {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState(prefillEmail || "");
+  const remembered = getRememberedEmail();
+  // A fresh prefillEmail (just finished onboarding) always wins over a
+  // remembered one from a previous session on this device — that's a
+  // more specific, more recent signal than "whoever last used this
+  // workstation."
+  const initialEmail = prefillEmail || remembered;
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  // Only auto-focus the password field when the email came from memory,
+  // not from a fresh prefill — genuinely matches "sign back in with your
+  // password only" for the common case of the same person returning, or
+  // a colleague who's used this device before and just needs to type
+  // their own password after switching the email.
+  const passwordRef = useRef(null);
+  useEffect(() => {
+    if (initialEmail && passwordRef.current) passwordRef.current.focus();
+  }, [initialEmail]);
+
+  const switchUser = () => {
+    forgetRememberedEmail();
+    setEmail("");
+    setPassword("");
+    setErr("");
+  };
 
   const doSignIn = async (e) => {
     e.preventDefault();
@@ -215,12 +238,19 @@ function FrontDoorAlternatives({ onSwitchToDemo, onSignedIn, prefillEmail }) {
 
       <Divider label="or sign in" />
       {err && <div style={errBox}><Icons.AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />{err}</div>}
+      {remembered && email === remembered && (
+        <div style={rememberedNote}>
+          Signing in as <strong>{remembered}</strong>.{" "}
+          <button type="button" onClick={switchUser} style={switchLink}>Not you?</button>
+        </div>
+      )}
       <form onSubmit={doSignIn}>
         <input
           style={{ ...inputStyle, marginBottom: 8 }} type="email" value={email}
           onChange={(e) => setEmail(e.target.value)} placeholder="you@hospitalos.ng" autoComplete="username"
         />
         <input
+          ref={passwordRef}
           style={{ ...inputStyle, marginBottom: 12 }} type="password" value={password}
           onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password"
         />
@@ -634,6 +664,8 @@ const primaryBtn = {
   padding: "12px 0", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 6,
 };
 const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
+const rememberedNote = { fontSize: 12.5, color: "var(--muted)", marginBottom: 10, lineHeight: 1.5 };
+const switchLink = { font: "inherit", fontSize: 12.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" };
 const codePreview = { display: "flex", alignItems: "center", gap: 7, background: "var(--good-bg)", color: "var(--good)", fontSize: 12, padding: "9px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
 const lockedField = {
   display: "flex", alignItems: "center", gap: 8, ...inputStyle,

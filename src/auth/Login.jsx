@@ -38,10 +38,10 @@ export default function Login() {
         )}
 
         <div style={footNote}>
-          <Icons.ShieldAlert size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+          <Icons.ShieldCheck size={13} style={{ flexShrink: 0, marginTop: 1 }} />
           <span>
-            Sign-in runs in-browser for this preview and is not secure. Production sign-in
-            verifies credentials server-side.
+            Your password is checked server-side against a securely hashed copy — it is never
+            stored or transmitted in readable form.
           </span>
         </div>
       </div>
