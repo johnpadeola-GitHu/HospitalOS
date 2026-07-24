@@ -189,10 +189,15 @@ function Guarded({ route }) {
 }
 
 function Shell() {
-  const { signedIn } = useAuth();
+  const { signedIn, loading } = useAuth();
   useEffect(() => {
     if (signedIn) loadPriceCache();
   }, [signedIn]);
+  // Deliberately brief and unstyled beyond basic centering — this only
+  // shows for the moment it takes to check an existing token (see
+  // AuthContext's rehydration effect), not a real loading experience
+  // that needs its own design treatment.
+  if (loading) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--muted)", fontSize: 13 }}>Loading…</div>;
   if (!signedIn) return <Login />;
   return (
     <BrowserRouter>

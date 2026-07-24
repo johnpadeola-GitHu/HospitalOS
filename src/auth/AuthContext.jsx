@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { canAccessArea, canDo, roleLabel as rbacRoleLabel, areasFor } from "../lib/rbac";
 import { record, AUDIT_ACTIONS } from "../lib/audit";
 import { checkAndRecordDevice, deviceLabel } from "../lib/deviceFingerprint";
@@ -32,6 +32,49 @@ const PLATFORM_ADMIN_EMAIL = "support@agorox.africa";
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [view, setView] = useState("tenant"); // "tenant" | "platform"
+  // Starts true and stays true only for the brief moment it takes to
+  // check an existing token — see the rehydration effect below. Shell()
+  // in App.jsx waits for this before deciding between Login and the
+  // real app, so a valid existing session never flashes the sign-in
+  // screen first.
+  const [loading, setLoading] = useState(true);
+
+  // Session rehydration on mount — this was genuinely, completely
+  // missing before: a valid, unexpired token sitting in localStorage
+  // meant nothing to a freshly loaded page, since nothing ever read it
+  // back. Every page reload or new tab forced an interactive sign-in
+  // regardless of how recently someone had authenticated. Found by E2E
+  // testing specifically because it used a saved session against a
+  // fresh page load rather than always signing in interactively within
+  // the same session — exactly the class of defect a normal manual
+  // click-through wouldn't surface, since a developer testing by hand
+  // naturally stays in the same tab.
+  useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+        if (cancelled) return;
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          // Token is stale/expired/invalid — clear it rather than leave
+          // a dead token sitting in localStorage indefinitely.
+          localStorage.removeItem(TOKEN_KEY);
+        }
+      } catch {
+        // A network hiccup here shouldn't strand the user signed out —
+        // leave the token in place and simply let this session start
+        // unauthenticated for now; the next successful load will retry.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const signIn = useCallback(async (email, password) => {
     let res, data;
@@ -99,6 +142,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     signedIn: !!user,
+    loading,
     signIn,
     signOut,
     role: user?.role,
