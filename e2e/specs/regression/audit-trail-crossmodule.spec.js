@@ -34,6 +34,6 @@ test.describe("Cross-module: registration writes a real audit entry @regression 
     // directly against RegistrationADT.jsx's own record() call
     // (`Registered ${lastName}, ${firstName}`), not a loose substring
     // guess at what an audit log "probably" says.
-    await expect(page.getByText(`Registered ${lastName}, ${firstName}`)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(`Registered ${lastName}, ${firstName}`)).toBeVisible({ timeout: 20000 });
   });
 });

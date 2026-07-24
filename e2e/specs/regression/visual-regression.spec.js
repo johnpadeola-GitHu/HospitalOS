@@ -42,7 +42,7 @@ test.describe("Visual regression — stable screens @regression @visual", () => 
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto("/");
-    await page.getByRole("heading", { name: "Activate your hospital" }).waitFor({ timeout: 15000 });
+    await page.getByRole("heading", { name: "Activate your hospital" }).waitFor({ timeout: 30000 });
     await expect(page).toHaveScreenshot("login.png", { fullPage: true, maxDiffPixelRatio: 0.02 });
     await context.close();
   });

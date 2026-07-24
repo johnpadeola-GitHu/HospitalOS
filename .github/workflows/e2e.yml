@@ -52,7 +52,12 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        # Was only installing chromium — but the config runs smoke
+        # tests on Firefox, WebKit, and two mobile viewports too. This
+        # is the confirmed, verified cause of 6 real failures in the
+        # first full-suite run: those browser engines were never
+        # actually present on the CI runner at all.
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Show resolved run mode
         # Printed plainly so a run's log always states, in the actual
