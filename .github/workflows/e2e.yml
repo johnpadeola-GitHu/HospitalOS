@@ -30,7 +30,16 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 40 # increased from 20 — the suite grew from 92 to 346 tests with the per-role and cross-browser additions
+    timeout-minutes: 40
+    # Computed ONCE, in a single expression, rather than repeated as two
+    # separate (and, in an earlier version of this file, wrongly
+    # behaving) conditions on two different steps. A real run showed
+    # "Run smoke tests" executing for a push event, when it should have
+    # been "Run full suite" — this restructure removes the duplicated
+    # logic that made that possible to get subtly wrong, in favor of one
+    # value both steps reference identically.
+    env:
+      RUN_FULL_SUITE: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.full_suite == 'true') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -45,15 +54,21 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run smoke tests (schedule / default)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.full_suite != 'true')
+      - name: Show resolved run mode
+        # Printed plainly so a run's log always states, in the actual
+        # output, which path it took — no more inferring it indirectly
+        # from which step has a checkmark.
+        run: echo "RUN_FULL_SUITE resolved to -> ${{ env.RUN_FULL_SUITE }}"
+
+      - name: Run smoke tests only
+        if: env.RUN_FULL_SUITE != 'true'
         run: npm run e2e:setup && npm run e2e:smoke
         env:
           SUPERADMIN_EMAIL: ${{ secrets.SUPERADMIN_EMAIL }}
           SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
 
-      - name: Run full suite (push to main / manual override)
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.full_suite == 'true')
+      - name: Run full suite
+        if: env.RUN_FULL_SUITE == 'true'
         run: npm run e2e:setup && npm run e2e
         env:
           SUPERADMIN_EMAIL: ${{ secrets.SUPERADMIN_EMAIL }}
