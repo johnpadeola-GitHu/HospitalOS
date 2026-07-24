@@ -125,27 +125,52 @@ handle genuine data correctly.
 
 ## What's here now, and what's deliberately not
 
-Eleven tests across seven files — a smoke check that the app is alive
-and navigable, and regression coverage for the cash session lifecycle,
-RBAC boundaries, patient registration (including a required-field
-validation check), a cross-module audit trail check (registering a
-patient and confirming the exact resulting entry is independently
-findable in Security & audit, a completely different screen), and the
-pharmacy allergy hard-block — the highest safety-value test in the
-suite, spanning Records (recording the allergy) and Pharmacy
-(attempting the dispense). It was deliberately held back in an earlier
-round until both modules' selectors were checked directly against
-source; that verification turned up a genuinely important detail — the
-actual match is a case-insensitive substring check
-(`drugName.includes(substance)`), not an exact one, confirmed against
-the backend route before the test was written to rely on it. It also
-caught a real path error before it shipped: an early draft used
-`/system/records`, the real path is `/records`.
+92 tests across seven files. Two genuinely different kinds of
+coverage, worth telling apart:
 
-This is a deliberate, sanctioned choice, not a shortfall: establish
-real infrastructure first, expand coverage progressively as it's
-actually run and proven against the live app, rather than write a
-large volume of untested test code in one pass.
+**Deep coverage** (a handful of tests, thoroughly verified): the cash
+session lifecycle, RBAC boundaries, patient registration, a
+cross-module audit trail check, and the pharmacy allergy hard-block —
+each one walks a real multi-step workflow and checks the actual
+guarantee, not just that a page renders.
+
+**Broad coverage** (`all-routes-smoke.spec.js`, 82 tests): one test
+per route extracted directly from `navGroups.js`, each confirming the
+route loads to a real, non-empty heading rather than a blank page or a
+crash. This was originally written quickly, at explicit direction to
+prioritize speed — and on review, two real gaps from that speed were
+found and fixed, not just asserted fixed:
+
+1. The core assumption ("every routed page renders a real heading")
+had only been spot-checked on a handful of modules, then generalized
+to all 82. Went back and checked all 88 module component files
+systematically: 10 don't literally use the shared `PageHeader`
+component, but every single one was individually traced — some
+(CT/MRI/Ultrasound) render it indirectly through a shared wrapper, one
+(`Reports.jsx`) uses its own local `<h1>`, and the rest (Settlement,
+ActivationCodes, the print views, the patient picker) turned out not
+to be standalone routes at all, confirmed against both `navGroups.js`
+and `App.jsx`'s route table.
+
+2. The human-readable labels used as test names had been written from
+memory rather than the verified list — a systematic diff against the
+real `navGroups.js` content found 55 of 82 wrong (shortened or
+paraphrased). Regenerated the entire array programmatically from
+source instead of hand-fixing each one, then re-diffed to confirm zero
+remaining mismatches. The one "mismatch" left is a genuine duplicate:
+`/instruments` is registered twice in `navGroups.js` under two
+different nav groups with two different real labels — not a wrong
+label, an actual property of the app's navigation.
+
+These wrong labels never affected whether any test passed or failed —
+the assertion only checks for non-empty heading text — but they'd have
+made failure reports harder to read correctly, and the exercise is
+what surfaced the duplicate-route finding above.
+
+This is a deliberate, sanctioned choice: establish real infrastructure
+first, expand coverage progressively, and — per direct instruction —
+prioritize speed once the foundation was solid, then go back and
+verify the assumptions underneath what speed produced.
 
 **The clear next priority, and why it's not here yet**: the
 allergy/stock pharmacy hard-block tests are the highest safety value
