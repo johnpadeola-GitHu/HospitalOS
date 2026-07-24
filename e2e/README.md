@@ -172,15 +172,94 @@ first, expand coverage progressively, and — per direct instruction —
 prioritize speed once the foundation was solid, then go back and
 verify the assumptions underneath what speed produced.
 
-**The clear next priority, and why it's not here yet**: the
-allergy/stock pharmacy hard-block tests are the highest safety value
-still missing, but testing them properly requires first recording a
-patient allergy through Records/clinical notes — a second module whose
-selectors haven't been verified with the same rigor as everything
-above yet. Rather than write that test against guessed selectors, it's
-being left as the explicit next step once those are checked directly,
-the same way `/patients/adt` and `/lab` were checked directly after an
-earlier draft guessed them wrong.
+## Closing the gaps: what got added, and what's still genuinely open
+
+After a green run, a direct question was asked: does this mean
+everything is tested? The honest answer was no, with five specific
+gaps named — only one role tested broadly, "loads" not verified as
+"works correctly," no visual/UI testing, only one browser, and most
+business logic untested. Real progress was made on several of these;
+none are fully closed, and it's worth being precise about which is
+which.
+
+**Cross-browser and mobile — genuinely closed for the smoke tests.**
+`playwright.config.js` now runs the smoke suite (sign-in, dashboard,
+search palette) on Chromium, Firefox, WebKit, and two mobile viewports
+(Pixel 5, iPhone 13) — 349 tests total now, up from 92. The full
+regression suite deliberately stays Chromium-only: running all of it
+on every engine would roughly quadruple CI time for tests that mostly
+check server-side behavior (RBAC, balance validation), which doesn't
+vary by browser at all. One honest nuance: the smoke test's Ctrl+K
+check still technically fires under mobile emulation even though a
+real phone has no physical keyboard — Playwright can dispatch the
+keyboard event regardless, so it's not a fully realistic mobile
+interaction, just a mechanically-passing one.
+
+**Per-role coverage — built and verified, not yet running.**
+`per-role-route-coverage.spec.js` checks all 82 routes against each of
+Cashier, Nurse, and Pharmacist's real `areas` list from `rbac.js` —
+routes inside the role's allowed areas should load real content,
+routes outside should show the access-denied screen. The route-to-group
+mapping was extracted programmatically from `navGroups.js`, the same
+way as the broad Super Admin test, specifically to avoid repeating the
+55-wrong-labels mistake. This adds 246 tests — but every one of them
+skips with an explicit message until those three roles' test accounts
+actually exist and their credentials are set in `.env` / GitHub
+Secrets. Built correctly; still needs those accounts to actually run.
+
+**Visual regression — infrastructure built, baselines not yet
+generated.** `visual-regression.spec.js` screenshots the Dashboard,
+the login/activation screen, and the sidebar. This is different from
+everything else in this suite: it could not be pre-verified the way
+the others were, because there's no way to generate or inspect a
+screenshot without a live browser against the live site, which this
+sandbox doesn't have. The first real run will fail for every one of
+these three tests with "no baseline found" — that's expected, not a
+bug. Run locally once with `npx playwright test --update-snapshots`,
+look at the generated images yourself to confirm they're actually
+correct, then commit them. After that, a failure means a real visual
+change happened.
+
+**Deep functional and business-logic testing — advanced, honestly not
+finished.** `balance-validation.spec.js` closes the gap flagged
+earlier: the first attempt (register a fresh patient, try to overpay
+their zero balance) turned out to be unworkable — traced directly
+through `billingService.js` and confirmed `listAccounts()` only
+includes patients with at least one existing charge, and
+`getAccount()`/`recordPayment()` both fail earlier with "No account
+for this patient" before ever reaching a balance check. The working
+version instead finds whichever real account in the live Billing table
+already has a positive balance, reads that balance directly from the
+page, and confirms a payment above it is rejected with the exact
+message from `billingService.js` — server-side re-validated too, not
+just a client-side restriction.
+
+What's still genuinely open: cash sessions, the allergy block,
+registration, the audit trail, and now balance validation are real,
+deep coverage — but stock deduction correctness, most clinical
+workflows beyond what's listed, and claim/co-payment calculations
+still have no assertions checking their outcomes are right, only that
+their pages exist via the broad route checks. That's the honest
+remaining scope, not something to treat as closed.
+
+## Everything re-verified before calling this done
+
+Before treating any of this as trustworthy, three checks were run
+across the *whole* suite, not just the newest file:
+
+- Every hardcoded route across every spec file (including the
+  earliest ones — cash session, allergy block, registration, audit
+  trail) was re-checked against the current `navGroups.js`
+  programmatically. Zero drift found.
+- The exact button/label text those same earlier tests depend on was
+  re-confirmed present in current source — none of it had silently
+  changed since those tests were originally written, across several
+  rounds of real app changes since.
+- `npm ci` was run against a clean copy of the current
+  `package.json`/`package-lock.json` pair — the exact class of check
+  that would have caught the Cloudflare Pages build failure earlier in
+  this project, run proactively this time rather than after something
+  broke.
 
 ## The `e2e/.auth/` folder
 

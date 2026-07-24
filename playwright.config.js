@@ -40,6 +40,40 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
       dependencies: ["setup"],
+      // The full suite (all 92 tests) runs here — the primary target.
+    },
+    // Cross-browser and mobile-viewport coverage, deliberately scoped
+    // to @smoke only rather than the full suite. Running all 92 tests
+    // on every engine would multiply CI time roughly fourfold for
+    // marginal additional signal on tests that are mostly checking
+    // server-side behavior (RBAC, balance validation) which doesn't
+    // vary by browser engine at all. The smoke tests specifically
+    // exercise real rendering and interaction (the sidebar, the search
+    // palette's keyboard shortcut) — the things that genuinely can
+    // differ across engines and viewport sizes.
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+      dependencies: ["setup"],
+      grep: /@smoke/,
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+      dependencies: ["setup"],
+      grep: /@smoke/,
+    },
+    {
+      name: "mobile-chrome",
+      use: { ...devices["Pixel 5"] },
+      dependencies: ["setup"],
+      grep: /@smoke/,
+    },
+    {
+      name: "mobile-safari",
+      use: { ...devices["iPhone 13"] },
+      dependencies: ["setup"],
+      grep: /@smoke/,
     },
   ],
 });

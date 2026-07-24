@@ -30,7 +30,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40 # increased from 20 — the suite grew from 92 to 346 tests with the per-role and cross-browser additions
     steps:
       - uses: actions/checkout@v4
 
