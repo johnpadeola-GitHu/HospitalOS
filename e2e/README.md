@@ -62,31 +62,44 @@ npm install                       # installs @playwright/test, already in packag
 npx playwright install chromium   # downloads the actual browser binary — only needs doing once
 ```
 
-## Test accounts — required before most of this runs
+## Test accounts and credentials — required before most of this runs
+
+Credentials are never hardcoded in the test files — they come from
+environment variables (a local `.env` file, or GitHub Secrets in CI).
+This wasn't always true; an earlier version of this suite had the demo
+account's password sitting in plain text in a committed file, which
+was corrected once flagged.
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and fill in real values. `.env` itself is gitignored
+and must never be committed — only `.env.example` (the template, no
+real credentials) is tracked.
 
 Only one real, confirmed account is used right now: the permanent demo
 Super Admin (`demo@agorox.africa`), already isolated on its own tenant.
-That's enough to run the smoke suite and `cash-session.spec.js`, since
-Super Admin can reach every area including Finance.
+Filling in just `SUPERADMIN_PASSWORD` is enough to run the smoke suite
+and `cash-session.spec.js`, since Super Admin can reach every area
+including Finance.
 
 `rbac-boundaries.spec.js` needs dedicated per-role test accounts —
 **do not use real hospital staff credentials for automated testing.**
 Create these on the demo tenant, signed in as the demo Super Admin,
-under Administration → Users & roles:
+under Administration → Users & roles, then fill in their email/password
+pairs in `.env`:
 
-| Role | Suggested email |
+| Role | .env variables |
 |---|---|
-| Cashier | `cashier-test@example.com` |
-| Nurse | `nurse-test@example.com` |
-| Pharmacist | `pharmacist-test@example.com` |
+| Cashier | `CASHIER_EMAIL`, `CASHIER_PASSWORD` |
+| Nurse | `NURSE_EMAIL`, `NURSE_PASSWORD` |
+| Pharmacist | `PHARMACIST_EMAIL`, `PHARMACIST_PASSWORD` |
 
-Set a real password for each, then add them to the `ROLES` object at the
-top of `e2e/auth.setup.js` (commented-out lines are already there,
-ready to uncomment and fill in).
-
-If an account doesn't exist yet, its RBAC test **skips with an explicit
-message** telling you exactly what to create — it won't fail silently
-or confusingly.
+A role is silently skipped in `auth.setup.js` if its email/password
+aren't both set — no error, it just won't have a saved session, and
+its dependent tests will skip with an explicit message telling you
+exactly what to create rather than failing confusingly.
 
 ## Running
 
@@ -112,15 +125,22 @@ handle genuine data correctly.
 
 ## What's here now, and what's deliberately not
 
-Ten tests across six files — a smoke check that the app is alive and
-navigable, and regression coverage for the cash session lifecycle, RBAC
-boundaries, patient registration (including a required-field validation
-check), and one deliberately cross-module test: registering a patient
-and then confirming the exact resulting entry is independently
-findable in Security & audit, a completely different screen. That last
-one matters more than it might look — it's testing the actual
-guarantee (every consequential action leaves a real, searchable
-record), not just that two pages individually load.
+Eleven tests across seven files — a smoke check that the app is alive
+and navigable, and regression coverage for the cash session lifecycle,
+RBAC boundaries, patient registration (including a required-field
+validation check), a cross-module audit trail check (registering a
+patient and confirming the exact resulting entry is independently
+findable in Security & audit, a completely different screen), and the
+pharmacy allergy hard-block — the highest safety-value test in the
+suite, spanning Records (recording the allergy) and Pharmacy
+(attempting the dispense). It was deliberately held back in an earlier
+round until both modules' selectors were checked directly against
+source; that verification turned up a genuinely important detail — the
+actual match is a case-insensitive substring check
+(`drugName.includes(substance)`), not an exact one, confirmed against
+the backend route before the test was written to rely on it. It also
+caught a real path error before it shipped: an early draft used
+`/system/records`, the real path is `/records`.
 
 This is a deliberate, sanctioned choice, not a shortfall: establish
 real infrastructure first, expand coverage progressively as it's

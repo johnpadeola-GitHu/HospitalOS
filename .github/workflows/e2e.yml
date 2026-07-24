@@ -1,0 +1,89 @@
+name: HospitalOS E2E tests
+
+# Two different triggers, deliberately given different scope:
+#
+# - Push to main: the full suite (smoke + regression). This is tied to
+#   an actual code change, so it's a genuinely bounded, occasional
+#   event — a reasonable time to accept that regression tests create
+#   real data (test patients, etc.) in the demo tenant.
+#
+# - Daily schedule: smoke only. A schedule runs forever, indefinitely —
+#   running the full regression suite on every one of those runs would
+#   accumulate test patients in the demo tenant without bound. Smoke
+#   tests don't create data at all (they only sign in and check the
+#   app is alive), so they're the safe thing to run unattended and
+#   repeatedly.
+#
+# Both can also be triggered manually from the Actions tab.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *" # 06:00 UTC daily
+  workflow_dispatch:
+    inputs:
+      full_suite:
+        description: "Run the full suite (smoke + regression) instead of smoke only"
+        type: boolean
+        default: false
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests (schedule / default)
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.full_suite != 'true')
+        run: npm run e2e:setup && npm run e2e:smoke
+        env:
+          SUPERADMIN_EMAIL: ${{ secrets.SUPERADMIN_EMAIL }}
+          SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
+
+      - name: Run full suite (push to main / manual override)
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.full_suite == 'true')
+        run: npm run e2e:setup && npm run e2e
+        env:
+          SUPERADMIN_EMAIL: ${{ secrets.SUPERADMIN_EMAIL }}
+          SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
+          CASHIER_EMAIL: ${{ secrets.CASHIER_EMAIL }}
+          CASHIER_PASSWORD: ${{ secrets.CASHIER_PASSWORD }}
+          NURSE_EMAIL: ${{ secrets.NURSE_EMAIL }}
+          NURSE_PASSWORD: ${{ secrets.NURSE_PASSWORD }}
+          PHARMACIST_EMAIL: ${{ secrets.PHARMACIST_EMAIL }}
+          PHARMACIST_PASSWORD: ${{ secrets.PHARMACIST_PASSWORD }}
+
+      - name: Generate QA Command Center dashboard
+        if: always()
+        run: npm run qa-center
+
+      # Uploaded regardless of pass/fail — a failed run's report is the
+      # whole point of having it; only a successful run's report would
+      # defeat the purpose of "what failed, where, why, evidence."
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload QA Command Center dashboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-command-center-dashboard
+          path: qa-command-center/dashboard.html
+          retention-days: 14

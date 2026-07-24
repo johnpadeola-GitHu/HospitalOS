@@ -11,21 +11,25 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // test suite that only ever signs in once, as one role, would miss
 // almost everything RBAC actually does.
 //
-// CAUTION, read before running this: these accounts must already
-// exist and have real passwords set before this setup will work. This
-// file does not create them — see e2e/README.md for exactly which
-// accounts are expected and how to create them safely, without using
-// real hospital staff credentials for automated testing.
+// Credentials come from environment variables (.env locally, GitHub
+// Secrets in CI) — never hardcoded here. See .env.example for the
+// expected variable names, and e2e/README.md for how to create the
+// role-specific test accounts safely, without using real hospital
+// staff credentials for automated testing. A role is silently skipped
+// if its email/password aren't set, rather than failing the whole
+// setup run over an account nobody's configured yet.
 const ROLES = {
-  superadmin: { email: "demo@agorox.africa", password: "demo-hospital" },
-  // Add real per-role test accounts here once created — see README.
-  // cashier: { email: "cashier-test@example.com", password: "REPLACE_ME" },
-  // nurse: { email: "nurse-test@example.com", password: "REPLACE_ME" },
+  superadmin: { email: process.env.SUPERADMIN_EMAIL, password: process.env.SUPERADMIN_PASSWORD },
+  cashier: { email: process.env.CASHIER_EMAIL, password: process.env.CASHIER_PASSWORD },
+  nurse: { email: process.env.NURSE_EMAIL, password: process.env.NURSE_PASSWORD },
+  pharmacist: { email: process.env.PHARMACIST_EMAIL, password: process.env.PHARMACIST_PASSWORD },
 };
 
 for (const [role, creds] of Object.entries(ROLES)) {
+  if (!creds.email || !creds.password) continue;
+
   setup(`authenticate as ${role}`, async ({ page }) => {
-    await page.goto("/?_cb=" + Date.now());
+    await page.goto("/");
 
     // Deliberately scoped to the ACTUAL sign-in placeholder text, not a
     // generic input[type=email] selector — the same page also renders

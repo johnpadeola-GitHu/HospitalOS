@@ -12,8 +12,8 @@ dist
 dist-ssr
 *.local
 
-# Playwright — .auth holds real, live session tokens (never commit
-# these); the other three are regenerated on every test run.
+# E2E test credentials — real values only, never the .env.example template
+.env
 e2e/.auth
 playwright-report
 test-results
