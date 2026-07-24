@@ -25,7 +25,7 @@ const ROLES = {
 
 for (const [role, creds] of Object.entries(ROLES)) {
   setup(`authenticate as ${role}`, async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?_cb=" + Date.now());
 
     // Deliberately scoped to the ACTUAL sign-in placeholder text, not a
     // generic input[type=email] selector — the same page also renders

@@ -11,7 +11,7 @@ test.use({ storageState: path.join(__dirname, "../../.auth/superadmin.json") });
 // in seconds and catch a genuinely broken build, not subtle logic bugs.
 test.describe("Application is alive @smoke", () => {
   test("dashboard loads after sign-in with the sidebar fully rendered", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?_cb=" + Date.now());
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({ timeout: 15000 });
 
     // Super Admin's account has all 13 areas — confirmed directly
@@ -23,7 +23,7 @@ test.describe("Application is alive @smoke", () => {
   });
 
   test("search palette opens and closes", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?_cb=" + Date.now());
     await page.getByRole("heading", { name: "Dashboard" }).waitFor({ timeout: 15000 });
 
     await page.keyboard.press("Control+k");
