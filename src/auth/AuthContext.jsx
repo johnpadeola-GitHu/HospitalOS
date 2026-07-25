@@ -105,11 +105,22 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = useCallback(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
     if (user) record({ actor: user, action: AUDIT_ACTIONS.SIGN_OUT, entity: "session", entityId: user.email, detail: "Signed out" });
-    // NOTE: this clears the local token but does not yet revoke the session
-    // row server-side (no POST /auth/signout route exists in Phase 1) — the
-    // D1 session simply expires naturally after 12 hours. Real revocation
-    // is a small, fast follow-up once needed.
+
+    // Revoke the session row server-side so the token is dead immediately,
+    // not just when it expires 12h later. Fire-and-forget: we clear local
+    // state below regardless, so a failed or blocked request can never
+    // strand the user in a half-signed-in UI. keepalive lets the request
+    // finish even if the tab is closing.
+    if (token) {
+      fetch(`${API_URL}/auth/signout`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        keepalive: true,
+      }).catch(() => { /* best-effort; the session also expires within 12h */ });
+    }
+
     localStorage.removeItem(TOKEN_KEY);
     // The remembered email (see rememberedEmail.js) is deliberately NOT
     // cleared here — the whole point is that the same person (or the
