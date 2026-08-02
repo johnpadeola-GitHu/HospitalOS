@@ -12,6 +12,11 @@ const BASE_URL = process.env.HOSPITALOS_BASE_URL || "https://hospitalos.agorox.a
 
 export default defineConfig({
   testDir: "./e2e/specs",
+  // Cleans up any E2E-created patients after the full suite finishes,
+  // pass or fail — necessary because the suite runs against the real, live
+  // deployment above rather than an isolated test tenant. See
+  // global-teardown.js for exactly what it does and why.
+  globalTeardown: "./e2e/global-teardown.js",
   fullyParallel: true,
   // Deliberately conservative retries — a flaky-looking failure against
   // a real backend is more often a genuine timing issue worth seeing
