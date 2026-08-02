@@ -66,6 +66,7 @@ export const NAV_GROUPS = [
     icon: "Pill",
     items: [
       { id: "dispensing", label: "Dispensing", path: "/pharmacy/dispensing" , icon: "Pill" },
+      { id: "prescriptions", label: "Prescriptions", path: "/pharmacy/prescriptions" , icon: "ClipboardList" },
       { id: "inventory", label: "Drug inventory", path: "/pharmacy/inventory" , icon: "Package" },
       { id: "formulary", label: "Formulary & NAFDAC", path: "/pharmacy/formulary" , icon: "BookMarked" },
     ],

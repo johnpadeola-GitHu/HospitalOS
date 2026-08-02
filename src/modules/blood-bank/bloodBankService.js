@@ -57,8 +57,8 @@ export async function listInventory() {
   return apiCall("/blood-bank/inventory");
 }
 
-export async function addUnit({ group, expiryDaysAhead = 35 }) {
-  return apiCall("/blood-bank/units", { method: "POST", body: { group, expiryDaysAhead } });
+export async function addUnit({ group, expiryDaysAhead = 35, quantity = 1 }) {
+  return apiCall("/blood-bank/units", { method: "POST", body: { group, expiryDaysAhead, quantity } });
 }
 
 export async function listRequests({ includeCompleted = false } = {}) {

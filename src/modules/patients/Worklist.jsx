@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 import { listOrders } from "../lab/labService";
 import { listStudies } from "../radiology/radiologyService";
+import { listRequests as listBloodRequests } from "../blood-bank/bloodBankService";
 import { PageHeader } from "../../lib/ui";
 
-// Worklist — outstanding diagnostic tasks across lab + radiology, the
-// cross-cutting "what needs doing" view.
+// Worklist — outstanding diagnostic and clinical tasks across the hospital,
+// the cross-cutting "what needs doing" view. Covers laboratory (all
+// disciplines, including histopathology/cytology, which flow through lab
+// orders), radiology, and blood-bank transfusion requests awaiting action.
 export default function Worklist() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let a = true;
-    Promise.all([listOrders({ status: "all" }), listStudies({})])
-      .then(([orders, studies]) => {
+    Promise.all([
+      listOrders({ status: "all" }),
+      listStudies({}),
+      listBloodRequests({ includeCompleted: false }).catch(() => []),
+    ])
+      .then(([orders, studies, bloodRequests]) => {
         if (!a) return;
         const labTasks = orders.filter((o) => o.status !== "verified").map((o) => ({
           id: "lab-" + o.id, area: "Laboratory", ref: o.accession, patient: o.patientName, task: o.testName, state: o.status,
@@ -20,7 +27,14 @@ export default function Worklist() {
         const radTasks = studies.filter((s) => s.status !== "reported").map((s) => ({
           id: "rad-" + s.id, area: "Radiology", ref: s.accession, patient: s.patientName, task: s.name, state: s.status,
         }));
-        setItems([...labTasks, ...radTasks]);
+        // Transfusion requests that aren't yet transfused are outstanding
+        // tasks — crossmatch, issue, or complete. listRequests already
+        // excludes completed ('transfused') requests.
+        const bloodTasks = (bloodRequests || []).map((r) => ({
+          id: "blood-" + r.id, area: "Blood Bank", ref: r.ref, patient: r.patientName,
+          task: `Transfusion — ${r.recipientGroup}`, state: r.status,
+        }));
+        setItems([...labTasks, ...radTasks, ...bloodTasks]);
       })
       .catch((e) => console.error(e))
       .finally(() => { if (a) setLoading(false); });

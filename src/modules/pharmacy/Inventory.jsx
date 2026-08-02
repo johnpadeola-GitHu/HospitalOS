@@ -138,6 +138,8 @@ export default function Inventory() {
 
 function RestockModal({ drug, onClose, onDone }) {
   const [qty, setQty] = useState("");
+  const [batchNo, setBatchNo] = useState("");
+  const [expiry, setExpiry] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -153,7 +155,7 @@ function RestockModal({ drug, onClose, onDone }) {
     setBusy(true);
     setErr("");
     try {
-      await restock(drug.id, n);
+      await restock(drug.id, { quantity: n, batchNo: batchNo.trim() || undefined, expiry: expiry || undefined });
       await onDone();
     } catch (e) {
       setErr(e.message);
@@ -184,6 +186,22 @@ function RestockModal({ drug, onClose, onDone }) {
       <Field label="Quantity received">
         <input type="number" min="1" style={inputStyle} value={qty} onChange={(e) => setQty(e.target.value)} autoFocus />
       </Field>
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <Field label="Batch number (optional)">
+            <input style={inputStyle} value={batchNo} onChange={(e) => setBatchNo(e.target.value)} placeholder="Auto-generated if blank" />
+          </Field>
+        </div>
+        <div style={{ flex: 1 }}>
+          <Field label="Expiry date (optional)">
+            <input type="date" style={inputStyle} value={expiry} onChange={(e) => setExpiry(e.target.value)} />
+          </Field>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>
+        Stock is dispensed first-expiry-first, so recording expiry keeps the soonest-expiring units moving first.
+      </div>
 
       {n > 0 && (
         <div style={{ fontSize: 13, marginTop: 4 }}>

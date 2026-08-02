@@ -33,8 +33,11 @@ export default function Instruments() {
   const [showDetect, setShowDetect] = useState(false);
   const [err, setErr] = useState("");
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async ({ silent = false } = {}) => {
+    // Only show the full-screen loading state on the FIRST load. Refreshes
+    // triggered by an action (status change, device registration) run
+    // silently so the screen doesn't flash "Loading…" on every small change.
+    if (!silent) setLoading(true);
     try {
       const [d, m, s] = await Promise.all([
         listInstruments({ category: cat }),
@@ -54,9 +57,14 @@ export default function Instruments() {
   const cycleStatus = async (d) => {
     setErr("");
     const order = ["online", "idle", "offline", "error"];
+    const nextStatus = order[(order.indexOf(d.status) + 1) % order.length];
+    // Optimistic update: reflect the new status immediately in the list, then
+    // reconcile with the server silently. The user sees an instant response
+    // instead of a full-screen reload for a one-field change.
+    setDevices((prev) => prev.map((x) => (x.id === d.id ? { ...x, status: nextStatus } : x)));
     try {
-      await setInstrumentStatus(d.id, order[(order.indexOf(d.status) + 1) % order.length]);
-      await refresh();
+      await setInstrumentStatus(d.id, nextStatus);
+      await refresh({ silent: true });
     } catch (e) {
       setErr(e.message);
     }
@@ -167,12 +175,12 @@ export default function Instruments() {
           device={actionFor.device}
           kind={actionFor.kind}
           onClose={() => setActionFor(null)}
-          onDone={async () => { setActionFor(null); await refresh(); }}
+          onDone={async () => { setActionFor(null); await refresh({ silent: true }); }}
         />
       )}
 
       {showDetect && (
-        <DetectDeviceModal actor={user} onClose={() => setShowDetect(false)} onDone={async () => { setShowDetect(false); await refresh(); }} />
+        <DetectDeviceModal actor={user} onClose={() => setShowDetect(false)} onDone={async () => { setShowDetect(false); await refresh({ silent: true }); }} />
       )}
     </div>
   );

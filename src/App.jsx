@@ -14,6 +14,7 @@ import Laboratory from "./modules/lab/Laboratory";
 import Alerts from "./modules/alerts/Alerts";
 import Dashboard from "./modules/dashboard/Dashboard";
 import Dispensing from "./modules/pharmacy/Dispensing";
+import Prescriptions from "./modules/pharmacy/Prescriptions";
 import Inventory from "./modules/pharmacy/Inventory";
 import Billing from "./modules/finance/Billing";
 import Radiology from "./modules/radiology/Radiology";
@@ -169,6 +170,7 @@ const MODULES = {
   "/radiology": Radiology,
   "/alerts": Alerts,
   "/pharmacy/dispensing": Dispensing,
+  "/pharmacy/prescriptions": Prescriptions,
   "/pharmacy/inventory": Inventory,
   "/finance/billing": Billing,
   "/finance/payments": Payments,

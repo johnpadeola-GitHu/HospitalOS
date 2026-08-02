@@ -70,9 +70,21 @@ export async function listDispenses({ limit = 20 } = {}) {
   return apiCall(`/pharmacy/dispenses?limit=${limit}`);
 }
 
-// Restock — used by inventory later; kept here so stock has one owner.
-export async function restock(drugId, quantity) {
-  return apiCall(`/pharmacy/drugs/${encodeURIComponent(drugId)}/restock`, { method: "PATCH", body: { quantity } });
+// Restock — now creates a BATCH with an optional batch number and expiry date.
+export async function restock(drugId, { quantity, batchNo, expiry } = {}) {
+  return apiCall(`/pharmacy/drugs/${encodeURIComponent(drugId)}/restock`, {
+    method: "PATCH", body: { quantity, batchNo, expiry },
+  });
+}
+
+// Batches held for a drug, FEFO order, with days-to-expiry.
+export async function listBatches(drugId) {
+  return apiCall(`/pharmacy/drugs/${encodeURIComponent(drugId)}/batches`);
+}
+
+// Expiry alerts: batches expired or expiring within `withinDays` (default 90).
+export async function listExpiryAlerts({ withinDays = 90 } = {}) {
+  return apiCall(`/pharmacy/expiry-alerts?withinDays=${withinDays}`);
 }
 
 // Feed for the Alerts screen: drugs at or below reorder level.
@@ -93,4 +105,23 @@ export async function listBillableDispenses() {
     amount: r.total,
     at: r.at,
   }));
+}
+
+// --- Prescription queue (doctor prescribes -> pharmacy fulfils) ---
+export async function listPrescriptions(status = "pending") {
+  return apiCall(`/pharmacy/prescriptions?status=${encodeURIComponent(status)}`);
+}
+export async function createPrescription({ patientId, drugId, quantity, dosage, notes }) {
+  return apiCall("/pharmacy/prescriptions", { method: "POST", body: { patientId, drugId, quantity, dosage, notes } });
+}
+export async function fulfillPrescription(id) {
+  return apiCall(`/pharmacy/prescriptions/${encodeURIComponent(id)}/fulfill`, { method: "POST" });
+}
+export async function cancelPrescription(id, reason) {
+  return apiCall(`/pharmacy/prescriptions/${encodeURIComponent(id)}/cancel`, { method: "POST", body: { reason } });
+}
+
+// Check a candidate drug against the patient's current medications.
+export async function checkInteractions(patientId, drugId) {
+  return apiCall(`/pharmacy/check-interactions/${encodeURIComponent(patientId)}?drugId=${encodeURIComponent(drugId)}`);
 }

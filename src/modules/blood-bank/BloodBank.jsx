@@ -105,14 +105,20 @@ function InventoryTab() {
 function AddUnitModal({ onClose, onDone }) {
   const [group, setGroup] = useState("O+");
   const [days, setDays] = useState("35");
+  const [qty, setQty] = useState("1");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
   const submit = async () => {
+    const n = parseInt(qty, 10);
+    if (!Number.isFinite(n) || n < 1 || n > 100) {
+      setErr("Enter a quantity between 1 and 100.");
+      return;
+    }
     setBusy(true);
     setErr("");
     try {
-      await addUnit({ group, expiryDaysAhead: parseInt(days, 10) || 35 });
+      await addUnit({ group, expiryDaysAhead: parseInt(days, 10) || 35, quantity: n });
       await onDone();
     } catch (e) {
       setErr(e.message);
@@ -130,7 +136,7 @@ function AddUnitModal({ onClose, onDone }) {
             Cancel
           </Button>
           <Button variant="primary" onClick={submit} disabled={busy}>
-            {busy ? "Adding…" : "Add unit"}
+            {busy ? "Adding…" : `Add ${(parseInt(qty,10) || 1) > 1 ? (parseInt(qty,10)+" units") : "unit"}`}
           </Button>
         </>
       }
@@ -151,6 +157,11 @@ function AddUnitModal({ onClose, onDone }) {
         <div style={{ width: 150 }}>
           <Field label="Expires in (days)">
             <input type="number" min="1" style={inputStyle} value={days} onChange={(e) => setDays(e.target.value)} />
+          </Field>
+        </div>
+        <div style={{ width: 110 }}>
+          <Field label="Quantity">
+            <input type="number" min="1" max="100" style={inputStyle} value={qty} onChange={(e) => setQty(e.target.value)} />
           </Field>
         </div>
       </div>
