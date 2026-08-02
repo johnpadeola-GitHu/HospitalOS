@@ -2,10 +2,10 @@
   <!-- The HospitalOS mark: matches AppLayout.jsx's actual footer logo
        exactly — a red rounded square (27.8% corner radius, matching the
        footer's 18px box / 5px radius proportions) with Lucide's "Cross"
-       icon in white (72.2% of the box, strokeWidth 3), not a separately
-       drawn plus sign. This file previously used solid overlapping
-       rectangles, which did not actually match the footer's rendered
-       icon despite an earlier comment here claiming they were identical. -->
+       icon in white (72.2% of the box, strokeWidth 3). Transparent
+       outside the rounded rect by design — the PNG fallbacks below are
+       rendered with alpha preserved, so no white matte shows in the
+       corners in any context (browser tab, OS taskbar, bookmarks). -->
   <rect width="100" height="100" rx="27.8" fill="#D6241C"/>
   <g transform="translate(13.9, 13.9)">
     <svg width="72.2" height="72.2" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">

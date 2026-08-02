@@ -8,7 +8,7 @@ import { PageHeader, Button, Modal, Field } from "../../lib/ui";
 import ReceiptPrint from "./ReceiptPrint";
 import { useAuth } from "../../auth/AuthContext";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 function when(iso) {
   return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });

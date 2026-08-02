@@ -4,7 +4,7 @@ import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle, Emp
 import { useAuth } from "../../auth/AuthContext";
 import PatientPicker from "../patients/PatientPicker";
 
-const naira = (n) => "\u20a6" + n.toLocaleString();
+import { naira } from "../../lib/money";
 const STAGE_LABEL = { waiting: "Waiting", "in-chair": "In chair", completed: "Completed" };
 
 export default function Dental() {

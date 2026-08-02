@@ -5,7 +5,7 @@ import {
 } from "./bankReconciliationService";
 import { PageHeader, Button, Modal, Pill } from "../../lib/ui";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 const when = (iso) => new Date(iso).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
 
 const STATUS_TONE = { unmatched: "warn", auto_matched: "good", manually_matched: "good", no_match: "bad" };

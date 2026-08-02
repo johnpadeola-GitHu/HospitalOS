@@ -4,7 +4,7 @@ import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 import ReceiptPrint from "./ReceiptPrint";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 export default function Billing() {
   const { may } = useAuth();

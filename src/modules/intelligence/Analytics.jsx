@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { analytics } from "./analyticsService";
 import { PageHeader } from "../../lib/ui";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 export default function Analytics() {
   const [data, setData] = useState(null);

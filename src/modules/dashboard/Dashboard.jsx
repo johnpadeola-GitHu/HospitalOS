@@ -10,7 +10,7 @@ import { billingSummary } from "../finance/billingService";
 import { listLowStock } from "../pharmacy/pharmacyService";
 import { PageHeader, StatCard, Card, Pill } from "../../lib/ui";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 // Every role has the "overview" area, so this screen always loads — but
 // not every role has patient-care, diagnostics, finance, or pharmacy

@@ -10,7 +10,7 @@ import { releaseResult, isReleased, releaseStatus } from "../../engines/results"
 import { useAuth } from "../../auth/AuthContext";
 import ImagingReportPrint from "../radiology/ImagingReportPrint";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 /**
  * One workspace, reused by Ultrasound/CT/MRI. Each caller supplies its

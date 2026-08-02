@@ -8,7 +8,7 @@ import {
 } from "./settlementService";
 import { StatCard, Card, Pill, Button } from "../../lib/ui";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 const compact = (n) => n >= 1000000 ? (n / 1000000).toFixed(1) + "M" : n >= 1000 ? (n / 1000).toFixed(0) + "k" : String(n);
 
 export default function Settlement() {

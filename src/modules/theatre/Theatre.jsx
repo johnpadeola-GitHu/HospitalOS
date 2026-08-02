@@ -14,7 +14,7 @@ import { listPatients } from "../patients/patientService";
 import { priceFor } from "../../engines/pricing";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 function timeLabel(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

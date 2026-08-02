@@ -1,6 +1,6 @@
 import { useLetterhead, Letterhead, PrintableOverlay, DocFooterNote } from "../../lib/printable";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 export default function ReceiptPrint({ payment, account, onClose, actor }) {
   const settings = useLetterhead();

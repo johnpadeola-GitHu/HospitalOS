@@ -13,7 +13,7 @@ import { useAuth } from "../../auth/AuthContext";
 import PatientPicker from "../patients/PatientPicker";
 import { record, AUDIT_ACTIONS } from "../../lib/audit";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 const FILTERS = [
   { id: "all", label: "All" },

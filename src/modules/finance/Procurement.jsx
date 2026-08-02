@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { PO_TINT, listPOs, advancePO, createPO } from "./procurementService";
 import { Button, Modal, Field, inputStyle, PageHeader } from "../../lib/ui";
 
-const naira = (n) => "₦" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 
 export default function Procurement() {
   const [rows, setRows] = useState([]);

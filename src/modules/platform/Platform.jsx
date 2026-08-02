@@ -9,7 +9,7 @@ import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle } fr
 import Settlement from "./Settlement";
 import ActivationCodes from "./ActivationCodes";
 
-const naira = (n) => "\u20a6" + Math.round(n).toLocaleString();
+import { naira } from "../../lib/money";
 const ago = (iso) => {
   const m = Math.round((Date.now() - new Date(iso)) / 60000);
   if (m < 60) return `${m}m ago`;
