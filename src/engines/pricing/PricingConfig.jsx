@@ -33,13 +33,24 @@ export default function PricingConfig() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
+    setErr("");
     try {
       const [c, o] = await Promise.all([catalogueFor(cat), listOverrides(cat)]);
       setCatalogue(c);
       setOverrides(o);
-    
     } catch (e) {
       console.error(e);
+      // Pharmacy is the one category whose catalogue is a live API call
+      // (listDrugs) rather than a static in-memory list like every other
+      // category here — so it's also the only one that can fail to load.
+      // Silently showing "No items match" in that case looks identical to
+      // an empty formulary and is genuinely misleading; say what happened.
+      setCatalogue([]);
+      setErr(
+        cat === "pharmacy"
+          ? "Couldn't load the drug formulary — check your connection and try again."
+          : "Couldn't load this category. Try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -100,7 +111,12 @@ export default function PricingConfig() {
       </div>
 
       <Card title={CATEGORIES.find((c) => c.key === cat)?.label} pad={false}>
-        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : items.length === 0 ? (
+        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : err ? (
+          <div style={{ padding: 22 }}>
+            <EmptyState icon="AlertTriangle" title="Couldn't load pricing" hint={err} />
+            <div style={{ textAlign: "center", marginTop: 4 }}><Button onClick={refresh}>Try again</Button></div>
+          </div>
+        ) : items.length === 0 ? (
           <div style={{ padding: 22 }}><EmptyState icon="Tags" title="No items match" /></div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
