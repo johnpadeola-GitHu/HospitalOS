@@ -154,14 +154,14 @@ function Landing({ onCat, onOpen, CATEGORIES }) {
           const n = articlesIn(c.key).length;
           return (
             <button key={c.key} style={catCard} onClick={() => onCat(c.key)}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={catIcon}><Ico name={c.icon} size={16} color="var(--charcoal)" /></div>
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", flex: 1, textAlign: "left" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={catIcon}><Ico name={c.icon} size={17} color="var(--charcoal)" /></div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-strong)", flex: 1, textAlign: "left" }}>
                   {c.label}
                 </span>
                 <span style={countChip}>{n}</span>
               </div>
-              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 7, lineHeight: 1.5, textAlign: "left" }}>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 5, lineHeight: 1.45, textAlign: "left" }}>
                 {c.blurb}
               </div>
             </button>
@@ -369,9 +369,9 @@ const guideBanner = {
 };
 const guideIcon = { width: 34, height: 34, borderRadius: 9, background: "var(--charcoal)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const heroCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px 16px 18px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
-const catGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 };
-const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "14px 15px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
-const catIcon = { width: 30, height: 30, borderRadius: 8, background: "var(--charcoal-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const catGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 };
+const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "11px 12px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
+const catIcon = { width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const countChip = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--border)", padding: "1px 7px", borderRadius: 5 };
 const cardGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 };
 const artCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "13px 14px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };

@@ -16,9 +16,9 @@ function groupContainsPath(group, pathname) {
 }
 
 const WIDTH_KEY = "hospitalos.sidebarWidth";
-const MIN_WIDTH = 220;
-const MAX_WIDTH = 380;
-const DEFAULT_WIDTH = 258;
+const MIN_WIDTH = 260;
+const MAX_WIDTH = 400;
+const DEFAULT_WIDTH = 280;
 
 function loadWidth() {
   const saved = parseInt(localStorage.getItem(WIDTH_KEY), 10);
@@ -114,6 +114,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
               >
                 <Icon name={g.icon} size={17} style={{ color: isActiveGroup ? "var(--accent)" : "var(--charcoal)", flexShrink: 0 }} />
                 <span style={S.groupLabel}>{g.label}</span>
+                <span style={{ flex: 1 }} />
                 {g.comingSoon ? (
                   <span style={S.soonBadge}>Soon</span>
                 ) : (
@@ -222,8 +223,9 @@ const S = {
     background: "var(--accent-bg)",
   },
   groupLabel: {
-    flex: 1, textAlign: "left", fontSize: 12.5, fontWeight: 600,
+    flexShrink: 0, textAlign: "left", fontSize: 12.5, fontWeight: 600,
     letterSpacing: "0.04em", color: "var(--charcoal-strong)", textTransform: "uppercase",
+    whiteSpace: "nowrap",
   },
   count: {
     fontSize: 11, fontWeight: 600, color: "var(--muted)",

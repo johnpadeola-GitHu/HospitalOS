@@ -102,6 +102,7 @@ export default function AppLayout() {
               <div style={footerBrandRow}>
                 <div style={footerLogo}><Icons.Cross size={13} strokeWidth={3} color="#fff" /></div>
                 <span style={footerBrand}>HospitalOS</span>
+                <span style={footerVersion}>v1.0.0</span>
                 <span style={footerBy}>powered by AgoroX Africa</span>
               </div>
               <nav style={footerLinks}>
@@ -110,7 +111,7 @@ export default function AppLayout() {
                 <a href="/legal/HospitalOS-IP-Policy.pdf" download style={footLink}>IP Policy</a>
                 <a href="mailto:support@agorox.africa" style={footLink}>Contact Support</a>
               </nav>
-              <div style={footerMeta}>v1.0.0 &nbsp;&middot;&nbsp; &copy; 2026 AgoroX Africa. All rights reserved.</div>
+              <div style={footerMeta}>Copyright &copy; 2026 AgoroX Africa. All rights reserved.</div>
             </div>
           </footer>
         </main>
@@ -140,6 +141,10 @@ const footerInner = {
 const footerBrandRow = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
 const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "#D6241C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const footerBrand = { fontSize: 12.5, fontWeight: 700, color: "var(--charcoal-strong)" };
+const footerVersion = {
+  fontSize: 10, fontWeight: 600, color: "var(--muted)", background: "var(--surface)",
+  border: "1px solid var(--border)", borderRadius: 999, padding: "1px 7px", flexShrink: 0,
+};
 const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
 const footLink = { color: "var(--muted)", fontWeight: 500, whiteSpace: "nowrap" };
