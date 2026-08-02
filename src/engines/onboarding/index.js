@@ -28,39 +28,17 @@ const API_URL = "https://hospitalos-api.johnpadeola.workers.dev";
 
 export const DEMO_DURATION_DAYS = 7;
 
-export const FREE_TIERS = [
-  {
-    key: "starter", label: "Starter", commissionPct: 2.75,
-    sizeLabel: "Small hospitals & clinics", bedRange: "Up to 49 beds",
-    blurb: "Everything HospitalOS offers, for a facility just getting started with digital records.",
-  },
-  {
-    key: "growth", label: "Growth", commissionPct: 2.25,
-    sizeLabel: "Medium hospitals", bedRange: "50\u2013149 beds",
-    blurb: "The same full platform, at a lower commission as your collections grow.",
-  },
-  {
-    key: "scale", label: "Scale", commissionPct: 1.75,
-    sizeLabel: "Large hospitals", bedRange: "150+ beds",
-    blurb: "Our lowest commission rate, for hospitals running real volume across multiple sites.",
-  },
-];
+export const COMMUNITY_TIER = {
+  key: "community", label: "Community", commissionPct: 2.75,
+  blurb: "Everything HospitalOS offers. No setup fees, no licence fees, no monthly subscription \u2014 a commission on successful payments, settled immediately by the payment gateway.",
+};
 
 export const PAID_TIER = {
   key: "enterprise", label: "Enterprise", priceNaira: 4_500_000, billingPeriod: "annual",
   blurb: "One flat annual price, no commission on your collections \u2014 predictable cost regardless of volume.",
 };
 
-export const ALL_TIERS = [...FREE_TIERS, PAID_TIER];
-
-/** Suggests a tier from a self-reported bed count. A starting point, not a lock — the signup form lets the hospital choose any tier regardless. */
-export function suggestTier(bedCount) {
-  const n = parseInt(bedCount, 10);
-  if (!Number.isFinite(n) || n <= 0) return null;
-  if (n < 50) return "starter";
-  if (n < 150) return "growth";
-  return "scale";
-}
+export const ALL_TIERS = [COMMUNITY_TIER, PAID_TIER];
 
 export function getTier(key) {
   return ALL_TIERS.find((t) => t.key === key) || null;

@@ -224,3 +224,10 @@ export async function billingSummary() {
     outstanding: accounts.reduce((s, a) => s + a.balance, 0),
   };
 }
+
+// This hospital's own Enterprise Savings Advisory — { applicable: false } if
+// the tenant is already on Enterprise (flat billing), otherwise the
+// projected-commission-vs-licence comparison for the dashboard card.
+export async function getEnterpriseRecommendation() {
+  return apiCall("/finance/enterprise-recommendation");
+}
