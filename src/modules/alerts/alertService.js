@@ -7,6 +7,7 @@
 
 import { listCriticalOrders, getTest, flagValue } from "../lab/labService";
 import { listLowStock } from "../pharmacy/pharmacyService";
+import { listLowStores } from "../finance/procurementService";
 import { listUrgentStudies } from "../radiology/radiologyService";
 import { listOpsIssues } from "../operations/operationsService";
 import { listUnstablePatients } from "../critical-care/criticalCareService";
@@ -343,12 +344,33 @@ function alertFromPolicy(p) {
   };
 }
 
+// Source 2b — stores: a general (non-drug) supply at/below reorder level
+// suggests raising a purchase order. Same severity logic as pharmacy: out
+// entirely is critical, low but non-zero is a warning.
+function alertFromStoreItem(item) {
+  const out = item.qty <= 0;
+  return {
+    id: `stores:${item.id}`,
+    source: "Stores",
+    severity: out ? "critical" : "warning",
+    patientName: null,
+    hospitalNo: null,
+    title: out ? "Out of stock \u2014 raise an LPO" : "Low stock \u2014 consider an LPO",
+    detail: out
+      ? `${item.item} \u2014 0 remaining (reorder at ${item.reorder})`
+      : `${item.item} \u2014 ${item.qty} left (reorder at ${item.reorder})`,
+    reference: item.category,
+    at: new Date().toISOString(),
+  };
+}
+
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity, expiringLicenses, allAccreditations, seriousIncidents, overduePolicies] = await Promise.all([
+  const [criticalOrders, lowStock, lowStores, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity, expiringLicenses, allAccreditations, seriousIncidents, overduePolicies] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
+    listLowStores(),
     listUrgentStudies(),
     listOpsIssues(),
     listUnstablePatients(),
@@ -369,6 +391,7 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
   const alerts = [
     ...criticalOrders.map(alertFromLabOrder),
     ...lowStock.map(alertFromDrug),
+    ...lowStores.map(alertFromStoreItem),
     ...urgentStudies.map(alertFromStudy),
     ...opsIssues.map(alertFromOpsIssue),
     ...unstable.map(alertFromUnstable),

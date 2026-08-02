@@ -37,8 +37,8 @@ export async function listPOs() {
   return apiCall("/finance/purchase-orders");
 }
 
-export async function createPO({ supplier, items, amount }) {
-  return apiCall("/finance/purchase-orders", { method: "POST", body: { supplier, items, amount } });
+export async function createPO({ supplier, items, amount, lines }) {
+  return apiCall("/finance/purchase-orders", { method: "POST", body: { supplier, items, amount, lines } });
 }
 
 export async function advancePO(id) {
@@ -47,4 +47,23 @@ export async function advancePO(id) {
 
 export async function listStores() {
   return apiCall("/finance/stores");
+}
+
+// Feed for Alerts: store items at or below their reorder threshold.
+// Mirrors pharmacy's listLowStock() \u2014 same shape of signal, different
+// source. Filtered client-side since the dataset is small and the backend
+// already returns each item's computed `low` flag.
+export async function listLowStores() {
+  const all = await apiCall("/finance/stores");
+  return all.filter((s) => s.low);
+}
+
+// Register a new general (non-drug) store item.
+export async function createStoreItem({ item, category, qty, reorder }) {
+  return apiCall("/finance/stores", { method: "POST", body: { item, category, qty, reorder } });
+}
+
+// Manual restock of a store item (top-up outside the PO-receipt flow).
+export async function restockStoreItem(itemId, quantity) {
+  return apiCall(`/finance/stores/${encodeURIComponent(itemId)}/restock`, { method: "PATCH", body: { quantity } });
 }
