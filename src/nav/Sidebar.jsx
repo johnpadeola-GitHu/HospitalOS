@@ -15,10 +15,49 @@ function groupContainsPath(group, pathname) {
   return group.items.some((it) => it.path === pathname);
 }
 
+const WIDTH_KEY = "hospitalos.sidebarWidth";
+const MIN_WIDTH = 220;
+const MAX_WIDTH = 380;
+const DEFAULT_WIDTH = 258;
+
+function loadWidth() {
+  const saved = parseInt(localStorage.getItem(WIDTH_KEY), 10);
+  if (Number.isFinite(saved) && saved >= MIN_WIDTH && saved <= MAX_WIDTH) return saved;
+  return DEFAULT_WIDTH;
+}
+
 export default function Sidebar({ isOpen, onNavigate }) {
   const { pathname } = useLocation();
   const { can } = useAuth();
   const [alerts, setAlerts] = useState(0);
+  const [width, setWidth] = useState(loadWidth);
+  const [resizing, setResizing] = useState(false);
+
+  // Drag-to-resize: the handle sits on the sidebar's right edge. Width is
+  // clamped between MIN/MAX and persisted, so long group names like
+  // "Patient care" never have to wrap or overflow \u2014 the user sets the
+  // width that suits their own longest label once, and it stays.
+  useEffect(() => {
+    if (!resizing) return;
+    const onMove = (e) => {
+      const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, e.clientX));
+      setWidth(next);
+    };
+    const onUp = () => {
+      setResizing(false);
+      setWidth((w) => { localStorage.setItem(WIDTH_KEY, String(w)); return w; });
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, [resizing]);
 
   const visibleGroups = NAV_GROUPS.filter((g) => can(g.id));
 
@@ -43,17 +82,30 @@ export default function Sidebar({ isOpen, onNavigate }) {
   };
 
   return (
-    <aside style={S.aside} className={`no-print app-sidebar${isOpen ? " is-open" : ""}`}>
+    <aside
+      style={{ ...S.aside, width, minWidth: width }}
+      className={`no-print app-sidebar${isOpen ? " is-open" : ""}`}
+    >
       <div style={S.brand}>
         <TenantBrand />
       </div>
+
+      {/* Drag handle: resizes the sidebar so long group names like "Patient
+          care" never wrap or overflow. Width is remembered per browser. */}
+      <div
+        className="sidebar-resize-handle"
+        style={{ ...S.resizeHandle, ...(resizing ? S.resizeHandleActive : null) }}
+        onMouseDown={(e) => { e.preventDefault(); setResizing(true); }}
+        onDoubleClick={() => { setWidth(DEFAULT_WIDTH); localStorage.setItem(WIDTH_KEY, String(DEFAULT_WIDTH)); }}
+        title="Drag to resize \u00b7 double-click to reset"
+      />
 
       <nav style={S.nav}>
         {visibleGroups.map((g) => {
           const isOpen = open[g.id];
           const isActiveGroup = groupContainsPath(g, pathname);
           return (
-            <div key={g.id} style={{ marginBottom: 4 }}>
+            <div key={g.id} style={{ marginBottom: 1 }}>
               <button
                 style={{ ...S.groupHeader, ...(isActiveGroup ? S.groupHeaderActive : null), ...(g.noCollapse ? S.groupHeaderStatic : null) }}
                 onClick={() => toggle(g.id, g.noCollapse)}
@@ -133,9 +185,17 @@ export default function Sidebar({ isOpen, onNavigate }) {
 
 const S = {
   aside: {
-    width: 258, minWidth: 258, height: "100vh",
+    height: "100vh", position: "relative",
     background: "var(--sidebar)", borderRight: "1px solid var(--border)",
     display: "flex", flexDirection: "column", overflow: "hidden",
+    flexShrink: 0,
+  },
+  resizeHandle: {
+    position: "absolute", top: 0, right: -3, width: 6, height: "100%",
+    cursor: "col-resize", zIndex: 20, background: "transparent",
+  },
+  resizeHandleActive: {
+    background: "var(--accent)", opacity: 0.35,
   },
   brand: {
     display: "flex", alignItems: "center", gap: 10, padding: "16px 18px",
@@ -151,23 +211,19 @@ const S = {
   pinnedLinkActive: { background: "var(--accent-bg)", color: "var(--accent)" },
   groupHeader: {
     width: "100%", display: "flex", alignItems: "center", gap: 12,
-    padding: "11px 12px", background: "none", border: "none", cursor: "pointer",
+    padding: "8px 12px", background: "none", border: "none", cursor: "pointer",
     font: "inherit", color: "var(--charcoal-strong)", borderRadius: 9,
-    // left-accent placeholder keeps geometry stable between active/inactive
-    borderLeft: "3px solid transparent",
   },
   groupHeaderStatic: {
     cursor: "default", opacity: 1,
   },
-  // Active/open group: soft fill + clay left-accent bar, matching the
-  // PoultrySuite "Command Center" active row.
+  // Active/open group: soft fill only, no left accent bar.
   groupHeaderActive: {
     background: "var(--accent-bg)",
-    borderLeft: "3px solid var(--accent)",
   },
   groupLabel: {
-    flex: 1, textAlign: "left", fontSize: 14, fontWeight: 500,
-    letterSpacing: "0", color: "var(--charcoal-strong)",
+    flex: 1, textAlign: "left", fontSize: 12.5, fontWeight: 600,
+    letterSpacing: "0.04em", color: "var(--charcoal-strong)", textTransform: "uppercase",
   },
   count: {
     fontSize: 11, fontWeight: 600, color: "var(--muted)",
