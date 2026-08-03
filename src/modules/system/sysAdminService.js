@@ -38,6 +38,10 @@ export async function listSites() {
   return apiCall("/system/sites");
 }
 
+export async function createSite({ name, type, beds }) {
+  return apiCall("/system/sites", { method: "POST", body: { name, type, beds } });
+}
+
 export async function toggleSite(id) {
   return apiCall(`/system/sites/${encodeURIComponent(id)}/toggle`, { method: "PATCH" });
 }

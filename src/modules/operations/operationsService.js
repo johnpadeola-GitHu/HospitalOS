@@ -54,6 +54,9 @@ export const EQUIP_STATUS = {
 export async function listEquipment() {
   return apiCall("/operations/equipment");
 }
+export async function createEquipment({ name, category, location, vendor, year }) {
+  return apiCall("/operations/equipment", { method: "POST", body: { name, category, location, vendor, year } });
+}
 export async function setEquipmentStatus(id, status) {
   return apiCall(`/operations/equipment/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } });
 }
@@ -66,6 +69,9 @@ export const VEHICLE_STATUS = {
 
 export async function listFleet() {
   return apiCall("/operations/fleet");
+}
+export async function createVehicle({ reg, type, model }) {
+  return apiCall("/operations/fleet", { method: "POST", body: { reg, type, model } });
 }
 export async function setVehicleStatus(id, status) {
   return apiCall(`/operations/fleet/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } });

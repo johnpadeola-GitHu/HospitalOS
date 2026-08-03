@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { EQUIP_STATUS, listEquipment, setEquipmentStatus } from "./operationsService";
-import { inputStyle, PageHeader } from "../../lib/ui";
+import { EQUIP_STATUS, listEquipment, createEquipment, setEquipmentStatus } from "./operationsService";
+import { inputStyle, PageHeader, Button, Modal, Field } from "../../lib/ui";
 
 const STATUS_KEYS = Object.keys(EQUIP_STATUS);
 
 export default function Biomedical() {
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -39,7 +40,8 @@ export default function Biomedical() {
 
   return (
     <div>
-      <PageHeader group="Operations" title={<>Biomedical engineering</>} icon="Wrench" />
+      <PageHeader group="Operations" title={<>Biomedical engineering</>} icon="Wrench"
+        actions={<Button variant="primary" onClick={() => setShowAdd(true)}>+ Add equipment</Button>} />
 
       <div style={statRow}>
         {STATUS_KEYS.map((k) => (
@@ -93,7 +95,71 @@ export default function Biomedical() {
           </tbody>
         </table>
       </div>
+
+      {showAdd && (
+        <AddEquipmentModal
+          onClose={() => setShowAdd(false)}
+          onDone={async () => { setShowAdd(false); await refresh(); }}
+        />
+      )}
     </div>
+  );
+}
+
+function AddEquipmentModal({ onClose, onDone }) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [vendor, setVendor] = useState("");
+  const [year, setYear] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const submit = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await createEquipment({ name, category, location, vendor, year });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      title="Add equipment"
+      onClose={onClose}
+      footer={<>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy || !name.trim() || !category.trim()}>
+          {busy ? "Adding\u2026" : "Add to register"}
+        </Button>
+      </>}
+    >
+      {err && <div style={{ color: "var(--bad)", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
+      <Field label="Equipment name">
+        <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Infusion pump" autoFocus />
+      </Field>
+      <Field label="Category">
+        <input style={inputStyle} value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Patient monitoring" />
+      </Field>
+      <Field label="Location">
+        <input style={inputStyle} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. ICU Bay 3" />
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label="Vendor (optional)">
+          <input style={inputStyle} value={vendor} onChange={(e) => setVendor(e.target.value)} />
+        </Field>
+        <Field label="Year (optional)">
+          <input type="number" style={inputStyle} value={year} onChange={(e) => setYear(e.target.value)} />
+        </Field>
+      </div>
+      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>
+        A tag (e.g. EQ-0101) is assigned automatically. New equipment starts as Operational.
+      </div>
+    </Modal>
   );
 }
 

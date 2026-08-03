@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { VEHICLE_STATUS, listFleet, setVehicleStatus } from "./operationsService";
-import { inputStyle, PageHeader } from "../../lib/ui";
+import { VEHICLE_STATUS, listFleet, createVehicle, setVehicleStatus } from "./operationsService";
+import { inputStyle, PageHeader, Button, Modal, Field } from "../../lib/ui";
 
 const STATUS_KEYS = Object.keys(VEHICLE_STATUS);
 
 export default function Fleet() {
   const [fleet, setFleet] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -39,7 +40,8 @@ export default function Fleet() {
 
   return (
     <div>
-      <PageHeader group="Operations" title={<>Ambulance &amp; fleet</>} icon="Ambulance" />
+      <PageHeader group="Operations" title={<>Ambulance &amp; fleet</>} icon="Ambulance"
+        actions={<Button variant="primary" onClick={() => setShowAdd(true)}>+ Add vehicle</Button>} />
 
       <div style={statRow}>
         {STATUS_KEYS.map((k) => (
@@ -93,7 +95,59 @@ export default function Fleet() {
           </tbody>
         </table>
       </div>
+
+      {showAdd && (
+        <AddVehicleModal
+          onClose={() => setShowAdd(false)}
+          onDone={async () => { setShowAdd(false); await refresh(); }}
+        />
+      )}
     </div>
+  );
+}
+
+function AddVehicleModal({ onClose, onDone }) {
+  const [reg, setReg] = useState("");
+  const [type, setType] = useState("");
+  const [model, setModel] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const submit = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await createVehicle({ reg, type, model });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      title="Add vehicle"
+      onClose={onClose}
+      footer={<>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy || !reg.trim() || !type.trim() || !model.trim()}>
+          {busy ? "Adding\u2026" : "Add to fleet"}
+        </Button>
+      </>}
+    >
+      {err && <div style={{ color: "var(--bad)", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
+      <Field label="Registration number">
+        <input style={inputStyle} value={reg} onChange={(e) => setReg(e.target.value)} placeholder="e.g. LSD 234 XY" autoFocus />
+      </Field>
+      <Field label="Type">
+        <input style={inputStyle} value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. Ambulance" />
+      </Field>
+      <Field label="Model">
+        <input style={inputStyle} value={model} onChange={(e) => setModel(e.target.value)} placeholder="e.g. Toyota Hiace" />
+      </Field>
+      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>New vehicles start as Available.</div>
+    </Modal>
   );
 }
 

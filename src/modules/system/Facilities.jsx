@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { listSites, toggleSite } from "./sysAdminService";
-import { Button, PageHeader } from "../../lib/ui";
+import { listSites, createSite, toggleSite } from "./sysAdminService";
+import { Button, PageHeader, Modal, Field, inputStyle } from "../../lib/ui";
 
 export default function Facilities() {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -23,7 +24,8 @@ export default function Facilities() {
 
   return (
     <div>
-      <PageHeader group="Administration" title={<>Facilities &amp; sites</>} icon="Hospital" />
+      <PageHeader group="Administration" title={<>Facilities &amp; sites</>} icon="Hospital"
+        actions={<Button variant="primary" onClick={() => setShowAdd(true)}>+ Add site</Button>} />
 
       {loading ? (
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading sites…</div>
@@ -41,7 +43,59 @@ export default function Facilities() {
           ))}
         </div>
       )}
+
+      {showAdd && (
+        <AddSiteModal
+          onClose={() => setShowAdd(false)}
+          onDone={async () => { setShowAdd(false); await refresh(); }}
+        />
+      )}
     </div>
+  );
+}
+
+function AddSiteModal({ onClose, onDone }) {
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [beds, setBeds] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const submit = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await createSite({ name, type, beds });
+      await onDone();
+    } catch (e) {
+      setErr(e.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      title="Add site"
+      onClose={onClose}
+      footer={<>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="primary" onClick={submit} disabled={busy || !name.trim() || !type.trim()}>
+          {busy ? "Adding\u2026" : "Add site"}
+        </Button>
+      </>}
+    >
+      {err && <div style={{ color: "var(--bad)", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
+      <Field label="Site name">
+        <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Ibadan Teaching Hospital \u2014 Annex" autoFocus />
+      </Field>
+      <Field label="Type">
+        <input style={inputStyle} value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. Satellite clinic" />
+      </Field>
+      <Field label="Beds (optional)">
+        <input type="number" style={inputStyle} value={beds} onChange={(e) => setBeds(e.target.value)} />
+      </Field>
+      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>New sites start Active.</div>
+    </Modal>
   );
 }
 
