@@ -450,7 +450,7 @@ function ResultModal({ order, onClose, onDone }) {
         {order.patientName} · {order.hospitalNo} · {order.accession}
       </div>
       {test.analytes.map((a) => {
-        const flag = values[a.key] ? flagValue(a, values[a.key]) : "normal";
+        const flag = values[a.key] ? flagValue(order.testCode, a, values[a.key]) : "normal";
         const fs = FLAG_STYLE[flag];
         return (
           <div key={a.key} style={analyteRow}>

@@ -36,6 +36,7 @@ async function apiCall(path, { method = "GET", body } = {}) {
 // crit low/high are the panic thresholds that raise a critical flag.
 export { TEST_CATALOGUE, DISCIPLINES, testsInDiscipline, searchCatalogue, CATALOGUE_SIZE } from "./catalogue";
 import { TEST_CATALOGUE } from "./catalogue";
+import { rangeFor } from "../../engines/labReferenceRanges";
 
 export const STATUSES = ["ordered", "collected", "resulted", "verified"];
 export const STATUS_LABELS = {
@@ -49,17 +50,19 @@ export function getTest(code) {
   return TEST_CATALOGUE.find((t) => t.code === code) || null;
 }
 
-// Flag a single analyte value against its range.
-export function flagValue(analyte, value) {
-  if (analyte.qualitative) {
+// Flag a single analyte value against its range. testCode + analyte.key
+// select the override, if a tenant has set one — see engines/labReferenceRanges.
+export function flagValue(testCode, analyte, value) {
+  const effective = rangeFor(testCode, analyte.key, analyte);
+  if (effective.qualitative) {
     return value && value.toLowerCase().startsWith("pos") ? "high" : "normal";
   }
   const v = parseFloat(value);
   if (Number.isNaN(v)) return "normal";
-  if (analyte.critLow != null && v <= analyte.critLow) return "critical";
-  if (analyte.critHigh != null && v >= analyte.critHigh) return "critical";
-  if (analyte.low != null && v < analyte.low) return "low";
-  if (analyte.high != null && v > analyte.high) return "high";
+  if (effective.critLow != null && v <= effective.critLow) return "critical";
+  if (effective.critHigh != null && v >= effective.critHigh) return "critical";
+  if (effective.low != null && v < effective.low) return "low";
+  if (effective.high != null && v > effective.high) return "high";
   return "normal";
 }
 
@@ -68,7 +71,7 @@ export function orderHasCritical(order) {
   if (!order.results) return false;
   const test = getTest(order.testCode);
   if (!test) return false;
-  return test.analytes.some((a) => flagValue(a, order.results[a.key]) === "critical");
+  return test.analytes.some((a) => flagValue(order.testCode, a, order.results[a.key]) === "critical");
 }
 
 export async function listOrders({ status = "all", query = "" } = {}) {

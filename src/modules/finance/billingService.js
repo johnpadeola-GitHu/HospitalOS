@@ -211,8 +211,17 @@ export async function getOnlinePaymentStatus(reference) {
 }
 
 // Flat ledger of all payments across patients, most recent first.
-export async function listPayments() {
-  return apiCall("/billing/payments");
+// Also usable as a search: pass query to filter by receipt or patient.
+export async function listPayments({ query = "" } = {}) {
+  const qs = query.trim() ? `?query=${encodeURIComponent(query.trim())}` : "";
+  return apiCall(`/billing/payments${qs}`);
+}
+
+// Invoices didn't have a search capability before — every prior call site
+// only ever looked one up by its own id.
+export async function searchInvoices(query) {
+  if (!query?.trim()) return [];
+  return apiCall(`/billing/invoices/search?query=${encodeURIComponent(query.trim())}`);
 }
 
 export async function billingSummary() {
@@ -225,9 +234,6 @@ export async function billingSummary() {
   };
 }
 
-// This hospital's own Enterprise Savings Advisory — { applicable: false } if
-// the tenant is already on Enterprise (flat billing), otherwise the
-// projected-commission-vs-licence comparison for the dashboard card.
 export async function getEnterpriseRecommendation() {
   return apiCall("/finance/enterprise-recommendation");
 }

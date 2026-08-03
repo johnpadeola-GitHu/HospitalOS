@@ -39,8 +39,10 @@ export const CLINICS = [
 export const BOOKING_STATUS = ["requested", "confirmed", "declined", "checked-in"];
 export const STATUS_TONE = { requested: "warn", confirmed: "info", declined: "bad", "checked-in": "good" };
 
-export async function listBookings({ status = "all" } = {}) {
-  return apiCall(`/bookings?status=${status}`);
+export async function listBookings({ status = "all", query = "" } = {}) {
+  const params = new URLSearchParams({ status });
+  if (query.trim()) params.set("query", query.trim());
+  return apiCall(`/bookings?${params.toString()}`);
 }
 
 export async function requestBooking({ name, phone, clinic, requestedDate, note }) {

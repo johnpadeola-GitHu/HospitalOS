@@ -6,6 +6,12 @@ import { listPatients } from "../modules/patients/patientService";
 import { searchWithExcerpt } from "../engines/help";
 import { useAuth } from "../auth/AuthContext";
 import { useHelp } from "../engines/help";
+import { searchStaff } from "../modules/staff/staffService";
+import { listOrders } from "../modules/lab/labService";
+import { listDrugs } from "../modules/pharmacy/pharmacyService";
+import { searchInvoices, listPayments } from "../modules/finance/billingService";
+import { listBookings } from "../modules/bookings/bookingsService";
+import { listCases } from "../modules/theatre/theatreService";
 
 // Global search — a real command palette, not a decorative box.
 // Searches three sources at once:
@@ -17,7 +23,10 @@ import { useHelp } from "../engines/help";
 export default function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState({ nav: [], patients: [], help: [] });
+  const [results, setResults] = useState({
+    nav: [], patients: [], help: [], staff: [], labOrders: [], drugs: [],
+    invoices: [], payments: [], bookings: [], cases: [],
+  });
   const [active, setActive] = useState(0);
   const inputRef = useRef(null);
   const navigate = useNavigate();
@@ -44,10 +53,13 @@ export default function GlobalSearch() {
     else { setQuery(""); setActive(0); }
   }, [open]);
 
-  // Run the search across all three sources.
+  // Run the search across all sources.
   useEffect(() => {
     const q = query.trim().toLowerCase();
-    if (!q) { setResults({ nav: [], patients: [], help: [] }); return; }
+    if (!q) {
+      setResults({ nav: [], patients: [], help: [], staff: [], labOrders: [], drugs: [], invoices: [], payments: [], bookings: [], cases: [] });
+      return;
+    }
     let alive = true;
 
     const nav = ALL_ROUTES
@@ -58,17 +70,20 @@ export default function GlobalSearch() {
     const help = searchWithExcerpt(q, 4);
 
     const t = setTimeout(async () => {
-      let patients = [];
-      // Only search patients if the role can reach patient care.
-      if (can("patient-care")) {
-        try {
-          const rows = await listPatients({ query: q, status: "all" });
-          patients = rows.slice(0, 5);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      if (alive) setResults({ nav, patients, help });
+      // Each source is independent and permission-gated the same way the
+      // original patient search was — a failing or unauthorized source
+      // must never blank out the others.
+      const [patients, staff, labOrders, drugs, invoices, payments, bookings, cases] = await Promise.all([
+        can("patient-care") ? listPatients({ query: q, status: "all" }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("overview") ? searchStaff({ query: q, role: "doctor" }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("diagnostics") ? listOrders({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("pharmacy") ? listDrugs({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("finance") ? searchInvoices(q).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("finance") ? listPayments({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("overview") ? listBookings({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("specialty-services") ? listCases({ includeCompleted: true, query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+      ]);
+      if (alive) setResults({ nav, patients, help, staff, labOrders, drugs, invoices, payments, bookings, cases });
     }, 140);
 
     setResults((r) => ({ ...r, nav, help }));
@@ -78,6 +93,13 @@ export default function GlobalSearch() {
   const flat = [
     ...results.nav.map((r) => ({ kind: "nav", ...r })),
     ...results.patients.map((p) => ({ kind: "patient", ...p })),
+    ...results.staff.map((s) => ({ kind: "staff", ...s })),
+    ...results.labOrders.map((o) => ({ kind: "lab", ...o })),
+    ...results.drugs.map((d) => ({ kind: "drug", ...d })),
+    ...results.invoices.map((i) => ({ kind: "invoice", ...i })),
+    ...results.payments.map((p) => ({ kind: "payment", ...p })),
+    ...results.bookings.map((b) => ({ kind: "booking", ...b })),
+    ...results.cases.map((c) => ({ kind: "case", ...c })),
     ...results.help.map((h) => ({ kind: "help", ...h })),
   ];
 
@@ -85,6 +107,13 @@ export default function GlobalSearch() {
     if (!item) return;
     if (item.kind === "nav") navigate(item.path);
     else if (item.kind === "patient") navigate("/records");
+    else if (item.kind === "staff") { /* no staff detail screen exists yet — just close */ }
+    else if (item.kind === "lab") navigate("/lab");
+    else if (item.kind === "drug") navigate("/pharmacy/inventory");
+    else if (item.kind === "invoice") navigate("/finance/billing");
+    else if (item.kind === "payment") navigate("/finance/payments");
+    else if (item.kind === "booking") navigate("/bookings");
+    else if (item.kind === "case") navigate("/theatre");
     else if (item.kind === "help") { navigate("/help"); openHelp(item.id); }
     setOpen(false);
   }, [navigate, openHelp]);
@@ -102,7 +131,7 @@ export default function GlobalSearch() {
       <button style={trigger} className="app-search-trigger" onClick={() => setOpen(true)} aria-label="Search">
         <Icons.Search size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
         <span className="app-search-label" style={{ fontSize: 12.5, color: "var(--muted)", flex: 1, textAlign: "left" }}>
-          Search patients, screens, help…
+          Search patients, records, screens…
         </span>
         <kbd className="app-search-label" style={kbd}>Ctrl K</kbd>
       </button>
@@ -115,7 +144,7 @@ export default function GlobalSearch() {
               <input
                 ref={inputRef}
                 style={paletteInput}
-                placeholder="Search patients, screens, help…"
+                placeholder="Search patients, records, screens…"
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setActive(0); }}
                 onKeyDown={onKeyDown}
@@ -160,6 +189,69 @@ export default function GlobalSearch() {
                     return (
                       <Row key={"p" + p.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
                         icon="UserRound" title={`${p.lastName}, ${p.firstName}`} sub={`${p.hospitalNo} · ${p.status}`} tag="Patient" />
+                    );
+                  })}
+
+                  {results.staff.length > 0 && <Section label="Doctors" />}
+                  {results.staff.map((s) => {
+                    const i = flat.findIndex((f) => f.kind === "staff" && f.id === s.id);
+                    return (
+                      <Row key={"st" + s.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="Stethoscope" title={s.name} sub={s.role} tag="Doctor" />
+                    );
+                  })}
+
+                  {results.labOrders.length > 0 && <Section label="Laboratory results" />}
+                  {results.labOrders.map((o) => {
+                    const i = flat.findIndex((f) => f.kind === "lab" && f.id === o.id);
+                    return (
+                      <Row key={"lb" + o.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="TestTube" title={o.testName} sub={`${o.patientName} · ${o.accession} · ${o.status}`} tag="Lab" />
+                    );
+                  })}
+
+                  {results.drugs.length > 0 && <Section label="Medicines" />}
+                  {results.drugs.map((d) => {
+                    const i = flat.findIndex((f) => f.kind === "drug" && f.id === d.id);
+                    return (
+                      <Row key={"dr" + d.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="Pill" title={d.name} sub={`${d.form} · Stock: ${d.stock} ${d.unit}`} tag="Medicine" />
+                    );
+                  })}
+
+                  {results.invoices.length > 0 && <Section label="Invoices" />}
+                  {results.invoices.map((inv) => {
+                    const i = flat.findIndex((f) => f.kind === "invoice" && f.id === inv.id);
+                    return (
+                      <Row key={"in" + inv.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="ReceiptText" title={`Invoice ${inv.invoiceNo}`} sub={`${inv.patientName} · ${inv.status}`} tag="Invoice" />
+                    );
+                  })}
+
+                  {results.payments.length > 0 && <Section label="Payments" />}
+                  {results.payments.map((pay) => {
+                    const i = flat.findIndex((f) => f.kind === "payment" && f.id === pay.id);
+                    return (
+                      <Row key={"pa" + pay.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="Banknote" title={`Receipt ${pay.receipt}`} sub={`${pay.patientName} · ${pay.method}`} tag="Payment" />
+                    );
+                  })}
+
+                  {results.bookings.length > 0 && <Section label="Appointments" />}
+                  {results.bookings.map((b) => {
+                    const i = flat.findIndex((f) => f.kind === "booking" && f.id === b.id);
+                    return (
+                      <Row key={"bk" + b.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="CalendarPlus" title={b.name} sub={`${b.clinic} · ${b.status}`} tag="Appointment" />
+                    );
+                  })}
+
+                  {results.cases.length > 0 && <Section label="Procedures" />}
+                  {results.cases.map((c) => {
+                    const i = flat.findIndex((f) => f.kind === "case" && f.id === c.id);
+                    return (
+                      <Row key={"cs" + c.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="Scissors" title={c.procName} sub={`${c.patientName} · ${c.stage}`} tag="Procedure" />
                     );
                   })}
 

@@ -164,6 +164,7 @@ export const NAV_GROUPS = [
       { id: "facilities", label: "Facilities & sites", path: "/system/facilities" , icon: "Hospital" },
       { id: "integration", label: "Instruments gateway", path: "/instruments" , icon: "Cable" },
       { id: "pricing", label: "Pricing", path: "/system/pricing" , icon: "Tags" },
+      { id: "lab-reference-ranges", label: "Lab reference ranges", path: "/system/lab-reference-ranges" , icon: "TestTube" },
       { id: "documents", label: "Documents & templates", path: "/system/documents" , icon: "Files" },
       { id: "privacy", label: "Privacy & consent", path: "/system/privacy" , icon: "ShieldCheck" },
       { id: "fhir", label: "FHIR interoperability", path: "/system/fhir" , icon: "Share2" },

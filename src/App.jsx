@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import Login from "./auth/Login";
 import { loadPriceCache } from "./engines/pricing";
+import { loadReferenceRangeCache } from "./engines/labReferenceRanges";
 import AppLayout from "./layout/AppLayout";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import NoAccess from "./pages/NoAccess";
@@ -53,6 +54,7 @@ import DiagnosticIntel from "./modules/diagnostic-intel/DiagnosticIntel";
 import Communication from "./modules/communication/Communication";
 import Bookings from "./modules/bookings/Bookings";
 import PricingConfig from "./engines/pricing/PricingConfig";
+import LabReferenceConfig from "./engines/labReferenceRanges/LabReferenceConfig";
 import Renal from "./modules/renal/Renal";
 import Referrals from "./modules/referrals/Referrals";
 import Nutrition from "./modules/nutrition/Nutrition";
@@ -137,6 +139,7 @@ const MODULES = {
   "/communication": Communication,
   "/bookings": Bookings,
   "/system/pricing": PricingConfig,
+  "/system/lab-reference-ranges": LabReferenceConfig,
   "/renal": Renal,
   "/referrals": Referrals,
   "/nutrition": Nutrition,
@@ -195,7 +198,7 @@ function Guarded({ route }) {
 function Shell() {
   const { signedIn, loading } = useAuth();
   useEffect(() => {
-    if (signedIn) loadPriceCache();
+    if (signedIn) { loadPriceCache(); loadReferenceRangeCache(); }
   }, [signedIn]);
   // Deliberately brief and unstyled beyond basic centering — this only
   // shows for the moment it takes to check an existing token (see

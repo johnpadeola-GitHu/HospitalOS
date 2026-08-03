@@ -58,8 +58,10 @@ export function getProcedure(code) {
   return PROCEDURES.find((p) => p.code === code) || null;
 }
 
-export async function listCases({ includeCompleted = false } = {}) {
-  return apiCall(`/theatre/cases?includeCompleted=${includeCompleted}`);
+export async function listCases({ includeCompleted = false, query = "" } = {}) {
+  const params = new URLSearchParams({ includeCompleted: String(includeCompleted) });
+  if (query.trim()) params.set("query", query.trim());
+  return apiCall(`/theatre/cases?${params.toString()}`);
 }
 
 export async function scheduleCase({ patientId, procCode, theatre, surgeon, scheduledFor }) {

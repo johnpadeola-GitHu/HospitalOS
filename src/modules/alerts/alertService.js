@@ -7,7 +7,6 @@
 
 import { listCriticalOrders, getTest, flagValue } from "../lab/labService";
 import { listLowStock } from "../pharmacy/pharmacyService";
-import { listLowStores } from "../finance/procurementService";
 import { listUrgentStudies } from "../radiology/radiologyService";
 import { listOpsIssues } from "../operations/operationsService";
 import { listUnstablePatients } from "../critical-care/criticalCareService";
@@ -23,6 +22,7 @@ import { listOverdueDsars } from "../privacy/privacyService";
 import { listExpiringLicenses, listAccreditations } from "../compliance/complianceService";
 import { listSeriousOpenIncidents } from "../incident-risk/incidentService";
 import { listOverduePolicies } from "../policies/policiesService";
+import { listIncompleteJourneys } from "./journeyAlertService";
 import { listActiveSevereCrises } from "../sickle-cell/sickleCellService";
 import { checkOutbreakThreshold } from "../ipc/ipcService";
 import { listHighRiskPatients as listHighRiskGeriatric } from "../geriatric/geriatricService";
@@ -38,7 +38,7 @@ const _acknowledged = new Set();
 function alertFromLabOrder(order) {
   const test = getTest(order.testCode);
   const criticalAnalytes = test.analytes
-    .filter((a) => flagValue(a, order.results[a.key]) === "critical")
+    .filter((a) => flagValue(order.testCode, a, order.results[a.key]) === "critical")
     .map((a) => `${a.label} ${order.results[a.key]}${a.unit ? " " + a.unit : ""}`);
   return {
     id: `lab:${order.id}`,
@@ -344,33 +344,32 @@ function alertFromPolicy(p) {
   };
 }
 
-// Source 2b — stores: a general (non-drug) supply at/below reorder level
-// suggests raising a purchase order. Same severity logic as pharmacy: out
-// entirely is critical, low but non-zero is a warning.
-function alertFromStoreItem(item) {
-  const out = item.qty <= 0;
+// Source — Patient Journey Engine: a required step (e.g. Lab) still
+// pending too long after an ED journey started becomes a warning alert.
+// No patient name/hospital-no available directly from the journey record
+// itself (only patientId) — same limitation the aggregator already has
+// for some ops-only sources; kept as a plain reference rather than
+// invented data.
+function alertFromIncompleteJourney(j) {
   return {
-    id: `stores:${item.id}`,
-    source: "Stores",
-    severity: out ? "critical" : "warning",
-    patientName: null,
-    hospitalNo: null,
-    title: out ? "Out of stock \u2014 raise an LPO" : "Low stock \u2014 consider an LPO",
-    detail: out
-      ? `${item.item} \u2014 0 remaining (reorder at ${item.reorder})`
-      : `${item.item} \u2014 ${item.qty} left (reorder at ${item.reorder})`,
-    reference: item.category,
-    at: new Date().toISOString(),
+    id: `journey:${j.instance_id}:${j.step_key}`,
+    source: "Patient journey",
+    severity: "warning",
+    patientName: undefined,
+    hospitalNo: undefined,
+    title: `${j.step_label} still pending`,
+    detail: `Emergency journey started ${j.started_at}, "${j.step_label}" step not yet fulfilled.`,
+    reference: j.origin_entity_id,
+    at: j.started_at,
   };
 }
 
 export async function listAlerts({ includeAcknowledged = false } = {}) {
   await delay();
 
-  const [criticalOrders, lowStock, lowStores, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity, expiringLicenses, allAccreditations, seriousIncidents, overduePolicies] = await Promise.all([
+  const [criticalOrders, lowStock, urgentStudies, opsIssues, unstable, bloodIssues, neonatal, overdueChemo, outbreaks, instrumentIssues, overdueDialysis, pendingReferrals, overdueImmunisations, overdueDsars, severeCrises, ipcOutbreaks, geriatricRisk, mhuAcuity, expiringLicenses, allAccreditations, seriousIncidents, overduePolicies, incompleteJourneys] = await Promise.all([
     listCriticalOrders(),
     listLowStock(),
-    listLowStores(),
     listUrgentStudies(),
     listOpsIssues(),
     listUnstablePatients(),
@@ -385,13 +384,13 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     listOverdueDsars(), listActiveSevereCrises(), checkOutbreakThreshold(),
     listHighRiskGeriatric(), listHighAcuityMhu(), listExpiringLicenses(), listAccreditations(),
     listSeriousOpenIncidents(), listOverduePolicies(),
+    listIncompleteJourneys(),
   ]);
   // checkOutbreakThreshold() result is bound to ipcOutbreaks above.
 
   const alerts = [
     ...criticalOrders.map(alertFromLabOrder),
     ...lowStock.map(alertFromDrug),
-    ...lowStores.map(alertFromStoreItem),
     ...urgentStudies.map(alertFromStudy),
     ...opsIssues.map(alertFromOpsIssue),
     ...unstable.map(alertFromUnstable),
@@ -412,6 +411,7 @@ export async function listAlerts({ includeAcknowledged = false } = {}) {
     ...allAccreditations.filter((a) => a.status !== "current").map(alertFromAccreditation),
     ...seriousIncidents.map(alertFromIncident),
     ...overduePolicies.map(alertFromPolicy),
+    ...incompleteJourneys.map(alertFromIncompleteJourney),
   ];
 
   const rank = { critical: 0, warning: 1 };

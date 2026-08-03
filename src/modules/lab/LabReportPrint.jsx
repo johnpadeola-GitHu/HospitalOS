@@ -38,7 +38,7 @@ export default function LabReportPrint({ order, release, onClose, actor }) {
         <tbody>
           {test?.analytes.map((a) => {
             const val = order.results?.[a.key];
-            const flag = val != null ? flagValue(a, val) : null;
+            const flag = val != null ? flagValue(order.testCode, a, val) : null;
             return (
               <tr key={a.key}>
                 <td style={{ ...td, fontWeight: 600 }}>{a.label}</td>
