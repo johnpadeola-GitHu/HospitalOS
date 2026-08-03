@@ -78,6 +78,7 @@ import { HelpProvider } from "./engines/help";
 import Instruments from "./modules/instruments/Instruments";
 import Formulary from "./modules/pharmacy/Formulary";
 import Procurement from "./modules/finance/Procurement";
+import ClinicalRules from "./modules/system/ClinicalRules";
 import Stores from "./modules/finance/Stores";
 import BankReconciliation from "./modules/finance/BankReconciliation";
 import PaymentCallback from "./modules/finance/PaymentCallback";
@@ -114,6 +115,7 @@ const MODULES = {
   "/ops/visitor": Visitor,
   "/system/facilities": Facilities,
   "/system/settings": Settings,
+  "/system/clinical-rules": ClinicalRules,
   "/system/security": Security,
   "/system/documents": SysDocuments,
   "/academic/training": Training,

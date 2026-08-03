@@ -48,6 +48,7 @@ export const ACTIONS = [
   { key: "finance:claim", label: "Manage claims" },
   { key: "finance:approve-claim", label: "Approve claims" },
   { key: "finance:refund", label: "Issue refunds" },
+  { key: "clinical-rules:override-block", label: "Override blocked clinical rules" },
   { key: "system:manage-users", label: "Manage users" },
   { key: "system:configure", label: "Change settings" },
   { key: "system:view-audit", label: "View audit log" },
@@ -64,7 +65,7 @@ export const ROLES = {
     areas: ["overview", "academy", "patient-care", "diagnostics", "pharmacy", "specialty-services"],
     grants: [
       "patient-care:*", "diagnostics:order", "diagnostics:result", "diagnostics:verify",
-      "diagnostics:transfuse", "pharmacy:dispense",
+      "diagnostics:transfuse", "pharmacy:dispense", "clinical-rules:override-block",
     ],
   },
   nurse: {
