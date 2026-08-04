@@ -7,11 +7,13 @@
 //
 // PHASE 1 LIVE, module 47. Device configuration and message history now
 // genuinely persist. SCOPE unchanged from the original honest
-// documentation: a production gateway needs real network listeners
-// (MLLP sockets, a DICOM SCP, a print daemon) — that's Worker/network
-// territory beyond what a browser (or this migration) can do. What runs
-// here is still the management + monitoring layer plus a faithful
-// simulation of each protocol's message flow — every "receive" function
+// documentation: a production gateway needs real, persistent network
+// listeners (MLLP sockets, a DICOM SCP) that a browser can't run and that
+// Cloudflare Workers architecturally can't hold open either (see
+// gateway-agent/README.md for exactly why) — that's what the real,
+// separately-installed Gateway Agent is for. What runs here is still the
+// management + monitoring layer plus a faithful simulation of each
+// protocol's message flow — every "receive" function
 // calls the SAME real, already-migrated downstream functions
 // (enterResults, scheduleStudy, deliverFraction) a live listener would
 // call, alongside the new real device/message-log recording, so nothing

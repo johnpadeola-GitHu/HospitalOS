@@ -81,13 +81,37 @@ export default function Instruments() {
       <div style={note}>
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
         <span>
-          Live network listening (MLLP for HL7, a DICOM SCP, a print daemon) runs
-          server-side. This screen manages and monitors every connected device;
-          each "receive/confirm/send" action runs the exact code path a real
-          listener would call — Lab, Radiology, Radiotherapy and Alerts cannot
-          tell the difference.
+          Real network listening (MLLP for HL7, a DICOM SCP) requires a small
+          Gateway Agent installed on a PC at the hospital \u2014 Cloudflare's edge
+          network cannot hold a persistent socket open the way these protocols
+          need. Once a device is registered below, contact the AgoroX team to have
+          the Gateway Agent installed on a PC next to that equipment \u2014 setup
+          is hands-on for now, not a self-service download. Until it's
+          installed for a given device, each "receive/confirm/send" action
+          here runs the exact code path a real listener would call, so Lab,
+          Radiology, and Alerts can't tell the difference \u2014 useful for
+          testing the rest of the system before real hardware is connected.
         </span>
       </div>
+
+      <Card title="Gateway Agent" pad={false}>
+        <div style={{ padding: 16 }}>
+          <div style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6, marginBottom: 12 }}>
+            The small program that connects a real analyzer or printer to HospitalOS.
+            Runs on any Windows PC on the same network as the equipment. Installed by the
+            AgoroX team as part of onboarding \u2014 register the device below, then reach out
+            to get it set up.
+          </div>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <Button variant="primary" icon="MessageCircle" onClick={() => window.open("https://wa.me/2348034129684", "_blank")}>
+              Contact AgoroX to install
+            </Button>
+            <span style={{ fontSize: 11, color: "var(--muted)" }}>
+              Register a device first, then reach out with its name so we know which one to bring the agent for.
+            </span>
+          </div>
+        </div>
+      </Card>
 
       {err && <div style={errBanner}>{err}</div>}
 
@@ -206,6 +230,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
   const [err, setErr] = useState("");
   const [name, setName] = useState("");
   const [category, setCategory] = useState(DEVICE_CATEGORIES[0].key);
+  const [registered, setRegistered] = useState(null); // { deviceToken, name } once created
 
   const supported = isDeviceDetectionSupported();
 
@@ -225,14 +250,51 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
   const submit = async () => {
     setBusy(true); setErr("");
     try {
-      await registerInstrument({
+      const created = await registerInstrument({
         category, name, vendor: detected.manufacturerName,
         connectionType: detected.connectionType, vendorId: detected.vendorId, productId: detected.productId,
         actor,
       });
-      await onDone();
+      // The token is returned ONLY on this response \u2014 it's never
+      // fetchable again after this, same as any real API key. Show it
+      // here instead of closing immediately.
+      setRegistered({ deviceToken: created.deviceToken, name: created.name });
+      setBusy(false);
     } catch (e) { setErr(e.message); setBusy(false); }
   };
+
+  if (registered) {
+    return (
+      <Modal title="Device registered" onClose={onDone} footer={<Button variant="primary" onClick={onDone}>Done</Button>}>
+        <div style={detectedBox}>
+          <Icons.CheckCircle2 size={14} color="var(--good)" style={{ flexShrink: 0, marginTop: 1 }} />
+          <div style={{ fontSize: 13, color: "var(--ink-strong)" }}>
+            <strong>{registered.name}</strong> is registered. Save the token below \u2014 the AgoroX team
+            will need it to set up the Gateway Agent on a PC next to this device.
+          </div>
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--muted)", marginTop: 14, marginBottom: 4 }}>
+          DEVICE TOKEN \u2014 shown once, copy it now
+        </div>
+        <div style={{
+          fontFamily: "var(--font-mono)", fontSize: 12.5, background: "var(--surface)",
+          border: "1px solid var(--border)", borderRadius: 6, padding: "10px 12px",
+          wordBreak: "break-all", userSelect: "all",
+        }}>
+          {registered.deviceToken}
+        </div>
+        <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 8 }}>
+          This won't be shown again. If you lose it, remove the device and register it again to get a new one.
+        </div>
+        <Button
+          variant="secondary" icon="MessageCircle" onClick={() => window.open("https://wa.me/2348034129684", "_blank")}
+          style={{ marginTop: 14 }}
+        >
+          Contact AgoroX to set up this device
+        </Button>
+      </Modal>
+    );
+  }
 
   return (
     <Modal title="Detect connected device" onClose={onClose} footer={detected ? (
