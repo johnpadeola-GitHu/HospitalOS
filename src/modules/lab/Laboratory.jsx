@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   TEST_CATALOGUE,
+  searchCatalogue,
   STATUS_LABELS,
   listOrders,
   createOrder,
@@ -300,9 +301,13 @@ function OrderModal({ onClose, onDone }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [testQuery, setTestQuery] = useState("");
   const [testCode, setTestCode] = useState(TEST_CATALOGUE[0].code);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+
+  const selectedTest = TEST_CATALOGUE.find((t) => t.code === testCode);
+  const testMatches = testQuery.trim() ? searchCatalogue(testQuery).slice(0, 8) : [];
 
   useEffect(() => {
     let alive = true;
@@ -385,14 +390,43 @@ function OrderModal({ onClose, onDone }) {
         )}
       </div>
       <Field label="Test">
-        <select style={inputStyle} value={testCode} onChange={(e) => setTestCode(e.target.value)}>
-          {TEST_CATALOGUE.map((t) => (
-            <option key={t.code} value={t.code}>
-              {t.name} ({t.department})
-            </option>
-          ))}
-        </select>
+        <input
+          style={inputStyle}
+          placeholder="Search by name, code, department, or specimen (291 tests across 12 disciplines)"
+          value={testQuery}
+          onChange={(e) => setTestQuery(e.target.value)}
+        />
       </Field>
+      {testQuery.trim() && (
+        <div style={{ maxHeight: 180, overflowY: "auto", marginBottom: 8 }}>
+          {testMatches.map((t) => (
+            <button
+              key={t.code}
+              onClick={() => { setTestCode(t.code); setTestQuery(""); }}
+              style={resultRow}
+            >
+              <span style={{ fontWeight: 500, color: "var(--ink-strong)" }}>
+                {t.name}
+              </span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--muted)" }}>
+                {t.code} · {t.department}
+              </span>
+            </button>
+          ))}
+          {testMatches.length === 0 && (
+            <div style={{ fontSize: 12, color: "var(--muted)", padding: "8px 2px" }}>
+              No tests match.
+            </div>
+          )}
+        </div>
+      )}
+      <div style={{
+        fontSize: 12.5, padding: "8px 10px", borderRadius: 6,
+        background: "var(--surface-2)", border: "1px solid var(--border)", marginBottom: 4,
+      }}>
+        <strong style={{ color: "var(--ink-strong)" }}>{selectedTest.name}</strong>
+        <span style={{ color: "var(--muted)" }}> — {selectedTest.code} · {selectedTest.department} · {selectedTest.specimen}</span>
+      </div>
     </Modal>
   );
 }

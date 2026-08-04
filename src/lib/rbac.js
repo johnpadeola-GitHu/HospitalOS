@@ -15,9 +15,11 @@ export const AREAS = [
   { key: "overview", label: "Overview & alerts" },
   { key: "academy", label: "Academy" },
   { key: "patient-care", label: "Patient care" },
+  { key: "laboratory", label: "Laboratory" },
   { key: "diagnostics", label: "Diagnostics" },
   { key: "pharmacy", label: "Pharmacy" },
   { key: "finance", label: "Finance & trade" },
+  { key: "accounts", label: "Accounts & Procurement" },
   { key: "operations", label: "Operations" },
   { key: "academic", label: "Academic" },
   { key: "specialty-services", label: "Specialty services" },
@@ -62,7 +64,7 @@ export const ROLES = {
   },
   doctor: {
     label: "Doctor",
-    areas: ["overview", "academy", "patient-care", "diagnostics", "pharmacy", "specialty-services"],
+    areas: ["overview", "academy", "patient-care", "laboratory", "diagnostics", "pharmacy", "specialty-services"],
     grants: [
       "patient-care:*", "diagnostics:order", "diagnostics:result", "diagnostics:verify",
       "diagnostics:transfuse", "pharmacy:dispense", "clinical-rules:override-block",
@@ -76,13 +78,13 @@ export const ROLES = {
   },
   "lab-scientist": {
     label: "Lab Scientist",
-    areas: ["overview", "academy", "diagnostics"],
+    areas: ["overview", "academy", "laboratory", "diagnostics"],
     // Can collect and result; verification is a separate responsibility.
     grants: ["diagnostics:collect", "diagnostics:result", "diagnostics:verify"],
   },
   radiographer: {
     label: "Radiographer",
-    areas: ["overview", "academy", "diagnostics"],
+    areas: ["overview", "academy", "laboratory", "diagnostics"],
     grants: ["diagnostics:order", "diagnostics:result"],
   },
   pharmacist: {
@@ -100,6 +102,26 @@ export const ROLES = {
     label: "Records Officer",
     areas: ["overview", "academy", "patient-care"],
     grants: ["patient-care:register"],
+  },
+  "ops-manager": {
+    label: "Operations Manager",
+    areas: ["overview", "academy", "operations", "intelligence"],
+    grants: ["operations:*"],
+  },
+  "compliance-officer": {
+    label: "Compliance Officer",
+    areas: ["overview", "academy", "compliance", "intelligence"],
+    grants: ["compliance:*"],
+  },
+  "public-health-officer": {
+    label: "Public Health Officer",
+    areas: ["overview", "academy", "public-health", "intelligence"],
+    grants: ["public-health:*"],
+  },
+  accountant: {
+    label: "Accountant",
+    areas: ["overview", "academy", "accounts"],
+    grants: ["accounts:*"],
   },
 };
 
