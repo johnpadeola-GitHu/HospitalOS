@@ -149,7 +149,7 @@ export default function Laboratory() {
                     <td style={{ ...td, textAlign: "right" }}>
                       <div style={{ display: "inline-flex", gap: 6 }}>
                         {o.status === "ordered" && may("diagnostics:collect") && (
-                          <Button onClick={() => act(collectSample, o.id)}>Collect</Button>
+                          <Button onClick={() => act(collectSample, o.id)}>Collect sample</Button>
                         )}
                         {(o.status === "collected" || o.status === "resulted") && (
                           <Button onClick={() => setResultFor(o)}>
@@ -302,12 +302,17 @@ function OrderModal({ onClose, onDone }) {
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
   const [testQuery, setTestQuery] = useState("");
-  const [testCode, setTestCode] = useState(TEST_CATALOGUE[0].code);
+  const [selectedTests, setSelectedTests] = useState([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
-  const selectedTest = TEST_CATALOGUE.find((t) => t.code === testCode);
   const testMatches = testQuery.trim() ? searchCatalogue(testQuery).slice(0, 8) : [];
+
+  const addTest = (t) => {
+    if (!selectedTests.some((x) => x.code === t.code)) setSelectedTests((s) => [...s, t]);
+    setTestQuery("");
+  };
+  const removeTest = (code) => setSelectedTests((s) => s.filter((t) => t.code !== code));
 
   useEffect(() => {
     let alive = true;
@@ -325,20 +330,32 @@ function OrderModal({ onClose, onDone }) {
       setErr("Select a patient first.");
       return;
     }
+    if (selectedTests.length === 0) {
+      setErr("Select at least one test.");
+      return;
+    }
     setBusy(true);
     setErr("");
-    try {
-      await createOrder({
-        patientId: selected.id,
-        patientName: `${selected.lastName}, ${selected.firstName}`,
-        hospitalNo: selected.hospitalNo,
-        testCode,
-      });
-      await onDone();
-    } catch (e) {
-      setErr(e.message);
-      setBusy(false);
+    const failed = [];
+    for (const t of selectedTests) {
+      try {
+        await createOrder({
+          patientId: selected.id,
+          patientName: `${selected.lastName}, ${selected.firstName}`,
+          hospitalNo: selected.hospitalNo,
+          testCode: t.code,
+        });
+      } catch (e) {
+        failed.push(`${t.name}: ${e.message}`);
+      }
     }
+    if (failed.length > 0) {
+      setErr(`${selectedTests.length - failed.length} of ${selectedTests.length} ordered. Failed: ${failed.join("; ")}`);
+      setBusy(false);
+      if (failed.length < selectedTests.length) await onDone();
+      return;
+    }
+    await onDone();
   };
 
   return (
@@ -350,8 +367,8 @@ function OrderModal({ onClose, onDone }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={submit} disabled={busy || !selected}>
-            {busy ? "Ordering…" : "Order test"}
+          <Button variant="primary" onClick={submit} disabled={busy || !selected || selectedTests.length === 0}>
+            {busy ? "Ordering…" : selectedTests.length > 1 ? `Order ${selectedTests.length} tests` : "Order test"}
           </Button>
         </>
       }
@@ -402,7 +419,7 @@ function OrderModal({ onClose, onDone }) {
           {testMatches.map((t) => (
             <button
               key={t.code}
-              onClick={() => { setTestCode(t.code); setTestQuery(""); }}
+              onClick={() => addTest(t)}
               style={resultRow}
             >
               <span style={{ fontWeight: 500, color: "var(--ink-strong)" }}>
@@ -420,13 +437,34 @@ function OrderModal({ onClose, onDone }) {
           )}
         </div>
       )}
-      <div style={{
-        fontSize: 12.5, padding: "8px 10px", borderRadius: 6,
-        background: "var(--surface-2)", border: "1px solid var(--border)", marginBottom: 4,
-      }}>
-        <strong style={{ color: "var(--ink-strong)" }}>{selectedTest.name}</strong>
-        <span style={{ color: "var(--muted)" }}> — {selectedTest.code} · {selectedTest.department} · {selectedTest.specimen}</span>
-      </div>
+      {selectedTests.length === 0 ? (
+        <div style={{ fontSize: 12.5, color: "var(--muted)", padding: "8px 2px" }}>
+          No tests selected yet — search above and click a test to add it. A specimen can carry several tests
+          together, the same way a single tube run through an analyzer produces multiple results at once.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 4 }}>
+          {selectedTests.map((t) => (
+            <div key={t.code} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              fontSize: 12.5, padding: "8px 10px", borderRadius: 6,
+              background: "var(--surface-2)", border: "1px solid var(--border)",
+            }}>
+              <span>
+                <strong style={{ color: "var(--ink-strong)" }}>{t.name}</strong>
+                <span style={{ color: "var(--muted)" }}> — {t.code} · {t.department} · {t.specimen}</span>
+              </span>
+              <button
+                onClick={() => removeTest(t.code)}
+                aria-label={`Remove ${t.name}`}
+                style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 14, padding: "0 4px" }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </Modal>
   );
 }

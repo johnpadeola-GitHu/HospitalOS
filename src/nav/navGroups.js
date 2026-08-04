@@ -22,7 +22,7 @@ export const NAV_GROUPS = [
   {
     id: "patient-care",
     label: "Patient care",
-    icon: "HeartPulse",
+    icon: "BedDouble",
     items: [
       { id: "registration", label: "Registration & ADT", path: "/patients/adt" , icon: "UserPlus" },
       { id: "records", label: "Medical records", path: "/records" , icon: "FileHeart" },
@@ -44,7 +44,7 @@ export const NAV_GROUPS = [
   {
     id: "laboratory",
     label: "Laboratory",
-    icon: "TestTube",
+    icon: "FlaskConical",
     items: [
       { id: "laboratory-main", label: "Laboratory", path: "/lab" , icon: "TestTube" },
       { id: "poct", label: "Point of care testing", path: "/poct" , icon: "Timer" },

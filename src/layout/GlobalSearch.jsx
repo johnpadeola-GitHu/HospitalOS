@@ -7,7 +7,7 @@ import { searchWithExcerpt } from "../engines/help";
 import { useAuth } from "../auth/AuthContext";
 import { useHelp } from "../engines/help";
 import { searchStaff } from "../modules/staff/staffService";
-import { listOrders } from "../modules/lab/labService";
+import { listOrders, searchCatalogue } from "../modules/lab/labService";
 import { listDrugs } from "../modules/pharmacy/pharmacyService";
 import { searchInvoices, listPayments } from "../modules/finance/billingService";
 import { listBookings } from "../modules/bookings/bookingsService";
@@ -24,7 +24,7 @@ export default function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({
-    nav: [], patients: [], help: [], staff: [], labOrders: [], drugs: [],
+    nav: [], patients: [], help: [], staff: [], labOrders: [], labTests: [], drugs: [],
     invoices: [], payments: [], bookings: [], cases: [],
   });
   const [active, setActive] = useState(0);
@@ -57,7 +57,7 @@ export default function GlobalSearch() {
   useEffect(() => {
     const q = query.trim().toLowerCase();
     if (!q) {
-      setResults({ nav: [], patients: [], help: [], staff: [], labOrders: [], drugs: [], invoices: [], payments: [], bookings: [], cases: [] });
+      setResults({ nav: [], patients: [], help: [], staff: [], labOrders: [], labTests: [], drugs: [], invoices: [], payments: [], bookings: [], cases: [] });
       return;
     }
     let alive = true;
@@ -68,6 +68,7 @@ export default function GlobalSearch() {
       .slice(0, 5);
 
     const help = searchWithExcerpt(q, 4);
+    const labTests = can("laboratory") ? searchCatalogue(q).slice(0, 5) : [];
 
     const t = setTimeout(async () => {
       // Each source is independent and permission-gated the same way the
@@ -76,17 +77,17 @@ export default function GlobalSearch() {
       const [patients, staff, labOrders, drugs, invoices, payments, bookings, cases] = await Promise.all([
         can("patient-care") ? listPatients({ query: q, status: "all" }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("overview") ? searchStaff({ query: q, role: "doctor" }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
-        can("diagnostics") ? listOrders({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
+        can("laboratory") ? listOrders({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("pharmacy") ? listDrugs({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("finance") ? searchInvoices(q).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("finance") ? listPayments({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("overview") ? listBookings({ query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
         can("specialty-services") ? listCases({ includeCompleted: true, query: q }).then((r) => r.slice(0, 5)).catch(() => []) : Promise.resolve([]),
       ]);
-      if (alive) setResults({ nav, patients, help, staff, labOrders, drugs, invoices, payments, bookings, cases });
+      if (alive) setResults({ nav, patients, help, staff, labOrders, labTests, drugs, invoices, payments, bookings, cases });
     }, 140);
 
-    setResults((r) => ({ ...r, nav, help }));
+    setResults((r) => ({ ...r, nav, help, labTests }));
     return () => { alive = false; clearTimeout(t); };
   }, [query, can]);
 
@@ -95,6 +96,7 @@ export default function GlobalSearch() {
     ...results.patients.map((p) => ({ kind: "patient", ...p })),
     ...results.staff.map((s) => ({ kind: "staff", ...s })),
     ...results.labOrders.map((o) => ({ kind: "lab", ...o })),
+    ...results.labTests.map((t) => ({ kind: "labTest", ...t })),
     ...results.drugs.map((d) => ({ kind: "drug", ...d })),
     ...results.invoices.map((i) => ({ kind: "invoice", ...i })),
     ...results.payments.map((p) => ({ kind: "payment", ...p })),
@@ -109,6 +111,7 @@ export default function GlobalSearch() {
     else if (item.kind === "patient") navigate("/records");
     else if (item.kind === "staff") { /* no staff detail screen exists yet — just close */ }
     else if (item.kind === "lab") navigate("/lab");
+    else if (item.kind === "labTest") navigate("/lab");
     else if (item.kind === "drug") navigate("/pharmacy/inventory");
     else if (item.kind === "invoice") navigate("/finance/billing");
     else if (item.kind === "payment") navigate("/finance/payments");
@@ -207,6 +210,15 @@ export default function GlobalSearch() {
                     return (
                       <Row key={"lb" + o.id} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
                         icon="TestTube" title={o.testName} sub={`${o.patientName} · ${o.accession} · ${o.status}`} tag="Lab" />
+                    );
+                  })}
+
+                  {results.labTests.length > 0 && <Section label="Lab tests (catalogue)" />}
+                  {results.labTests.map((t) => {
+                    const i = flat.findIndex((f) => f.kind === "labTest" && f.code === t.code);
+                    return (
+                      <Row key={"lt" + t.code} active={i === active} onClick={() => choose(flat[i])} onHover={() => setActive(i)}
+                        icon="FlaskConical" title={t.name} sub={`${t.code} · ${t.department} · ${t.specimen}`} tag="Test" />
                     );
                   })}
 

@@ -8,7 +8,8 @@
 export const CATEGORIES = [
   { key: "start", label: "Getting started", icon: "Rocket", blurb: "Orientation, signing in, and how the system is laid out." },
   { key: "clinical", label: "Clinical workflows", icon: "Stethoscope", blurb: "Registration, admission, records, emergency, critical care." },
-  { key: "diagnostics", label: "Diagnostics", icon: "Microscope", blurb: "Imaging, blood bank, radiotherapy, and the instruments gateway. Laboratory has its own section." },
+  { key: "laboratory", label: "Laboratory", icon: "FlaskConical", blurb: "291 tests across 12 disciplines, the Gateway Agent, biobanking, and point of care testing." },
+  { key: "diagnostics", label: "Diagnostics", icon: "Microscope", blurb: "Imaging, blood bank, radiotherapy, and the instruments gateway." },
   { key: "pharmacy", label: "Pharmacy", icon: "Pill", blurb: "Dispensing, inventory, and allergy safety." },
   { key: "finance", label: "Finance", icon: "Wallet", blurb: "Billing, payments, claims, and accommodation charges." },
   { key: "safety", label: "Safety & alerts", icon: "BellRing", blurb: "What raises an alert and how alerts clear." },
@@ -192,7 +193,7 @@ export const ARTICLES = [
   },
 
   {
-    id: "lab", cat: "diagnostics", icon: "TestTube",
+    id: "lab", cat: "laboratory", icon: "TestTube",
     title: "Ordering tests and entering results",
     lead: "A strict lifecycle, live reference-range flagging, and instant critical alerts.",
     body: [
@@ -209,7 +210,7 @@ export const ARTICLES = [
       { p: "Each value is checked against its reference range and marked Low, High, or Critical as you type. A critical value puts a red dot on the accession and raises a hospital-wide alert the moment it is saved." },
       { note: "291 tests across 12 disciplines \u2014 Haematology, Chemistry, Endocrinology, Cardiac Markers, Tumor Markers, Immunology & Autoimmune, Serology & Infectious Disease, Microbiology, Urinalysis & Renal, Toxicology & Drug Levels, Molecular & Genetic, and Transfusion Medicine. Not every test carries a real numeric reference range yet \u2014 the ones brought in from a broader catalogue that don't have a confirmed clinical range default to a qualitative result pending a lab director's sign-off, rather than a guessed number." },
     ],
-    related: ["instruments", "alerts"],
+    related: ["instruments", "alerts", "lab-reference-ranges"],
   },
   {
     id: "result-release", cat: "diagnostics", icon: "Send",
@@ -688,7 +689,7 @@ export const ARTICLES = [
     related: ["lab"],
   },
   {
-    id: "biobanking", cat: "diagnostics", icon: "Archive",
+    id: "biobanking", cat: "laboratory", icon: "Archive",
     title: "Biobanking",
     lead: "Long-term specimen storage, distinct from the active lab worklist.",
     body: [
@@ -984,7 +985,7 @@ export const ARTICLES = [
     related: ["instruments", "oncology"],
   },
   {
-    id: "poct", cat: "diagnostics", icon: "Timer",
+    id: "poct", cat: "laboratory", icon: "Timer",
     title: "Point-of-care testing",
     lead: "Bedside results, logged where they happen \u2014 the ward, not the central laboratory.",
     body: [
