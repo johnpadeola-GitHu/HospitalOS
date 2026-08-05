@@ -69,6 +69,8 @@ export default function Biomedical() {
                   Loading register…
                 </td>
               </tr>
+            ) : equipment.length === 0 ? (
+              <tr><td colSpan={5} style={emptyCell}>No equipment registered yet.</td></tr>
             ) : (
               equipment.map((e) => (
                 <tr key={e.id} style={{ borderTop: "1px solid var(--border)" }}>

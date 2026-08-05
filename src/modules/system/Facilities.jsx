@@ -29,6 +29,8 @@ export default function Facilities() {
 
       {loading ? (
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading sites…</div>
+      ) : sites.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No sites registered yet.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {sites.map((s) => (

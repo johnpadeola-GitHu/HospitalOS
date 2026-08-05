@@ -34,7 +34,7 @@ export default function Reporting() {
       {err && <div style={errBox}>{err}</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading…</div> : rows.map((r) => {
+        {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading…</div> : rows.length === 0 ? <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No reports generated yet.</div> : rows.map((r) => {
           const tint = REPORT_TINT[r.status];
           return (
             <div key={r.id} style={card}>

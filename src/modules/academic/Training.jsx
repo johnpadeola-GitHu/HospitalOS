@@ -38,7 +38,9 @@ export default function Training() {
 
       {err && <div style={errBox}>{err}</div>}
 
-      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading programmes…</div> : (
+      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading programmes…</div> : rows.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No training programmes yet.</div>
+      ) : (
         <div style={grid}>
           {rows.map((t) => (
             <div key={t.id} style={card}>

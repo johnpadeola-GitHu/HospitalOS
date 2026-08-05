@@ -26,6 +26,9 @@ export default function Logbooks() {
           <thead><tr>{["Date", "Trainee", "Procedure", "Supervisor"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
           <tbody>
             {loading ? <tr><td colSpan={4} style={emptyCell}>Loading…</td></tr> :
+              rows.length === 0 ? (
+              <tr><td colSpan={4} style={emptyCell}>Nothing here yet.</td></tr>
+            ) : (
               rows.map((l) => (
                 <tr key={l.id} style={{ borderTop: "1px solid var(--border)" }}>
                   <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--muted)" }}>{l.date}</td>
@@ -33,7 +36,7 @@ export default function Logbooks() {
                   <td style={td}>{l.procedure}</td>
                   <td style={{ ...td, color: "var(--muted)" }}>{l.supervisor}</td>
                 </tr>
-              ))}
+              )))}
           </tbody>
         </table>
       </div>

@@ -58,6 +58,8 @@ export default function CSSD() {
                   Loading…
                 </td>
               </tr>
+            ) : batches.length === 0 ? (
+              <tr><td colSpan={5} style={emptyCell}>No sterilisation batches yet.</td></tr>
             ) : (
               batches.map((b) => {
                 const tint = STAGE_TINT[b.stage];

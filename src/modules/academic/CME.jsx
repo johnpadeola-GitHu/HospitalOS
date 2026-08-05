@@ -38,7 +38,9 @@ export default function CME() {
 
       {err && <div style={errBox}>{err}</div>}
 
-      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading activities…</div> : (
+      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading activities…</div> : rows.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No CME activities yet.</div>
+      ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rows.map((c) => (
             <div key={c.id} style={card}>

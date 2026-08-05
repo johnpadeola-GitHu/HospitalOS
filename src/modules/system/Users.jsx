@@ -95,6 +95,8 @@ export default function Users() {
                   Loading users…
                 </td>
               </tr>
+            ) : users.length === 0 ? (
+              <tr><td colSpan={4} style={emptyCell}>No users match.</td></tr>
             ) : (
               users.map((u) => (
                 <tr key={u.id} style={{ borderTop: "1px solid var(--border)", opacity: u.active ? 1 : 0.55 }}>

@@ -37,7 +37,9 @@ export default function Research() {
 
       {err && <div style={errBox}>{err}</div>}
 
-      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading studies…</div> : (
+      {loading ? <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading studies…</div> : rows.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No research studies yet.</div>
+      ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rows.map((r) => (
             <div key={r.id} style={card}>

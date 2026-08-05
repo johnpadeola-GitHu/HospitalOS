@@ -32,6 +32,9 @@ export default function Formulary() {
           <thead><tr>{["Drug", "Form", "NAFDAC no.", "Unit price"].map((h) => <th key={h} style={th}>{h}</th>)}</tr></thead>
           <tbody>
             {loading ? <tr><td colSpan={4} style={emptyCell}>Loading formulary…</td></tr> :
+              rows.length === 0 ? (
+              <tr><td colSpan={4} style={emptyCell}>Nothing here yet.</td></tr>
+            ) : (
               rows.map((d) => (
                 <tr key={d.id} style={{ borderTop: "1px solid var(--border)" }}>
                   <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{d.name}</td>
@@ -39,7 +42,7 @@ export default function Formulary() {
                   <td style={{ ...td, fontFamily: "var(--font-mono)", fontSize: 12 }}>{d.nafdac}</td>
                   <td style={{ ...td, fontFamily: "var(--font-mono)" }}>₦{priceFor("pharmacy", d.id, d.price)}</td>
                 </tr>
-              ))}
+              )))}
           </tbody>
         </table>
       </div>

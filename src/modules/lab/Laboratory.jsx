@@ -341,8 +341,6 @@ function OrderModal({ onClose, onDone }) {
       try {
         await createOrder({
           patientId: selected.id,
-          patientName: `${selected.lastName}, ${selected.firstName}`,
-          hospitalNo: selected.hospitalNo,
           testCode: t.code,
         });
       } catch (e) {

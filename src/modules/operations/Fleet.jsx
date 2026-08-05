@@ -69,6 +69,12 @@ export default function Fleet() {
                   Loading fleet…
                 </td>
               </tr>
+            ) : fleet.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={emptyCell}>
+                  No vehicles in the fleet yet.
+                </td>
+              </tr>
             ) : (
               fleet.map((v) => (
                 <tr key={v.id} style={{ borderTop: "1px solid var(--border)" }}>

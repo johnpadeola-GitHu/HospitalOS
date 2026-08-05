@@ -49,6 +49,8 @@ export default function WardsBoard() {
 
       {loading ? (
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading bed board…</div>
+      ) : wards.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No wards configured yet.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {wards.map((w) => (

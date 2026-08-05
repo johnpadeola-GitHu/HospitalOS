@@ -331,7 +331,7 @@ function RecordModal({ kind, patient, actor, onClose, onDone, onError }) {
           type: amend ? "amendment" : form.type,
           subjective: form.subjective, objective: form.objective,
           assessment: form.assessment, plan: form.plan,
-          actor, amendsId: amend ? amend.id : null,
+          amendsId: amend ? amend.id : null,
         });
       } else if (type === "dx") {
         await addDiagnosis({ patientId: patient.id, code: form.code, status: form.status, actor });

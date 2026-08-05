@@ -41,6 +41,8 @@ export default function Facility() {
 
       {loading ? (
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading facility status…</div>
+      ) : rows.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No facility areas tracked yet.</div>
       ) : (
         <div style={grid}>
           {rows.map((f) => {

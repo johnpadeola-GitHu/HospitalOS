@@ -21,6 +21,8 @@ export default function Support() {
 
       {loading ? (
         <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading support services…</div>
+      ) : rows.length === 0 ? (
+        <div style={{ color: "var(--muted)", fontSize: 13, padding: "20px 2px" }}>No support services configured yet.</div>
       ) : (
         <div style={grid}>
           {rows.map((s) => (

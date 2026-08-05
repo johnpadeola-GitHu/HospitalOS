@@ -32,6 +32,8 @@ export default function Scheduling() {
           <tbody>
             {loading ? (
               <tr><td colSpan={3} style={emptyCell}>Loading roster…</td></tr>
+            ) : shifts.length === 0 ? (
+              <tr><td colSpan={3} style={emptyCell}>No shifts scheduled yet.</td></tr>
             ) : (
               shifts.map((s) => (
                 <tr key={s.id} style={{ borderTop: "1px solid var(--border)" }}>
