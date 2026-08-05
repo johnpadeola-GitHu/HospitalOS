@@ -307,7 +307,7 @@ function DisposeModal({ encounter, onClose, onDone }) {
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const acuityRow = { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" };
-const acuityChip = { fontSize: 12, padding: "5px 11px", borderRadius: 999 };
+const acuityChip = { fontSize: 12, padding: "5px 11px", borderRadius: 0 };
 const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "28px 24px", textAlign: "center" };
 const encCard = {
   display: "flex",
@@ -321,7 +321,7 @@ const encCard = {
   overflow: "hidden",
 };
 const acuityBar = { position: "absolute", left: 0, top: 0, bottom: 0, width: 4 };
-const acuityPill = { fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, whiteSpace: "nowrap" };
+const acuityPill = { fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 0, whiteSpace: "nowrap" };
 const dispBtn = {
   font: "inherit",
   fontSize: 13,

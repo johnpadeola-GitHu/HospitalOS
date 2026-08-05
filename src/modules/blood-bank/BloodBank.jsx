@@ -277,7 +277,7 @@ function ReqStatus({ status }) {
   }[status];
   const label = { crossmatched: "Crossmatched", issued: "Issued", transfused: "Transfused" }[status];
   return (
-    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>
+    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0 }}>
       {label}
     </span>
   );
@@ -396,7 +396,7 @@ const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "va
 const invGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 12 };
 const groupCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
 const groupLow = { borderColor: "#E4B6B2", background: "#FCF4F3" };
-const lowPill = { fontSize: 10, fontWeight: 600, color: "#B0281F", background: "#F7E4E2", padding: "1px 7px", borderRadius: 999 };
+const lowPill = { fontSize: 10, fontWeight: 600, color: "#B0281F", background: "#F7E4E2", padding: "1px 7px", borderRadius: 0 };
 const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };

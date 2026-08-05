@@ -278,7 +278,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
         </div>
         <div style={{
           fontFamily: "var(--font-mono)", fontSize: 12.5, background: "var(--surface)",
-          border: "1px solid var(--border)", borderRadius: 6, padding: "10px 12px",
+          border: "1px solid var(--border)", borderRadius: 0, padding: "10px 12px",
           wordBreak: "break-all", userSelect: "all",
         }}>
           {registered.deviceToken}
@@ -575,20 +575,20 @@ function PrinterAction({ device, onClose, onDone }) {
   );
 }
 
-const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.55 };
+const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.55 };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 10, marginBottom: 16 };
 const tabs = { display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" };
-const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 12px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 };
+const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 };
 const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
 const catCount = { fontSize: 10, fontWeight: 700, opacity: 0.75 };
 const row = { display: "flex", gap: 12, padding: "13px 16px" };
-const iconBox = { width: 36, height: 36, borderRadius: 9, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const iconBox = { width: 36, height: 36, borderRadius: 0, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const meta = { fontSize: 11.5, color: "var(--muted)", marginTop: 3 };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 16px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 16px", fontSize: 12.5, verticalAlign: "middle" };
-const codeBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 12px", fontFamily: "var(--font-mono)", fontSize: 10.5, lineHeight: 1.65, overflowX: "auto", whiteSpace: "pre", color: "var(--ink)" };
-const dicomStat = { display: "flex", gap: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
-const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12, padding: "10px 12px", borderRadius: 9, marginBottom: 14, lineHeight: 1.5 };
-const detectedBox = { display: "flex", gap: 9, background: "var(--good-bg)", padding: "11px 12px", borderRadius: 9, marginBottom: 14 };
+const codeBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 12px", fontFamily: "var(--font-mono)", fontSize: 10.5, lineHeight: 1.65, overflowX: "auto", whiteSpace: "pre", color: "var(--ink)" };
+const dicomStat = { display: "flex", gap: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };
+const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12, padding: "10px 12px", borderRadius: 0, marginBottom: 14, lineHeight: 1.5 };
+const detectedBox = { display: "flex", gap: 9, background: "var(--good-bg)", padding: "11px 12px", borderRadius: 0, marginBottom: 14 };

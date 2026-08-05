@@ -71,7 +71,7 @@ export default function CSSD() {
                     <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{b.contents}</td>
                     <td style={{ ...td, color: "var(--muted)" }}>{b.autoclave}</td>
                     <td style={td}>
-                      <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>
+                      <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0 }}>
                         {CSSD_LABELS[b.stage]}
                       </span>
                     </td>

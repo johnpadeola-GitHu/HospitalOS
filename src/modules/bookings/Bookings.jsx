@@ -122,7 +122,7 @@ function NewBookingModal({ onClose, onDone }) {
 }
 
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 16 };
-const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer", textTransform: "capitalize" };
+const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer", textTransform: "capitalize" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
 const demoNote = { background: "var(--info-bg)", color: "var(--info)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

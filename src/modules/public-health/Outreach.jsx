@@ -73,7 +73,7 @@ function AddModal({ actor, onClose, onDone }) {
       <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Plan"}</Button>
     </>}>
       {err && <div style={errBox}>{err}</div>}
-      <Field label="Activity"><input style={inputStyle} value={form.activity} onChange={set("activity")} placeholder="e.g. Rural health screening — Ijaye" /></Field>
+      <Field label="Activity"><input style={inputStyle} value={form.activity} onChange={set("activity")} placeholder="e.g. Hypertension screening, immunisation drive" /></Field>
       <Field label="Date"><input type="date" style={inputStyle} value={form.date} onChange={set("date")} /></Field>
       <Field label="Team"><input style={inputStyle} value={form.team} onChange={set("team")} placeholder="e.g. Community Health Team A" /></Field>
     </Modal>

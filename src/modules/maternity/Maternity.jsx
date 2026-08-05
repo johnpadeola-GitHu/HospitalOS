@@ -142,7 +142,7 @@ function StageChip({ stage }) {
     delivered: { bg: "#E6EFDF", fg: "#4A6329" },
   }[stage];
   return (
-    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999, whiteSpace: "nowrap" }}>
+    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0, whiteSpace: "nowrap" }}>
       {STAGE_LABELS[stage]}
     </span>
   );
@@ -262,7 +262,7 @@ function DeliveryModal({ admission, onClose, onDone }) {
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const card = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
 const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "20px 24px", textAlign: "center", color: "var(--muted)", fontSize: 13, marginBottom: 22 };
-const nbChip = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "3px 9px", borderRadius: 999 };
+const nbChip = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "3px 9px", borderRadius: 0 };
 const nbLow = { color: "#B0281F", background: "#F7E4E2" };
 const nbRow = { display: "flex", gap: 8, alignItems: "center", marginBottom: 8 };
 const removeBtn = { background: "none", border: "none", fontSize: 20, color: "var(--muted)", cursor: "pointer", lineHeight: 1 };

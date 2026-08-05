@@ -640,45 +640,45 @@ const dividerLabel = { fontSize: 11, fontWeight: 600, color: "var(--muted)" };
 const demoLink = {
   width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
   font: "inherit", fontSize: 13, fontWeight: 600, color: "var(--accent)",
-  background: "var(--accent-soft)", border: "1px solid var(--accent-bg)", borderRadius: 10,
+  background: "var(--accent-soft)", border: "1px solid var(--accent-bg)", borderRadius: 0,
   padding: "10px 0", cursor: "pointer",
 };
 const demoSub = { fontSize: 11, color: "var(--muted)", textAlign: "center", marginTop: 6, lineHeight: 1.5 };
 const signInBtn = {
   width: "100%", font: "inherit", fontSize: 13.5, fontWeight: 600, padding: "11px 14px",
-  borderRadius: 9, cursor: "pointer", border: "none", background: "var(--charcoal)", color: "#fff",
+  borderRadius: 0, cursor: "pointer", border: "none", background: "var(--charcoal)", color: "#fff",
   display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
 };
 const helpText = { fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6, marginBottom: 16 };
 const lbl = { display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--muted)", marginBottom: 5 };
 const backLink = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12.5, fontWeight: 600, color: "var(--muted)", background: "none", border: "none", cursor: "pointer", marginBottom: 14, padding: 0 };
 const inlineLink = { font: "inherit", fontSize: "inherit", fontWeight: 700, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" };
-const resumeNote = { display: "flex", gap: 7, background: "var(--accent-soft)", color: "var(--accent)", fontSize: 12, padding: "8px 11px", borderRadius: 9, marginBottom: 14, lineHeight: 1.5 };
+const resumeNote = { display: "flex", gap: 7, background: "var(--accent-soft)", color: "var(--accent)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14, lineHeight: 1.5 };
 const progressWrap = { display: "flex", gap: 4, marginBottom: 16 };
-const progressSeg = { flex: 1, height: 4, borderRadius: 3, background: "var(--border)" };
+const progressSeg = { flex: 1, height: 4, borderRadius: 0, background: "var(--border)" };
 const progressSegDone = { background: "var(--good)" };
 const progressSegCurrent = { background: "var(--charcoal)" };
 const primaryBtn = {
   width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-  background: "var(--charcoal)", color: "#fff", border: "none", borderRadius: 10,
+  background: "var(--charcoal)", color: "#fff", border: "none", borderRadius: 0,
   padding: "12px 0", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 6,
 };
-const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
+const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, marginBottom: 16, lineHeight: 1.5 };
 const rememberedNote = { fontSize: 12.5, color: "var(--muted)", marginBottom: 10, lineHeight: 1.5 };
 const switchLink = { font: "inherit", fontSize: 12.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" };
-const codePreview = { display: "flex", alignItems: "center", gap: 7, background: "var(--good-bg)", color: "var(--good)", fontSize: 12, padding: "9px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
+const codePreview = { display: "flex", alignItems: "center", gap: 7, background: "var(--good-bg)", color: "var(--good)", fontSize: 12, padding: "9px 12px", borderRadius: 0, marginBottom: 16, lineHeight: 1.5 };
 const lockedField = {
   display: "flex", alignItems: "center", gap: 8, ...inputStyle,
   background: "var(--surface)", color: "var(--ink-strong)", fontWeight: 600, cursor: "not-allowed",
 };
 const lockedNote = { fontSize: 11, color: "var(--muted)", lineHeight: 1.5, margin: "-8px 0 16px" };
-const inviteBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--ink)", fontSize: 12, padding: "12px 13px", borderRadius: 10, marginBottom: 18, lineHeight: 1.6 };
+const inviteBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--ink)", fontSize: 12, padding: "12px 13px", borderRadius: 0, marginBottom: 18, lineHeight: 1.6 };
 const chipGrid = { display: "flex", flexWrap: "wrap", gap: 7 };
-const chip = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12, fontWeight: 500, padding: "7px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const chip = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12, fontWeight: 500, padding: "7px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
-const planCard = { background: "var(--surface-2)", border: "1.5px solid var(--border-strong)", borderRadius: 12, padding: "16px 16px 14px", marginBottom: 18 };
+const planCard = { background: "var(--surface-2)", border: "1.5px solid var(--border-strong)", borderRadius: 0, padding: "16px 16px 14px", marginBottom: 18 };
 const agreementScroll = {
-  maxHeight: 340, overflowY: "auto", border: "1px solid var(--border-strong)", borderRadius: 10,
+  maxHeight: 340, overflowY: "auto", border: "1px solid var(--border-strong)", borderRadius: 0,
   padding: "16px 18px", background: "var(--surface)",
 };
 const agreementH = { fontSize: 12.5, fontWeight: 700, color: "var(--ink-strong)", marginBottom: 6 };
@@ -690,8 +690,8 @@ const agreementTd = { padding: "5px 8px", borderBottom: "1px solid var(--border)
 const scrollHint = { display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--warn)", marginTop: 8, fontWeight: 600 };
 const reviewRow = { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--border)" };
 const editLink = { font: "inherit", fontSize: 11.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 };
-const successIcon = { width: 48, height: 48, borderRadius: "50%", background: "var(--good)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 };
-const pendingBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "11px 13px", borderRadius: 10, marginBottom: 16, lineHeight: 1.6 };
-const credBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 18px", marginBottom: 18 };
+const successIcon = { width: 48, height: 48, borderRadius: 0, background: "var(--good)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 };
+const pendingBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "11px 13px", borderRadius: 0, marginBottom: 16, lineHeight: 1.6 };
+const credBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "16px 18px", marginBottom: 18 };
 const credLabel = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const credValue = { fontSize: 15, fontWeight: 700, color: "var(--ink-strong)", fontFamily: "var(--font-mono)", marginTop: 2 };

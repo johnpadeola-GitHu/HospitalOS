@@ -65,8 +65,12 @@ export async function listCME() {
 export async function addCmeActivity({ title, date, credits, category }) {
   return apiCall("/academic/cme", { method: "POST", body: { title, date, credits, category } });
 }
-export async function recordCmeAttendance(id) {
-  return apiCall(`/academic/cme/${encodeURIComponent(id)}/attend`, { method: "PATCH" });
+export async function recordCmeAttendance(id, { name, role } = {}) {
+  return apiCall(`/academic/cme/${encodeURIComponent(id)}/attend`, { method: "PATCH", body: { name, role } });
+}
+
+export async function listCmeAttendees(id) {
+  return apiCall(`/academic/cme/${encodeURIComponent(id)}/attendees`);
 }
 
 /* ---------------- Research projects ---------------- */

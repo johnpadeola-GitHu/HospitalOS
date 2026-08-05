@@ -55,11 +55,11 @@ const wrap = {
 };
 const panel = {
   width: "75%", maxWidth: 920, minWidth: 320, background: "var(--surface-2)",
-  border: "1px solid var(--border)", borderRadius: 16, padding: "32px 40px 26px",
+  border: "1px solid var(--border)", borderRadius: 0, padding: "32px 40px 26px",
   boxShadow: "0 10px 40px rgba(22,35,59,0.10)", maxHeight: "92vh", overflowY: "auto",
 };
 const mark = {
-  width: 40, height: 40, borderRadius: 11,
+  width: 40, height: 40, borderRadius: 0,
   background: "#D6241C",
   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
   boxShadow: "0 1px 3px rgba(22,35,59,0.08)",

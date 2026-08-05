@@ -158,10 +158,10 @@ function DoseModal({ child, actor, onClose, onDone }) {
 
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 16 };
 const toolbar = { display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" };
-const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
-const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
-const fill = { height: "100%", borderRadius: 999 };
+const track = { height: 7, borderRadius: 0, background: "var(--surface)", overflow: "hidden" };
+const fill = { height: "100%", borderRadius: 0 };
 const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

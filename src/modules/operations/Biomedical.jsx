@@ -166,7 +166,7 @@ function AddEquipmentModal({ onClose, onDone }) {
 }
 
 const statRow = { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" };
-const statChip = { fontSize: 12, padding: "5px 11px", borderRadius: 999 };
+const statChip = { fontSize: 12, padding: "5px 11px", borderRadius: 0 };
 const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };

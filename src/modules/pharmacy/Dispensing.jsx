@@ -113,7 +113,7 @@ export default function Dispensing() {
                           fontSize: 11,
                           fontWeight: 500,
                           padding: "2px 9px",
-                          borderRadius: 999,
+                          borderRadius: 0,
                         }}
                       >
                         {tint.label}

@@ -134,7 +134,7 @@ function RefStatus({ status }) {
     seen: { bg: "#E6EFDF", fg: "#4A6329" },
   }[status];
   return (
-    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>
+    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0 }}>
       {STATUS_LABELS[status]}
     </span>
   );

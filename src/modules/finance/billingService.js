@@ -233,7 +233,3 @@ export async function billingSummary() {
     outstanding: accounts.reduce((s, a) => s + a.balance, 0),
   };
 }
-
-export async function getEnterpriseRecommendation() {
-  return apiCall("/finance/enterprise-recommendation");
-}

@@ -14,6 +14,6 @@ export default function ModulePlaceholder({ title, group }) {
 const card = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "22px 24px",
 };

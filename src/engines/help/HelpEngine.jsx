@@ -373,24 +373,24 @@ const sectionLabel = { fontSize: 11, fontWeight: 700, color: "var(--muted)", tex
 const heroRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 24 };
 const guideBanner = {
   display: "flex", alignItems: "center", gap: 12, marginTop: 18,
-  background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: "var(--radius)",
+  background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: 0,
   padding: "13px 16px", textDecoration: "none", boxShadow: "var(--shadow-sm)",
 };
 const guideIcon = { width: 34, height: 34, borderRadius: 0, background: "var(--charcoal)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
-const heroCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px 16px 18px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
+const heroCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "16px 16px 18px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const catGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 };
-const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "11px 12px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
+const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "11px 12px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const catIcon = { width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const countChip = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--border)", padding: "1px 7px", borderRadius: 0 };
 const cardGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 };
-const artCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "13px 14px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
+const artCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "13px 14px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const artIcon = { width: 36, height: 36, borderRadius: 0, background: "var(--charcoal-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const lead = { fontSize: 13.5, color: "var(--muted)", lineHeight: 1.6, paddingBottom: 14, marginBottom: 4, borderBottom: "1px solid var(--border)", fontStyle: "italic" };
 const h3 = { fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", margin: "16px 0 8px", letterSpacing: "-0.01em" };
 const para = { fontSize: 13.5, lineHeight: 1.75, color: "var(--ink)", marginBottom: 12 };
 const li = { display: "flex", gap: 9, fontSize: 13.5, lineHeight: 1.7, color: "var(--ink)", marginBottom: 6 };
 const bullet = { color: "var(--charcoal)", fontWeight: 700, flexShrink: 0 };
-const stepNum = { flexShrink: 0, width: 19, height: 19, borderRadius: "50%", background: "var(--charcoal-bg)", color: "var(--charcoal-strong)", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2 };
+const stepNum = { flexShrink: 0, width: 19, height: 19, borderRadius: 0, background: "var(--charcoal-bg)", color: "var(--charcoal-strong)", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2 };
 const noteBox = { display: "flex", gap: 8, background: "var(--info-bg)", color: "var(--info)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, margin: "0 0 13px", lineHeight: 1.6 };
 const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, margin: "0 0 13px", lineHeight: 1.6 };
 const tth = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "8px 11px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.04em" };
@@ -400,4 +400,4 @@ const prevNextWrap = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
 const prevNextBtn = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 14px", cursor: "pointer", font: "inherit" };
 const prevNextLabel = { fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const prevNextTitle = { fontSize: 12.5, fontWeight: 600, color: "var(--ink-strong)", marginTop: 1 };
-const relPill = { display: "inline-flex", alignItems: "center", gap: 6, font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--ink-strong)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 999, padding: "5px 11px", cursor: "pointer" };
+const relPill = { display: "inline-flex", alignItems: "center", gap: 6, font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--ink-strong)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "5px 11px", cursor: "pointer" };

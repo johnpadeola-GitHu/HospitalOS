@@ -207,13 +207,13 @@ const S = {
   pinnedFooter: { flexShrink: 0, borderTop: "1px solid var(--border)", padding: "10px 12px", background: "var(--sidebar)" },
   pinnedLink: {
     display: "flex", alignItems: "center", gap: 12, padding: "11px 12px",
-    borderRadius: 9, fontSize: 13.5, fontWeight: 500, color: "var(--ink)",
+    borderRadius: 0, fontSize: 13.5, fontWeight: 500, color: "var(--ink)",
   },
   pinnedLinkActive: { background: "var(--accent-bg)", color: "var(--accent)" },
   groupHeader: {
     width: "100%", display: "flex", alignItems: "center", gap: 12,
     padding: "8px 12px", background: "none", border: "none", cursor: "pointer",
-    font: "inherit", color: "var(--charcoal-strong)", borderRadius: 9,
+    font: "inherit", color: "var(--charcoal-strong)", borderRadius: 0,
   },
   groupHeaderStatic: {
     cursor: "default", opacity: 1,
@@ -230,27 +230,27 @@ const S = {
   count: {
     fontSize: 11, fontWeight: 600, color: "var(--muted)",
     background: "var(--surface)", border: "1px solid var(--border)",
-    minWidth: 20, textAlign: "center", padding: "1px 6px", borderRadius: 999,
+    minWidth: 20, textAlign: "center", padding: "1px 6px", borderRadius: 0,
   },
   soonBadge: {
     fontSize: 9, fontWeight: 700, color: "#FFFFFF",
-    background: "var(--bad)", padding: "2px 7px", borderRadius: 999,
+    background: "var(--bad)", padding: "2px 7px", borderRadius: 0,
     letterSpacing: "0.03em", textTransform: "uppercase",
   },
   // Indent: rail + content, so leaves sit clearly one level under the domain.
   subList: { display: "flex", gap: 10, paddingLeft: 20, paddingBottom: 6, paddingTop: 3 },
-  rail: { width: 1.5, background: "var(--border)", borderRadius: 1, flexShrink: 0 },
+  rail: { width: 1.5, background: "var(--border)", borderRadius: 0, flexShrink: 0 },
   item: {
     display: "flex", alignItems: "center", gap: 11,
     padding: "9px 11px", margin: "1px 0", fontSize: 13.5,
-    color: "var(--charcoal)", borderRadius: 8, fontWeight: 450,
+    color: "var(--charcoal)", borderRadius: 0, fontWeight: 450,
   },
   itemActive: {
     color: "var(--accent)", background: "var(--accent-bg)", fontWeight: 600,
   },
   alertBadge: {
     fontSize: 11, fontWeight: 700, color: "#fff", background: "var(--bad)",
-    minWidth: 20, height: 20, borderRadius: 999, display: "inline-flex",
+    minWidth: 20, height: 20, borderRadius: 0, display: "inline-flex",
     alignItems: "center", justifyContent: "center", padding: "0 6px", flexShrink: 0,
   },
 };

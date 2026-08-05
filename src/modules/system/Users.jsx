@@ -280,7 +280,7 @@ const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--mut
 const avatar = {
   width: 34,
   height: 34,
-  borderRadius: "50%",
+  borderRadius: 0,
   background: "var(--accent-bg)",
   color: "var(--ink-strong)",
   display: "flex",
@@ -290,8 +290,8 @@ const avatar = {
   fontWeight: 600,
   flexShrink: 0,
 };
-const activePill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 999 };
-const inactivePill = { fontSize: 11, fontWeight: 500, color: "var(--muted)", background: "var(--surface)", padding: "2px 9px", borderRadius: 999 };
+const activePill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 0 };
+const inactivePill = { fontSize: 11, fontWeight: 500, color: "var(--muted)", background: "var(--surface)", padding: "2px 9px", borderRadius: 0 };
 const errBanner = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
 const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };
 const matrixCorner = { position: "sticky", left: 0, background: "var(--surface)", padding: "8px 10px", textAlign: "left", fontWeight: 600, color: "var(--muted)" };

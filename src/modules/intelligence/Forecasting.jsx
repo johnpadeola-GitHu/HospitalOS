@@ -44,7 +44,7 @@ export default function Forecasting() {
                   {d.value}%
                 </div>
                 <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 100 }}>
-                  <div style={{ width: "100%", height: `${(d.value / occMax) * 100}%`, background: d.value >= 90 ? "#A35A2E" : "#2F4A6D", borderRadius: "4px 4px 0 0" }} />
+                  <div style={{ width: "100%", height: `${(d.value / occMax) * 100}%`, background: d.value >= 90 ? "#A35A2E" : "#2F4A6D", borderRadius: 0 }} />
                 </div>
                 <div style={{ fontSize: 10, color: "var(--muted)" }}>{d.day}</div>
               </div>
@@ -63,7 +63,7 @@ export default function Forecasting() {
             {data.revenue.map((r) => (
               <div key={r.week} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                 <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 110 }}>
-                  <div style={{ width: "100%", height: `${(r.value / revMax) * 100}%`, background: "#6B9BD1", borderRadius: "4px 4px 0 0" }} />
+                  <div style={{ width: "100%", height: `${(r.value / revMax) * 100}%`, background: "#6B9BD1", borderRadius: 0 }} />
                 </div>
                 <div style={{ fontSize: 10, color: "var(--muted)" }}>{r.week}</div>
               </div>

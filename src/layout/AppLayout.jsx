@@ -127,7 +127,7 @@ const topbar = {
 };
 const hamburgerBtn = {
   display: "none", alignItems: "center", justifyContent: "center",
-  width: 34, height: 34, borderRadius: 8, border: "1px solid var(--border-strong)",
+  width: 34, height: 34, borderRadius: 0, border: "1px solid var(--border-strong)",
   background: "var(--surface)", color: "var(--charcoal-strong)", cursor: "pointer", flexShrink: 0,
 };
 // Generous padding on all four sides, with a max width so content breathes.
@@ -139,34 +139,34 @@ const footerInner = {
   flexWrap: "wrap", fontSize: 11.5, color: "var(--muted)",
 };
 const footerBrandRow = { display: "flex", alignItems: "center", gap: 7, flexShrink: 0 };
-const footerLogo = { width: 18, height: 18, borderRadius: 5, background: "#D6241C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const footerLogo = { width: 18, height: 18, borderRadius: 0, background: "#D6241C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const footerBrand = { fontSize: 12.5, fontWeight: 700, color: "var(--charcoal-strong)" };
 const footerVersion = {
   fontSize: 10, fontWeight: 600, color: "var(--muted)", background: "var(--surface)",
-  border: "1px solid var(--border)", borderRadius: 999, padding: "1px 7px", flexShrink: 0,
+  border: "1px solid var(--border)", borderRadius: 0, padding: "1px 7px", flexShrink: 0,
 };
 const footerBy = { fontSize: 11, color: "var(--muted)" };
 const footerLinks = { display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" };
 const footLink = { color: "var(--muted)", fontWeight: 500, whiteSpace: "nowrap" };
 const footerMeta = { fontSize: 11, color: "var(--muted)", whiteSpace: "nowrap", flexShrink: 0 };
 const platformMark = {
-  width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
+  width: 26, height: 26, borderRadius: 0, background: "linear-gradient(135deg, #1E3A6E, #2F5FA8)",
   display: "flex", alignItems: "center", justifyContent: "center",
 };
 const viewSwitchTrack = {
   position: "relative", display: "flex", alignItems: "center",
-  width: 48, height: 24, borderRadius: 999, border: "1px solid var(--border-strong)",
+  width: 48, height: 24, borderRadius: 0, border: "1px solid var(--border-strong)",
   background: "var(--surface)", cursor: "pointer", padding: 0, flexShrink: 0,
   transition: "background 0.15s ease",
 };
 const viewSwitchTrackOn = { background: "var(--accent)", borderColor: "var(--accent)" };
 const viewSwitchThumb = {
-  position: "absolute", top: 2, left: 2, width: 18, height: 18, borderRadius: "50%",
+  position: "absolute", top: 2, left: 2, width: 18, height: 18, borderRadius: 0,
   background: "#fff", boxShadow: "0 1px 3px rgba(22,35,59,0.25)",
   transition: "transform 0.15s ease",
 };
 const viewSwitchThumbOn = { transform: "translateX(24px)" };
 const signOutBtn = {
-  background: "none", border: "1px solid var(--border)", borderRadius: 8,
+  background: "none", border: "1px solid var(--border)", borderRadius: 0,
   padding: "6px 7px", cursor: "pointer", color: "var(--muted)", display: "flex",
 };

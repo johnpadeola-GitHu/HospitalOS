@@ -357,7 +357,7 @@ function ReportModal({ study, onClose, onDone }) {
 
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10, marginBottom: 18 };
 const sectionTitle = { fontSize: 13, fontWeight: 700, color: "var(--ink-strong)", margin: "6px 0 10px" };
-const row = { display: "flex", gap: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "13px 16px", boxShadow: "var(--shadow-sm)" };
+const row = { display: "flex", gap: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "13px 16px", boxShadow: "var(--shadow-sm)" };
 const reportedRow = { display: "flex", alignItems: "center", gap: 10, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "9px 13px", fontSize: 12.5 };
 const releasedBadge = { fontSize: 11, fontWeight: 600, color: "var(--good)", background: "var(--good-bg)", padding: "5px 10px", borderRadius: 0 };
 const urgentNote = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

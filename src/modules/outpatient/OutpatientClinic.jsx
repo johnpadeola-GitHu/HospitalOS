@@ -294,7 +294,7 @@ const countPill = {
   color: "var(--ink-strong)",
   background: "var(--accent-bg)",
   padding: "1px 8px",
-  borderRadius: 999,
+  borderRadius: 0,
 };
 const emptyCol = { fontSize: 12, color: "var(--muted)", padding: "10px 2px", textAlign: "center" };
 const visitCard = {

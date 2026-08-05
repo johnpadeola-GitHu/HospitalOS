@@ -175,5 +175,5 @@ const panelGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minm
 const panel = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
 const panelTitle = { fontWeight: 600, fontSize: 14, color: "var(--ink-strong)", marginBottom: 12 };
 const barRow = { display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 };
-const barTrack = { height: 6, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
-const barFill = { height: "100%", borderRadius: 999, background: "#2F4A6D" };
+const barTrack = { height: 6, borderRadius: 0, background: "var(--surface)", overflow: "hidden" };
+const barFill = { height: "100%", borderRadius: 0, background: "#2F4A6D" };

@@ -289,7 +289,7 @@ function StatusChip({ status }) {
         fontSize: 11,
         fontWeight: 500,
         padding: "2px 9px",
-        borderRadius: 999,
+        borderRadius: 0,
       }}
     >
       {STATUS_LABELS[status]}
@@ -569,7 +569,7 @@ const chip = {
   fontSize: 12,
   fontWeight: 500,
   padding: "6px 12px",
-  borderRadius: 999,
+  borderRadius: 0,
   border: "1px solid var(--border-strong)",
   background: "var(--surface-2)",
   color: "var(--muted)",
@@ -596,7 +596,7 @@ const critDot = {
   display: "inline-block",
   width: 7,
   height: 7,
-  borderRadius: "50%",
+  borderRadius: 0,
   background: "#B0281F",
   marginLeft: 7,
   verticalAlign: "middle",

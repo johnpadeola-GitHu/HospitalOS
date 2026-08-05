@@ -399,7 +399,7 @@ const chip = {
   fontSize: 12,
   fontWeight: 500,
   padding: "6px 12px",
-  borderRadius: 999,
+  borderRadius: 0,
   border: "1px solid var(--border-strong)",
   background: "var(--surface-2)",
   color: "var(--muted)",

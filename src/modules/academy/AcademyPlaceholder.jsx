@@ -62,7 +62,7 @@ const card = {
 };
 const badge = {
   display: "inline-flex", alignItems: "center", fontSize: 10.5, fontWeight: 700, color: "var(--warn)",
-  background: "var(--warn-bg)", padding: "3px 9px", borderRadius: 999,
+  background: "var(--warn-bg)", padding: "3px 9px", borderRadius: 0,
   textTransform: "uppercase", letterSpacing: "0.04em",
 };
 const row = {

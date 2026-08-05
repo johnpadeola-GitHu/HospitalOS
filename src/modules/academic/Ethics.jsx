@@ -64,7 +64,7 @@ export default function Ethics() {
                         PI: {e.pi} · {e.dept} · submitted {e.submitted} · {e.comments.length} comment{e.comments.length !== 1 ? "s" : ""}
                       </div>
                     </div>
-                    <span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999, flexShrink: 0 }}>{t.label}</span>
+                    <span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0, flexShrink: 0 }}>{t.label}</span>
                   </button>
 
                   {open && (
@@ -170,7 +170,7 @@ function DecideModal({ item, actor, onClose, onDone, onError }) {
   );
 }
 
-const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const row = { width: "100%", display: "flex", gap: 12, alignItems: "center", padding: "13px 16px", background: "none", border: "none", cursor: "pointer", font: "inherit" };
 const detail = { padding: "0 16px 14px 16px" };

@@ -143,7 +143,7 @@ const cardHead = {
   justifyContent: "space-between",
   marginBottom: 12,
 };
-const tierPill = { fontSize: 10.5, fontWeight: 600, color: "var(--charcoal)", background: "var(--charcoal-bg)", padding: "2px 8px", borderRadius: 999, whiteSpace: "nowrap" };
+const tierPill = { fontSize: 10.5, fontWeight: 600, color: "var(--charcoal)", background: "var(--charcoal-bg)", padding: "2px 8px", borderRadius: 0, whiteSpace: "nowrap" };
 const bedGrid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(84px, 1fr))",

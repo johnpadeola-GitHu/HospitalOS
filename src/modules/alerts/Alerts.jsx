@@ -149,7 +149,7 @@ const sevPill = {
   color: "#B0281F",
   background: "#F7E4E2",
   padding: "1px 8px",
-  borderRadius: 999,
+  borderRadius: 0,
 };
 const sevPillWarn = {
   fontSize: 11,
@@ -157,5 +157,5 @@ const sevPillWarn = {
   color: "#8A5A17",
   background: "#FBF0DC",
   padding: "1px 8px",
-  borderRadius: 999,
+  borderRadius: 0,
 };

@@ -40,7 +40,7 @@ export default function Procurement() {
                     <td style={{ ...td, fontWeight: 500, color: "var(--ink-strong)" }}>{p.supplier}</td>
                     <td style={{ ...td, color: "var(--muted)", maxWidth: 220 }}>{p.items}</td>
                     <td style={{ ...td, textAlign: "right", fontFamily: "var(--font-mono)" }}>{naira(p.amount)}</td>
-                    <td style={td}><span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>{t.label}</span></td>
+                    <td style={td}><span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0 }}>{t.label}</span></td>
                     <td style={{ ...td, textAlign: "right" }}>{canAdvance && <Button onClick={() => advance(p.id)}>{p.status === "draft" ? "Place order" : "Mark received"}</Button>}</td>
                   </tr>
                 );

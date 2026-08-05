@@ -160,9 +160,9 @@ function BankModal({ onClose, onDone }) {
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 16 };
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14 };
 const toolbar = { display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" };
-const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
-const fill = { height: "100%", borderRadius: 999 };
-const typeChip = { fontSize: 11.5, fontWeight: 500, color: "var(--ink)", background: "var(--surface)", border: "1px solid var(--border)", padding: "4px 10px", borderRadius: 999 };
+const track = { height: 7, borderRadius: 0, background: "var(--surface)", overflow: "hidden" };
+const fill = { height: "100%", borderRadius: 0 };
+const typeChip = { fontSize: 11.5, fontWeight: 500, color: "var(--ink)", background: "var(--surface)", border: "1px solid var(--border)", padding: "4px 10px", borderRadius: 0 };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 14px", fontSize: 12.5, verticalAlign: "middle" };
 const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 0, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };

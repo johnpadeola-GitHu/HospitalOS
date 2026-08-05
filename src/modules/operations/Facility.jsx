@@ -51,7 +51,7 @@ export default function Facility() {
               <div key={f.id} style={{ ...card, ...(f.status !== "operational" ? { borderColor: t.bg === "#F7E4E2" ? "#E4B6B2" : "var(--border)" } : null) }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontWeight: 500, fontSize: 14, color: "var(--ink-strong)" }}>{f.area}</span>
-                  <span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999 }}>{t.label}</span>
+                  <span style={{ background: t.bg, color: t.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0 }}>{t.label}</span>
                 </div>
                 {f.note && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{f.note}</div>}
                 <div style={{ marginTop: 10 }}>

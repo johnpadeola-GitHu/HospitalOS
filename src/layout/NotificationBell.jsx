@@ -112,21 +112,21 @@ export default function NotificationBell() {
 
 const bellBtn = { position: "relative", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 2 };
 const badge = {
-  position: "absolute", top: -4, right: -5, minWidth: 15, height: 15, borderRadius: 999,
+  position: "absolute", top: -4, right: -5, minWidth: 15, height: 15, borderRadius: 0,
   background: "var(--bad)", color: "#fff", fontSize: 9.5, fontWeight: 700,
   display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px",
 };
 const panel = {
   position: "absolute", top: "calc(100% + 10px)", right: 0, width: 320,
-  background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12,
+  background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0,
   boxShadow: "0 14px 40px rgba(22,35,59,0.18)", zIndex: 60, overflow: "hidden",
 };
 const panelHead = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", borderBottom: "1px solid var(--border)" };
-const countPill = { fontSize: 10, fontWeight: 700, color: "var(--bad)", background: "var(--bad-bg)", padding: "2px 7px", borderRadius: 999 };
+const countPill = { fontSize: 10, fontWeight: 700, color: "var(--bad)", background: "var(--bad-bg)", padding: "2px 7px", borderRadius: 0 };
 const empty = { padding: "26px 16px", textAlign: "center", fontSize: 12, color: "var(--muted)" };
 const item = { display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 14px", borderTop: "1px solid var(--border)" };
 const miniBtn = {
-  width: 24, height: 24, borderRadius: 7, border: "1px solid var(--border-strong)",
+  width: 24, height: 24, borderRadius: 0, border: "1px solid var(--border-strong)",
   background: "var(--surface)", color: "var(--good)", cursor: "pointer",
   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
 };

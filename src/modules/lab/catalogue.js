@@ -16,7 +16,7 @@ export const DISCIPLINES = [
   { key: "microbiology", label: "Microbiology" },
   { key: "serology", label: "Serology & Immunology" },
   { key: "endocrinology", label: "Endocrinology" },
-  { key: "molecular", label: "Molecular Diagnostics" },
+  { key: "molecular", label: "Routine Molecular Diagnostics" },
   { key: "histopathology", label: "Histopathology & Cytology" },
   { key: "transfusion", label: "Transfusion Medicine" },
   { key: "cardiac_markers", label: "Cardiac Markers" },
@@ -1164,14 +1164,7 @@ export const TEST_CATALOGUE = [
       { key: "qds", label: "Quadruple Marker (AFP/hCG/uE3/Inhibin A)", unit: "", qualitative: true }
     ],
   },
-  {
-    code: "NIPT", name: "NIPT (non-invasive prenatal — T13/18/21)", department: "Fertility & Pregnancy", discipline: "endocrinology",
-    price: 185000, tat: "10d", specimen: "EDTA plasma 10ml", curated: false, sendOut: true,
-    analytes: [
-      { key: "nipt", label: "NIPT (non-invasive prenatal — T13/18/21)", unit: "", qualitative: true }
-    ],
-  },
-  {
+    {
     code: "PAPP", name: "PAPP-A (1st trimester screen)", department: "Fertility & Pregnancy", discipline: "endocrinology",
     price: 14500, tat: "48h", specimen: "Serum", curated: false,
     analytes: [
@@ -1315,43 +1308,14 @@ export const TEST_CATALOGUE = [
       { key: "ca724", label: "CA 72-4 (gastric)", unit: "", qualitative: true }
     ],
   },
-  {
-    code: "CGA", name: "Chromogranin A", department: "Tumor Markers", discipline: "tumor_markers",
-    price: 22500, tat: "7d", specimen: "Serum", curated: false, sendOut: true,
-    analytes: [
-      { key: "cga", label: "Chromogranin A", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "NSE", name: "Neuron-Specific Enolase", department: "Tumor Markers", discipline: "tumor_markers",
-    price: 18500, tat: "7d", specimen: "Serum", curated: false, sendOut: true,
-    analytes: [
-      { key: "nse", label: "Neuron-Specific Enolase", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "SCC", name: "Squamous Cell Carcinoma antigen", department: "Tumor Markers", discipline: "tumor_markers",
-    price: 16500, tat: "7d", specimen: "Serum", curated: false, sendOut: true,
-    analytes: [
-      { key: "scc", label: "Squamous Cell Carcinoma antigen", unit: "", qualitative: true }
-    ],
-  },
-  {
+        {
     code: "TPSA", name: "Total PSA + Free PSA Ratio", department: "Tumor Markers", discipline: "tumor_markers",
     price: 16500, tat: "24h", specimen: "Serum", curated: false,
     analytes: [
       { key: "tpsa", label: "Total PSA + Free PSA Ratio", unit: "", qualitative: true }
     ],
   },
-  {
-    code: "HE4", name: "HE4 (ovarian) + ROMA score", department: "Tumor Markers", discipline: "tumor_markers",
-    price: 24500, tat: "72h", specimen: "Serum", curated: false, sendOut: true,
-    analytes: [
-      { key: "he4", label: "HE4 (ovarian) + ROMA score", unit: "", qualitative: true }
-    ],
-  },
-
-  /* ---------------- Immunology & Autoimmune ---------------- */
+    /* ---------------- Immunology & Autoimmune ---------------- */
   {
     code: "ANA", name: "Antinuclear Antibody (ANA, IFA)", department: "Immunology & Autoimmune", discipline: "serology",
     price: 12500, tat: "48h", specimen: "Serum", curated: true,
@@ -2060,57 +2024,7 @@ export const TEST_CATALOGUE = [
       { key: "cmvpcr", label: "CMV PCR (quantitative)", unit: "", qualitative: true }
     ],
   },
-  {
-    code: "BCRA", name: "BCR-ABL Quantitative (Major + Minor)", department: "Molecular & Genetic", discipline: "molecular",
-    price: 48500, tat: "10d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "bcra", label: "BCR-ABL Quantitative (Major + Minor)", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "JAK2", name: "JAK2 V617F Mutation", department: "Molecular & Genetic", discipline: "molecular",
-    price: 38500, tat: "10d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "jak2", label: "JAK2 V617F Mutation", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "FLT3", name: "FLT3-ITD Mutation Analysis", department: "Molecular & Genetic", discipline: "molecular",
-    price: 48500, tat: "14d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "flt3", label: "FLT3-ITD Mutation Analysis", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "BRCA", name: "BRCA1/BRCA2 Sequencing", department: "Molecular & Genetic", discipline: "molecular",
-    price: 285000, tat: "21d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "brca", label: "BRCA1/BRCA2 Sequencing", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "KARYO", name: "Karyotype (peripheral blood)", department: "Molecular & Genetic", discipline: "molecular",
-    price: 48500, tat: "14d", specimen: "Sodium heparin whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "karyo", label: "Karyotype (peripheral blood)", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "CFG", name: "Cystic Fibrosis Genotyping (common 35)", department: "Molecular & Genetic", discipline: "molecular",
-    price: 185000, tat: "21d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "cfg", label: "Cystic Fibrosis Genotyping (common 35)", unit: "", qualitative: true }
-    ],
-  },
-  {
-    code: "THLM", name: "Alpha & Beta Thalassaemia Genotyping", department: "Molecular & Genetic", discipline: "molecular",
-    price: 125000, tat: "21d", specimen: "EDTA whole blood", curated: false, sendOut: true,
-    analytes: [
-      { key: "thlm", label: "Alpha & Beta Thalassaemia Genotyping", unit: "", qualitative: true }
-    ],
-  },
-
-];
+              ];
 
 export const CATALOGUE_SIZE = TEST_CATALOGUE.length;
 

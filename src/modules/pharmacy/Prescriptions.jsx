@@ -72,7 +72,7 @@ export default function Prescriptions() {
             key={s}
             onClick={() => setStatusFilter(s)}
             style={{
-              padding: "6px 12px", borderRadius: 999, fontSize: 12.5, cursor: "pointer",
+              padding: "6px 12px", borderRadius: 0, fontSize: 12.5, cursor: "pointer",
               border: "1px solid var(--border)",
               background: statusFilter === s ? "var(--accent-bg)" : "transparent",
               color: statusFilter === s ? "var(--accent)" : "var(--charcoal)",
@@ -104,7 +104,7 @@ export default function Prescriptions() {
                     {rx.patientName} ({rx.hospitalNo}){rx.dosage ? ` · ${rx.dosage}` : ""}{rx.prescribedBy ? ` · by ${rx.prescribedBy}` : ""}
                   </div>
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 600, color: tint.fg, background: tint.bg, padding: "3px 9px", borderRadius: 999 }}>{tint.label}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: tint.fg, background: tint.bg, padding: "3px 9px", borderRadius: 0 }}>{tint.label}</span>
                 {rx.status === "pending" && (
                   <div style={{ display: "flex", gap: 6 }}>
                     {may("pharmacy:dispense") && (

@@ -159,7 +159,7 @@ function ReviewModal({ policy, actor, onClose, onDone }) {
 }
 
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 16 };
-const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
 const fileLink = { display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "var(--accent)", marginTop: 5 };

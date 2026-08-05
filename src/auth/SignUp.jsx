@@ -83,11 +83,11 @@ const lbl = { display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--m
 const backLink = { display: "inline-flex", alignItems: "center", gap: 5, font: "inherit", fontSize: 12.5, fontWeight: 600, color: "var(--muted)", background: "none", border: "none", cursor: "pointer", marginBottom: 16, padding: 0 };
 const primaryBtn = {
   width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-  background: "var(--charcoal)", color: "#fff", border: "none", borderRadius: 10,
+  background: "var(--charcoal)", color: "#fff", border: "none", borderRadius: 0,
   padding: "12px 0", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 6,
 };
-const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 9, marginBottom: 16, lineHeight: 1.5 };
-const successIcon = { width: 48, height: 48, borderRadius: "50%", background: "var(--good)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 };
-const credBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 18px", marginBottom: 18 };
+const errBox = { display: "flex", alignItems: "flex-start", gap: 8, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, marginBottom: 16, lineHeight: 1.5 };
+const successIcon = { width: 48, height: 48, borderRadius: 0, background: "var(--good)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 };
+const credBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "16px 18px", marginBottom: 18 };
 const credLabel = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const credValue = { fontSize: 15, fontWeight: 700, color: "var(--ink-strong)", fontFamily: "var(--font-mono)", marginTop: 2 };

@@ -107,9 +107,3 @@ export async function listPlatformInvoices(status = "all") {
 export async function markPlatformInvoicePaid(invoiceId) {
   return apiCall(`/platform/invoices/${encodeURIComponent(invoiceId)}/mark-paid`, { method: "PATCH" });
 }
-
-// Enterprise Savings Advisor — every Community tenant's projected annual
-// commission vs. the Enterprise licence, most-promising-savings first.
-export async function listEnterpriseRecommendations() {
-  return apiCall("/platform/enterprise-recommendations");
-}

@@ -43,5 +43,5 @@ const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--bor
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
-const lowPill = { fontSize: 11, fontWeight: 500, color: "#B0281F", background: "#F7E4E2", padding: "2px 9px", borderRadius: 999 };
-const okPill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 999 };
+const lowPill = { fontSize: 11, fontWeight: 500, color: "#B0281F", background: "#F7E4E2", padding: "2px 9px", borderRadius: 0 };
+const okPill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 0 };

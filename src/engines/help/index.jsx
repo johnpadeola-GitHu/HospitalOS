@@ -145,7 +145,7 @@ export function HelpLink({ articleId, label = "What's this?" }) {
       }}
     >
       <span style={{
-        width: 14, height: 14, borderRadius: "50%",
+        width: 14, height: 14, borderRadius: 0,
         border: "1px solid var(--border-strong)", fontSize: 9,
         display: "inline-flex", alignItems: "center", justifyContent: "center",
       }}>?</span>

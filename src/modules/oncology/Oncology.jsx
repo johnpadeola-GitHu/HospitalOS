@@ -237,13 +237,13 @@ function RegisterModal({ onClose, onDone }) {
 }
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
-const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const chipActive = { background: "var(--ink-strong)", color: "#fff", borderColor: "var(--ink-strong)" };
 const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
-const overdueDot = { display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#B0281F", marginLeft: 7, verticalAlign: "middle" };
+const overdueDot = { display: "inline-block", width: 7, height: 7, borderRadius: 0, background: "#B0281F", marginLeft: 7, verticalAlign: "middle" };
 const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 0, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
 const errBanner = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };

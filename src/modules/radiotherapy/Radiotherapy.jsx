@@ -99,9 +99,9 @@ function NewModal({ onClose, onDone }) {
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const card = { display: "flex", gap: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
-const track = { height: 6, borderRadius: 999, background: "var(--surface)", overflow: "hidden", maxWidth: 320 };
-const fill = { height: "100%", borderRadius: 999, background: "#2F4A6D" };
-const donePill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 999 };
+const track = { height: 6, borderRadius: 0, background: "var(--surface)", overflow: "hidden", maxWidth: 320 };
+const fill = { height: "100%", borderRadius: 0, background: "#2F4A6D" };
+const donePill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 0 };
 const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 0, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
 const errBanner = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };

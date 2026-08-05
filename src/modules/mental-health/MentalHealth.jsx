@@ -156,7 +156,7 @@ function RiskModal({ patient, actor, onClose, onDone }) {
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 16 };
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
 const selectSm = { fontSize: 12, padding: "6px 9px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--ink-strong)" };
-const flagChip = { font: "inherit", fontSize: 11.5, fontWeight: 500, padding: "5px 11px", borderRadius: 999, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const flagChip = { font: "inherit", fontSize: 11.5, fontWeight: 500, padding: "5px 11px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const flagChipActive = { background: "var(--bad)", color: "#fff", borderColor: "var(--bad)" };
 const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

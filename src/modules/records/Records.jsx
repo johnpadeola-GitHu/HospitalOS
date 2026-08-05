@@ -418,10 +418,10 @@ function RecordModal({ kind, patient, actor, onClose, onDone, onError }) {
 }
 
 const layout = { display: "grid", gridTemplateColumns: "222px 1fr", gap: 16, alignItems: "start" };
-const pickerCol = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 10, boxShadow: "var(--shadow-sm)" };
+const pickerCol = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: 10, boxShadow: "var(--shadow-sm)" };
 const pickRow = { width: "100%", display: "flex", padding: "7px 8px", background: "none", border: "none", borderRadius: 0, cursor: "pointer", font: "inherit", marginBottom: 1 };
 const pickActive = { background: "var(--charcoal-bg)" };
-const banner = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "14px 16px", marginBottom: 12, boxShadow: "var(--shadow-sm)", flexWrap: "wrap" };
+const banner = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px", marginBottom: 12, boxShadow: "var(--shadow-sm)", flexWrap: "wrap" };
 const allergyFlag = { display: "flex", alignItems: "center", gap: 7, background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "7px 11px", borderRadius: 0 };
 const tabs = { display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" };
 const tabBtn = { font: "inherit", fontSize: 12, fontWeight: 600, padding: "6px 12px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };

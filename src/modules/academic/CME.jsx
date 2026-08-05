@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as Icons from "lucide-react";
-import { listCME, addCmeActivity, recordCmeAttendance } from "./academicService";
+import { listCME, addCmeActivity, recordCmeAttendance, listCmeAttendees } from "./academicService";
 import { PageHeader, Button, Modal, Field, inputStyle } from "../../lib/ui";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -11,6 +11,9 @@ export default function CME() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [attendTarget, setAttendTarget] = useState(null);
+  const [expandId, setExpandId] = useState(null);
+  const [attendeesMap, setAttendeesMap] = useState({});
   const [err, setErr] = useState("");
 
   const refresh = useCallback(async () => {
@@ -49,16 +52,63 @@ export default function CME() {
                 <div style={{ fontSize: 12, color: "var(--muted)" }}>{c.date} · {c.category} · {c.attendees || 0} attended</div>
               </div>
               <span style={credits}>{c.credits} credits</span>
-              <Button onClick={() => attend(c.id)}>
-                <Icons.UserPlus size={13} /> Record attendance
-              </Button>
+              <div style={{ display: "flex", gap: 6 }}>
+                <Button onClick={() => setAttendTarget(c)}><Icons.UserPlus size={13} /> Record attendance</Button>
+                <Button onClick={() => expandAttendees(c.id)}><Icons.List size={13} /> {expandId === c.id ? "Hide" : "Attendees"}</Button>
+              </div>
+              {expandId === c.id && (
+                <div style={{ marginTop: 8, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                  {!attendeesMap[c.id] ? (
+                    <div style={{ fontSize: 12, color: "var(--muted)" }}>Loading…</div>
+                  ) : attendeesMap[c.id].length === 0 ? (
+                    <div style={{ fontSize: 12, color: "var(--muted)" }}>No attendees recorded yet.</div>
+                  ) : (
+                    attendeesMap[c.id].map((a) => (
+                      <div key={a.id} style={{ fontSize: 12, padding: "3px 0", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontWeight: 500, color: "var(--ink-strong)" }}>{a.name}</span>
+                        <span style={{ color: "var(--muted)" }}>{a.role || "—"}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
+      {attendTarget && (
+        <AttendModal activity={attendTarget} onClose={() => setAttendTarget(null)}
+          onDone={async () => {
+            setAttendTarget(null); await refresh();
+            if (attendTarget) setAttendeesMap((m) => ({ ...m, [attendTarget.id]: undefined }));
+          }} />
+      )}
       {showAdd && <AddModal actor={user} onClose={() => setShowAdd(false)} onDone={async () => { setShowAdd(false); await refresh(); }} />}
     </div>
+  );
+}
+
+function AttendModal({ activity, onClose, onDone }) {
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const submit = async () => {
+    if (!name.trim()) return setErr("Enter the attendee's name.");
+    setBusy(true); setErr("");
+    try { await recordCmeAttendance(activity.id, { name, role }); await onDone(); }
+    catch (e) { setErr(e.message); setBusy(false); }
+  };
+  return (
+    <Modal title={`Record attendance — ${activity.title}`} onClose={onClose} footer={<>
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="primary" onClick={submit} disabled={busy}>{busy ? "Saving…" : "Record"}</Button>
+    </>}>
+      {err && <div style={errBox}>{err}</div>}
+      <Field label="Attendee name *"><input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" autoFocus /></Field>
+      <Field label="Role / specialty"><input style={inputStyle} value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Consultant, Resident, Nurse" /></Field>
+    </Modal>
   );
 }
 
@@ -90,5 +140,5 @@ function AddModal({ actor, onClose, onDone }) {
 }
 
 const card = { display: "flex", gap: 12, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
-const credits = { fontSize: 11, fontWeight: 600, color: "#1E3350", background: "#D3E1F8", padding: "3px 10px", borderRadius: 999, flexShrink: 0 };
+const credits = { fontSize: 11, fontWeight: 600, color: "#1E3350", background: "#D3E1F8", padding: "3px 10px", borderRadius: 0, flexShrink: 0 };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

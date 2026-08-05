@@ -21,7 +21,7 @@ export function PageHeader({ group, title, icon = "Circle", subtitle, actions })
 const ph = {
   wrap: { display: "flex", alignItems: "center", gap: 12, marginBottom: 20 },
   iconBox: {
-    width: 38, height: 38, borderRadius: 10, background: "var(--accent-bg)",
+    width: 38, height: 38, borderRadius: 0, background: "var(--accent-bg)",
     border: "1px solid var(--border)", display: "flex", alignItems: "center",
     justifyContent: "center", flexShrink: 0,
   },
@@ -52,7 +52,7 @@ export function StatCard({ label, value, sub, tone = "default", onClick }) {
 const stat = {
   card: {
     background: "var(--surface-2)", border: "1px solid var(--border)",
-    borderRadius: "var(--radius)", padding: "14px 16px", boxShadow: "var(--shadow-sm)",
+    borderRadius: 0, padding: "14px 16px", boxShadow: "var(--shadow-sm)",
     textAlign: "left", font: "inherit", display: "block", width: "100%",
   },
   clickable: { cursor: "pointer" },
@@ -79,7 +79,7 @@ export function Card({ title, action, children, pad = true }) {
 const card = {
   wrap: {
     background: "var(--surface-2)", border: "1px solid var(--border)",
-    borderRadius: "var(--radius)", boxShadow: "var(--shadow-sm)", overflow: "hidden",
+    borderRadius: 0, boxShadow: "var(--shadow-sm)", overflow: "hidden",
   },
   head: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -101,7 +101,7 @@ export function Pill({ tone = "info", children }) {
   return (
     <span style={{
       background: t.bg, color: t.fg, fontSize: 10.5, fontWeight: 700,
-      padding: "3px 9px", borderRadius: 999, whiteSpace: "nowrap",
+      padding: "3px 9px", borderRadius: 0, whiteSpace: "nowrap",
       textTransform: "uppercase", letterSpacing: "0.04em",
     }}>
       {children}
@@ -124,7 +124,7 @@ export function Button({ children, variant = "secondary", icon, ...rest }) {
   const C = icon ? Icons[icon] : null;
   const base = {
     font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "8px 13px",
-    borderRadius: 8, cursor: "pointer", border: "1px solid var(--border-strong)",
+    borderRadius: 0, cursor: "pointer", border: "1px solid var(--border-strong)",
     display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
     transition: "background .12s",
   };
@@ -169,7 +169,7 @@ export function Field({ label, children }) {
 
 export const inputStyle = {
   width: "100%", font: "inherit", fontSize: 13, padding: "8px 10px",
-  borderRadius: 8, border: "1px solid var(--border-strong)",
+  borderRadius: 0, border: "1px solid var(--border-strong)",
   background: "var(--surface-2)", color: "var(--ink)",
 };
 
@@ -177,7 +177,7 @@ export const inputStyle = {
 export function EmptyState({ icon = "Inbox", title, hint }) {
   const C = Icons[icon] || Icons.Inbox;
   return (
-    <div style={{ background: "var(--surface-2)", border: "1px dashed var(--border-strong)", borderRadius: "var(--radius)", padding: "34px 24px", textAlign: "center" }}>
+    <div style={{ background: "var(--surface-2)", border: "1px dashed var(--border-strong)", borderRadius: 0, padding: "34px 24px", textAlign: "center" }}>
       <C size={26} strokeWidth={1.6} style={{ color: "var(--muted)", marginBottom: 8 }} />
       <div style={{ fontWeight: 700, color: "var(--ink-strong)", marginBottom: 3 }}>{title}</div>
       {hint && <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{hint}</div>}
@@ -192,7 +192,7 @@ const overlay = {
 };
 const sheet = {
   width: "100%", maxWidth: 460, maxHeight: "88vh", background: "var(--surface-2)",
-  borderRadius: 14, border: "1px solid var(--border)", overflow: "hidden",
+  borderRadius: 0, border: "1px solid var(--border)", overflow: "hidden",
   boxShadow: "0 12px 40px rgba(22,35,59,0.18)", display: "flex", flexDirection: "column",
 };
 const sheetBody = { padding: "18px 20px", overflowY: "auto", flex: "1 1 auto", WebkitOverflowScrolling: "touch" };
@@ -207,6 +207,6 @@ const sheetFoot = {
 const closeBtn = {
   background: "var(--bad)", border: "none", cursor: "pointer",
   color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-  width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+  width: 26, height: 26, borderRadius: 0, flexShrink: 0,
   boxShadow: "0 1px 2px rgba(176,40,31,0.35)",
 };

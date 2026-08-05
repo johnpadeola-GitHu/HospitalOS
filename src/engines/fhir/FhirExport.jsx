@@ -106,9 +106,9 @@ export default function FhirExport() {
 
 const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.55 };
 const layout = { display: "grid", gridTemplateColumns: "220px 1fr", gap: 16, alignItems: "start" };
-const pickerCol = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: 10, boxShadow: "var(--shadow-sm)" };
+const pickerCol = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: 10, boxShadow: "var(--shadow-sm)" };
 const pickRow = { width: "100%", display: "flex", padding: "7px 8px", background: "none", border: "none", borderRadius: 0, cursor: "pointer", font: "inherit", marginBottom: 1 };
 const pickActive = { background: "var(--charcoal-bg)" };
-const countChip = { fontSize: 11.5, color: "var(--ink)", background: "var(--surface)", border: "1px solid var(--border)", padding: "4px 10px", borderRadius: 999 };
+const countChip = { fontSize: 11.5, color: "var(--ink)", background: "var(--surface)", border: "1px solid var(--border)", padding: "4px 10px", borderRadius: 0 };
 const codeBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 12px", fontFamily: "var(--font-mono)", fontSize: 10, lineHeight: 1.6, overflowX: "auto", whiteSpace: "pre-wrap", color: "var(--ink)", maxHeight: 420, overflowY: "auto" };
 const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0 };

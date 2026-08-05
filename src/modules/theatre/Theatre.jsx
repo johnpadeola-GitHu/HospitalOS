@@ -118,7 +118,7 @@ function StageChip({ stage }) {
     completed: { bg: "#E6EFDF", fg: "#4A6329" },
   }[stage];
   return (
-    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 999, whiteSpace: "nowrap" }}>
+    <span style={{ background: tint.bg, color: tint.fg, fontSize: 11, fontWeight: 500, padding: "2px 9px", borderRadius: 0, whiteSpace: "nowrap" }}>
       {STAGE_LABELS[stage]}
     </span>
   );

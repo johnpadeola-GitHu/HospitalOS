@@ -108,7 +108,11 @@ export default function Settings() {
 
       <div style={{ ...section, marginTop: 20 }}>
         <div style={sectionTitle}>System preferences</div>
-        <Field label="Currency"><div style={{ fontSize: 13, color: "var(--ink-strong)" }}>{s.currency}</div></Field>
+        <Field label="Currency">
+          <div style={{ fontSize: 13, color: "var(--ink-strong)" }}>
+            Nigerian Naira (NGN — ₦)
+          </div>
+        </Field>
         <Field label="Timezone"><div style={{ fontSize: 13, color: "var(--ink-strong)" }}>{s.timezone}</div></Field>
         <Toggle label="NHIA integration enabled" on={s.nhisEnabled} onChange={() => patch({ nhisEnabled: !s.nhisEnabled })} />
         <Toggle label="Critical alert sound" on={s.criticalAlertSound} onChange={() => patch({ criticalAlertSound: !s.criticalAlertSound })} />
@@ -146,5 +150,5 @@ const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12,
 const logoImg = { width: 48, height: 48, objectFit: "cover", border: "1px solid var(--border)", flexShrink: 0 };
 const logoPlaceholder = { width: 48, height: 48, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "var(--muted)", flexShrink: 0 };
 const uploadBtn = { display: "flex", alignItems: "center", gap: 6, font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 12px", border: "1px solid var(--border-strong)", background: "var(--surface)", color: "var(--ink-strong)", cursor: "pointer" };
-const track = { width: 40, height: 22, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center" };
-const knob = { width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "transform 0.15s" };
+const track = { width: 40, height: 22, borderRadius: 0, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center" };
+const knob = { width: 18, height: 18, borderRadius: 0, background: "#fff", transition: "transform 0.15s" };

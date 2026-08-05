@@ -226,9 +226,9 @@ const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minma
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 16px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "11px 16px", fontSize: 12.5, verticalAlign: "middle" };
-const dot = { width: 7, height: 7, borderRadius: "50%", flexShrink: 0 };
-const track = { width: 36, height: 20, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", flexShrink: 0 };
-const knob = { width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "transform .15s" };
+const dot = { width: 7, height: 7, borderRadius: 0, flexShrink: 0 };
+const track = { width: 36, height: 20, borderRadius: 0, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", flexShrink: 0 };
+const knob = { width: 16, height: 16, borderRadius: 0, background: "#fff", transition: "transform .15s" };
 const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
 
 function CommercialPlanModal({ tenant, onClose, onDone }) {

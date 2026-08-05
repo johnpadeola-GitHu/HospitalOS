@@ -106,8 +106,8 @@ export function DocFooterNote({ children }) {
 }
 
 const letterheadWrap = { marginBottom: 18 };
-const logoImg = { width: 52, height: 52, borderRadius: 10, objectFit: "cover", border: "1px solid #E4E9F2", flexShrink: 0 };
-const logoFallback = { width: 52, height: 52, borderRadius: 10, background: "#E8EFFB", color: "#1E3A6E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, flexShrink: 0 };
+const logoImg = { width: 52, height: 52, borderRadius: 0, objectFit: "cover", border: "1px solid #E4E9F2", flexShrink: 0 };
+const logoFallback = { width: 52, height: 52, borderRadius: 0, background: "#E8EFFB", color: "#1E3A6E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, flexShrink: 0 };
 const hospitalName = { fontSize: 18, fontWeight: 700, color: "#22272B", letterSpacing: "-0.01em" };
 const hospitalMeta = { fontSize: 11.5, color: "#5A6472", marginTop: 1 };
 const overlay = { position: "fixed", inset: 0, background: "#fff", zIndex: 200, overflowY: "auto" };
@@ -115,8 +115,8 @@ const toolbar = {
   position: "sticky", top: 0, display: "flex", alignItems: "center", justifyContent: "space-between",
   padding: "12px 24px", borderBottom: "1px solid #E4E9F2", background: "#F8FAFC", zIndex: 2,
 };
-const printBtn = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "#fff", background: "#33393F", border: "none", borderRadius: 8, padding: "7px 14px", cursor: "pointer" };
-const closeBtn = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "#5A6472", background: "#fff", border: "1px solid #CBD5E5", borderRadius: 8, padding: "7px 14px", cursor: "pointer" };
+const printBtn = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "#fff", background: "#33393F", border: "none", borderRadius: 0, padding: "7px 14px", cursor: "pointer" };
+const closeBtn = { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "#5A6472", background: "#fff", border: "1px solid #CBD5E5", borderRadius: 0, padding: "7px 14px", cursor: "pointer" };
 const page = { maxWidth: 720, margin: "0 auto", padding: "36px 40px 60px" };
 const footerNote = { marginTop: 28, paddingTop: 14, borderTop: "1px solid #E4E9F2", fontSize: 10.5, color: "#7A8AA3", lineHeight: 1.6 };
 const watermark = { marginTop: 18, paddingTop: 10, borderTop: "1px dashed #CBD5E5", fontSize: 9.5, color: "#9AA5B3", textAlign: "center", letterSpacing: "0.01em" };

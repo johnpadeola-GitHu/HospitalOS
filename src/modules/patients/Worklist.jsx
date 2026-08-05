@@ -70,4 +70,4 @@ const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--bor
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
-const areaPill = { fontSize: 11, fontWeight: 500, color: "#1E3350", background: "#D3E1F8", padding: "2px 9px", borderRadius: 999 };
+const areaPill = { fontSize: 11, fontWeight: 500, color: "#1E3350", background: "#D3E1F8", padding: "2px 9px", borderRadius: 0 };

@@ -40,9 +40,9 @@ export default function TenantBrand() {
 }
 
 const wrap = { display: "flex", alignItems: "center", gap: 9, flexShrink: 0, minWidth: 0 };
-const logoImg = { width: 28, height: 28, borderRadius: 7, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
+const logoImg = { width: 28, height: 28, borderRadius: 0, objectFit: "cover", flexShrink: 0, border: "1px solid var(--border)" };
 const logoFallback = {
-  width: 28, height: 28, borderRadius: 7, background: "var(--accent-bg)", color: "var(--accent)",
+  width: 28, height: 28, borderRadius: 0, background: "var(--accent-bg)", color: "var(--accent)",
   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0,
 };
 const name = { fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
