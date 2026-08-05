@@ -116,7 +116,7 @@ function RiskCard({ label, value, hint, danger }) {
   return (
     <div style={{ ...panel, ...(danger ? { borderColor: "#E4B6B2", background: "#FCF4F3" } : null) }}>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-mono)", color: danger ? "#B0281F" : "var(--ink-strong)", margin: "3px 0" }}>
+      <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: danger ? "#B0281F" : "var(--ink-strong)", margin: "3px 0" }}>
         {value}
       </div>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{hint}</div>

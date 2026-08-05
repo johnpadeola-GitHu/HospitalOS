@@ -46,7 +46,7 @@ export default function Surveillance() {
                   {d.notifiable && <Pill tone="warn">Notifiable</Pill>}
                 </div>
               </div>
-              <span style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-mono)", color: "var(--ink-strong)" }}>{d.cases}</span>
+              <span style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: "var(--ink-strong)" }}>{d.cases}</span>
               <Pill tone={TREND_TONE[d.trend]}>
                 {(() => { const T = Icons[TREND_ICON[d.trend]]; return <T size={12} style={{ marginRight: 3 }} />; })()}
                 {d.trend}

@@ -361,7 +361,7 @@ function Stat({ label, value, accent }) {
   return (
     <div style={statCard}>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-mono)", color: accent ? "#8A5A17" : "var(--ink-strong)", marginTop: 2 }}>
+      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: accent ? "#8A5A17" : "var(--ink-strong)", marginTop: 2 }}>
         {value}
       </div>
     </div>

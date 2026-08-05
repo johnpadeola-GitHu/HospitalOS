@@ -118,7 +118,7 @@ function GenerateModal({ actor, onClose, onDone }) {
       <Modal title="Code generated" onClose={onDone} footer={<Button variant="primary" onClick={onDone}>Done</Button>}>
         <div style={{ textAlign: "center", padding: "10px 0" }}>
           <Icons.CheckCircle2 size={28} color="var(--good)" style={{ marginBottom: 10 }} />
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "0.03em" }}>{created.code}</div>
+          <div style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 18, fontWeight: 700, color: "var(--ink-strong)", letterSpacing: "0.03em" }}>{created.code}</div>
           <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6 }}>
             For {created.tenantName} — send this code directly to the hospital's administrator.
           </div>

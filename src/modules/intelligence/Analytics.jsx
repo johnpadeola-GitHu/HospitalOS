@@ -117,7 +117,7 @@ function Kpi({ label, value, warn }) {
   return (
     <div style={kpiCard}>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-mono)", color: warn ? "#8A5A17" : "var(--ink-strong)", marginTop: 2 }}>
+      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: warn ? "#8A5A17" : "var(--ink-strong)", marginTop: 2 }}>
         {value}
       </div>
     </div>
@@ -158,7 +158,7 @@ function Money({ label, value, accent }) {
   return (
     <div>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{label}</div>
-      <div style={{ fontSize: 20, fontWeight: 600, fontFamily: "var(--font-mono)", color: accent || "var(--ink-strong)" }}>
+      <div style={{ fontSize: 20, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: accent || "var(--ink-strong)" }}>
         {naira(value)}
       </div>
     </div>

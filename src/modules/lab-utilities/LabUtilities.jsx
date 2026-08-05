@@ -71,7 +71,7 @@ function Calculators() {
         </div>
         <div style={resultBox}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Result</div>
-          <div style={{ fontSize: 26, fontWeight: 700, fontFamily: "var(--font-mono)", color: display != null ? "var(--ink-strong)" : "var(--muted)", marginTop: 4 }}>
+          <div style={{ fontSize: 26, fontWeight: 700, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: display != null ? "var(--ink-strong)" : "var(--muted)", marginTop: 4 }}>
             {display != null ? display : "\u2014"}
             {display != null && typeof result !== "object" && <span style={{ fontSize: 13, fontWeight: 500, color: "var(--muted)" }}> {calc.unit}</span>}
           </div>
@@ -101,7 +101,7 @@ function Converters() {
         </label>
         <div style={{ fontSize: 20, color: "var(--muted)", paddingBottom: 8 }}>=</div>
         <div style={convResult}>
-          <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--ink-strong)" }}>
+          <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: "var(--ink-strong)" }}>
             {out != null ? out : "\u2014"}
           </div>
           <div style={{ fontSize: 11, color: "var(--muted)" }}>{c.to}</div>

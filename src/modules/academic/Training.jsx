@@ -53,7 +53,7 @@ export default function Training() {
             <div key={t.id} style={card}>
               <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-strong)" }}>{t.programme}</div>
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{t.level} · Lead: {t.lead}</div>
-              <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-mono)", color: "var(--ink-strong)", marginTop: 8 }}>{t.trainees}</div>
+              <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: "var(--ink-strong)", marginTop: 8 }}>{t.trainees}</div>
               <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 10 }}>trainees enrolled</div>
               <div style={{ display: "flex", gap: 6 }}>
                 <Button onClick={() => setEnrollTarget(t)}><Icons.UserPlus size={13} /> Enroll</Button>

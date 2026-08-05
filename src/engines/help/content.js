@@ -8,7 +8,7 @@
 export const CATEGORIES = [
   { key: "start", label: "Getting started", icon: "Rocket", blurb: "Orientation, signing in, and how the system is laid out." },
   { key: "clinical", label: "Clinical workflows", icon: "Stethoscope", blurb: "Registration, admission, records, emergency, critical care." },
-  { key: "laboratory", label: "Laboratory", icon: "FlaskConical", blurb: "279 tests across 12 disciplines covering routine hospital laboratory services. Advanced molecular and genomic investigations are handled by LabOS, with results returned automatically to the patient record." },
+  { key: "laboratory", label: "Laboratory", icon: "FlaskConical", blurb: "279 tests across 12 disciplines. Ordering, results, POCT, and reference ranges." },
   { key: "diagnostics", label: "Diagnostics", icon: "Microscope", blurb: "Imaging, blood bank, radiotherapy, and the instruments gateway." },
   { key: "pharmacy", label: "Pharmacy", icon: "Pill", blurb: "Dispensing, inventory, and allergy safety." },
   { key: "finance", label: "Finance", icon: "Wallet", blurb: "Billing, payments, claims, and accommodation charges." },

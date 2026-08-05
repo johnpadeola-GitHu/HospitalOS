@@ -447,8 +447,8 @@ function ImagingAction({ device, onClose, onDone }) {
           <span style={{ color: "var(--muted)" }}> for {result.study.patientName}</span>
         </div>
         <div style={dicomStat}>
-          <div><span style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700 }}>{result.series}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>series</div></div>
-          <div><span style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700 }}>{result.images}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>images</div></div>
+          <div><span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 20, fontWeight: 700 }}>{result.series}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>series</div></div>
+          <div><span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 20, fontWeight: 700 }}>{result.images}</span><div style={{ fontSize: 11, color: "var(--muted)" }}>images</div></div>
         </div>
         <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>Study status moved to Performed — ready for reporting.</div>
       </Modal>
@@ -500,7 +500,7 @@ function RtAction({ device, onClose, onDone }) {
         <div style={{ fontSize: 13 }}>
           <b style={{ color: "var(--ink-strong)" }}>{result.course.patientName}</b> — {result.course.site}
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--ink-strong)", margin: "8px 0" }}>
+        <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: "var(--ink-strong)", margin: "8px 0" }}>
           {result.course.fractionsDone}/{result.course.fractionsPlanned}
         </div>
         <div style={{ fontSize: 12, color: "var(--muted)" }}>fractions delivered</div>

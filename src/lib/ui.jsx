@@ -57,7 +57,7 @@ const stat = {
   },
   clickable: { cursor: "pointer" },
   label: { fontSize: 11, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" },
-  value: { fontSize: 26, fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "-0.03em", margin: "5px 0 1px" },
+  value: { fontSize: 28, fontWeight: 700, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em", margin: "5px 0 1px" },
   sub: { fontSize: 11.5, color: "var(--muted)" },
 };
 

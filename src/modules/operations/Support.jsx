@@ -28,7 +28,7 @@ export default function Support() {
           {rows.map((s) => (
             <div key={s.id} style={card}>
               <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-strong)" }}>{s.service}</div>
-              <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-mono)", color: "var(--ink-strong)", margin: "6px 0 2px" }}>{s.value}</div>
+              <div style={{ fontSize: 24, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: "var(--ink-strong)", margin: "6px 0 2px" }}>{s.value}</div>
               <div style={{ fontSize: 12, color: "var(--muted)" }}>{s.metric}</div>
             </div>
           ))}

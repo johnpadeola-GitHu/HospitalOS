@@ -70,12 +70,12 @@ function InventoryTab() {
           {inv.map((g) => (
             <div key={g.group} style={{ ...groupCard, ...(g.low ? groupLow : null) }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, fontWeight: 600, color: "var(--ink-strong)" }}>
+                <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 18, fontWeight: 600, color: "var(--ink-strong)" }}>
                   {g.group}
                 </span>
                 {g.low && <span style={lowPill}>Low</span>}
               </div>
-              <div style={{ fontSize: 28, fontWeight: 600, fontFamily: "var(--font-mono)", color: g.low ? "#B0281F" : "var(--ink-strong)", margin: "4px 0" }}>
+              <div style={{ fontSize: 28, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: g.low ? "#B0281F" : "var(--ink-strong)", margin: "4px 0" }}>
                 {g.count}
               </div>
               <div style={{ fontSize: 11, color: "var(--muted)" }}>

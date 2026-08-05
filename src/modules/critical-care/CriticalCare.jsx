@@ -126,7 +126,7 @@ function Stat({ label, value, danger }) {
   return (
     <div style={{ ...statCard, ...(danger ? { borderColor: "#E4B6B2", background: "#FCF4F3" } : null) }}>
       <div style={{ fontSize: 12, color: "var(--muted)" }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-mono)", color: danger ? "#B0281F" : "var(--ink-strong)", marginTop: 2 }}>
+      <div style={{ fontSize: 22, fontWeight: 600, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", color: danger ? "#B0281F" : "var(--ink-strong)", marginTop: 2 }}>
         {value}
       </div>
     </div>

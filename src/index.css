@@ -44,6 +44,7 @@
   --shadow: 0 1px 3px rgba(22, 35, 59, 0.07), 0 4px 12px rgba(22, 35, 59, 0.04);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-number: 'Inter', system-ui, sans-serif; /* tabular-nums applied at point of use */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
