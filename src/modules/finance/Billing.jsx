@@ -365,8 +365,8 @@ const statRow = {
   gap: 12,
   marginBottom: 18,
 };
-const statCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const statCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const num = { textAlign: "right", fontFamily: "var(--font-mono)" };
@@ -392,7 +392,7 @@ const invoiceBanner = {
   color: "#3D5A2A",
   fontSize: 12.5,
   padding: "10px 13px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
   lineHeight: 1.5,
 };
@@ -401,6 +401,6 @@ const errBox = {
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

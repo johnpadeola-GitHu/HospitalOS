@@ -201,15 +201,15 @@ function VitalsModal({ row, onClose, onDone }) {
 }
 
 const statRow = { display: "flex", gap: 12, marginBottom: 18, flexWrap: "wrap" };
-const statCard = { flex: "0 1 160px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" };
-const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "28px 24px", textAlign: "center" };
+const statCard = { flex: "0 1 160px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
+const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "28px 24px", textAlign: "center" };
 const grid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 };
-const card = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" };
+const card = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
 const cardUnstable = { border: "1px solid #E4B6B2", boxShadow: "inset 3px 0 0 #B0281F" };
 const cardHead = { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 };
 const unstablePill = { fontSize: 11, fontWeight: 600, color: "#B0281F", background: "#F7E4E2", padding: "2px 9px", borderRadius: 999 };
 const vitalsGrid = { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 12 };
-const vitalCell = { background: "var(--surface)", borderRadius: 8, padding: "7px 6px", textAlign: "center" };
+const vitalCell = { background: "var(--surface)", borderRadius: 0, padding: "7px 6px", textAlign: "center" };
 const cardFoot = { display: "flex", alignItems: "center", justifyContent: "space-between" };
 const vitalRow = { display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderTop: "1px solid var(--border)" };
-const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

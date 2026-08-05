@@ -240,14 +240,14 @@ function RecordModal({ onClose, onDone }) {
   );
 }
 
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", border: "1px solid var(--bad)", borderRadius: 8, padding: "9px 12px", fontSize: 12.5, marginBottom: 12 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", borderRadius: 8, padding: "9px 12px", fontSize: 12.5, marginBottom: 12 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", border: "1px solid var(--bad)", borderRadius: 0, padding: "9px 12px", fontSize: 12.5, marginBottom: 12 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", borderRadius: 0, padding: "9px 12px", fontSize: 12.5, marginBottom: 12 };
 const resultRow = {
   display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%",
-  padding: "9px 11px", borderRadius: 8, border: "1px solid transparent", background: "none",
+  padding: "9px 11px", borderRadius: 0, border: "1px solid transparent", background: "none",
   cursor: "pointer", textAlign: "left", font: "inherit", marginBottom: 3,
 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };

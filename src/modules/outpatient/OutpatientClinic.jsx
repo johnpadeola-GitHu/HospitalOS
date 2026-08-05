@@ -279,7 +279,7 @@ const board = {
 const column = {
   background: "var(--surface)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: 12,
 };
 const colHead = {
@@ -300,7 +300,7 @@ const emptyCol = { fontSize: 12, color: "var(--muted)", padding: "10px 2px", tex
 const visitCard = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 10,
+  borderRadius: 0,
   padding: "10px 11px",
 };
 const advanceBtn = {
@@ -308,7 +308,7 @@ const advanceBtn = {
   fontSize: 12,
   fontWeight: 500,
   padding: "5px 10px",
-  borderRadius: 7,
+  borderRadius: 0,
   border: "1px solid var(--border-strong)",
   background: "var(--ink-strong)",
   color: "#fff",
@@ -321,7 +321,7 @@ const resultRow = {
   alignItems: "center",
   padding: "8px 10px",
   border: "1px solid transparent",
-  borderRadius: 8,
+  borderRadius: 0,
   background: "none",
   cursor: "pointer",
   font: "inherit",
@@ -336,6 +336,6 @@ const errBox = {
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

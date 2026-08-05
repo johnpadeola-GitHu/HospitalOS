@@ -182,10 +182,10 @@ export default function DataImport() {
   );
 }
 
-const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.55 };
+const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.55 };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
-const dropZone = { border: "1.5px dashed var(--border-strong)", borderRadius: 12, padding: "26px 16px", textAlign: "center", cursor: "pointer", background: "var(--surface)" };
+const dropZone = { border: "1.5px dashed var(--border-strong)", borderRadius: 0, padding: "26px 16px", textAlign: "center", cursor: "pointer", background: "var(--surface)" };
 const mapRow = { display: "flex", alignItems: "center", gap: 12 };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "9px 14px", fontSize: 12.5, verticalAlign: "middle" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };

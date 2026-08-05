@@ -120,7 +120,7 @@ const toggle = {
 const emptyState = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "28px 24px",
   textAlign: "center",
 };
@@ -129,7 +129,7 @@ const alertCard = {
   gap: 14,
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "14px 16px",
   overflow: "hidden",
   position: "relative",

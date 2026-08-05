@@ -369,15 +369,15 @@ function Stat({ label, value, accent }) {
 }
 
 const statRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 18 };
-const statCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const statCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
 const methodPill = { fontSize: 11, fontWeight: 500, color: "var(--ink)", background: "var(--surface)", padding: "2px 9px", borderRadius: 999 };
 const settledPill = { fontSize: 11, fontWeight: 500, color: "var(--good)", background: "var(--good-bg)", padding: "2px 9px", borderRadius: 999 };
 const pendingPill = { fontSize: 11, fontWeight: 500, color: "var(--warn)", background: "var(--warn-bg)", padding: "2px 9px", borderRadius: 999 };
-const sessionBar = { display: "flex", alignItems: "center", gap: 8, fontSize: 13, padding: "10px 14px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10, marginBottom: 16 };
+const sessionBar = { display: "flex", alignItems: "center", gap: 8, fontSize: 13, padding: "10px 14px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, marginBottom: 16 };
 const sessionDot = { width: 8, height: 8, borderRadius: 999, background: "var(--good)", flexShrink: 0 };
-const inputStyle = { width: "100%", padding: "9px 11px", borderRadius: 8, border: "1px solid var(--border)", fontSize: 13, fontFamily: "var(--font-sans)", background: "var(--surface-2)", color: "var(--ink)" };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const inputStyle = { width: "100%", padding: "9px 11px", borderRadius: 0, border: "1px solid var(--border)", fontSize: 13, fontFamily: "var(--font-sans)", background: "var(--surface-2)", color: "var(--ink)" };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

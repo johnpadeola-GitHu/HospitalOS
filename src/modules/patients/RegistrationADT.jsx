@@ -409,7 +409,7 @@ const chipActive = { background: "var(--ink-strong)", color: "#fff", borderColor
 const tableWrap = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   overflow: "auto",
 };
 const th = {
@@ -427,6 +427,6 @@ const errBox = {
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

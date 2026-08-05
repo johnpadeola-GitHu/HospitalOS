@@ -116,11 +116,11 @@ const linkedNote = { display: "flex", alignItems: "center", gap: 5, fontSize: 11
 const unlinkedNote = { display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--warn)", marginTop: 4, lineHeight: 1.4 };
 const dropdown = {
   position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 20,
-  background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: 10,
+  background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: 0,
   boxShadow: "0 8px 24px rgba(22,35,59,0.14)", maxHeight: 220, overflowY: "auto", padding: 4,
 };
 const optionRow = {
   width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center",
-  padding: "8px 10px", borderRadius: 7, border: "none", background: "none", cursor: "pointer", font: "inherit", fontSize: 12.5,
+  padding: "8px 10px", borderRadius: 0, border: "none", background: "none", cursor: "pointer", font: "inherit", fontSize: 12.5,
 };
 const emptyRow = { padding: "12px 10px", fontSize: 12, color: "var(--muted)", lineHeight: 1.5 };

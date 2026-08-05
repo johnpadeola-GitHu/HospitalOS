@@ -116,6 +116,6 @@ const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minma
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14 };
 const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
 const fill = { height: "100%", borderRadius: 999, background: "var(--chart-1)" };
-const tip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12, boxShadow: "var(--shadow)" };
+const tip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, fontSize: 12, boxShadow: "var(--shadow)" };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 14px", fontSize: 12.5, verticalAlign: "middle" };

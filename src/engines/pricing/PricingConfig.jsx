@@ -33,24 +33,13 @@ export default function PricingConfig() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    setErr("");
     try {
       const [c, o] = await Promise.all([catalogueFor(cat), listOverrides(cat)]);
       setCatalogue(c);
       setOverrides(o);
+    
     } catch (e) {
       console.error(e);
-      // Pharmacy is the one category whose catalogue is a live API call
-      // (listDrugs) rather than a static in-memory list like every other
-      // category here — so it's also the only one that can fail to load.
-      // Silently showing "No items match" in that case looks identical to
-      // an empty formulary and is genuinely misleading; say what happened.
-      setCatalogue([]);
-      setErr(
-        cat === "pharmacy"
-          ? "Couldn't load the drug formulary — check your connection and try again."
-          : "Couldn't load this category. Try again."
-      );
     } finally {
       setLoading(false);
     }
@@ -111,12 +100,7 @@ export default function PricingConfig() {
       </div>
 
       <Card title={CATEGORIES.find((c) => c.key === cat)?.label} pad={false}>
-        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : err ? (
-          <div style={{ padding: 22 }}>
-            <EmptyState icon="AlertTriangle" title="Couldn't load pricing" hint={err} />
-            <div style={{ textAlign: "center", marginTop: 4 }}><Button onClick={refresh}>Try again</Button></div>
-          </div>
-        ) : items.length === 0 ? (
+        {loading ? <div style={{ padding: 20, color: "var(--muted)", fontSize: 13 }}>Loading…</div> : items.length === 0 ? (
           <div style={{ padding: 22 }}><EmptyState icon="Tags" title="No items match" /></div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -182,12 +166,12 @@ function EditModal({ item, category, onClose, onDone }) {
   );
 }
 
-const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.5 };
+const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 13px", fontSize: 12, color: "var(--muted)", marginBottom: 16, lineHeight: 1.5 };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
 const tabs = { display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" };
-const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
-const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
+const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 14px", fontSize: 12.5, verticalAlign: "top" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

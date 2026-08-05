@@ -170,9 +170,9 @@ function Empty() {
 }
 
 const kpiGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
-const kpiCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 15px" };
+const kpiCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "13px 15px" };
 const panelGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, alignItems: "start" };
-const panel = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" };
+const panel = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
 const panelTitle = { fontWeight: 600, fontSize: 14, color: "var(--ink-strong)", marginBottom: 12 };
 const barRow = { display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 };
 const barTrack = { height: 6, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };

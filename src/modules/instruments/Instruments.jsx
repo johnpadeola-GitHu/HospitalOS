@@ -82,14 +82,14 @@ export default function Instruments() {
         <Icons.Info size={14} style={{ color: "var(--muted)", flexShrink: 0, marginTop: 1 }} />
         <span>
           Real network listening (MLLP for HL7, a DICOM SCP) requires a small
-          Gateway Agent installed on a PC at the hospital \u2014 Cloudflare's edge
+          Gateway Agent installed on a PC at the hospital — Cloudflare's edge
           network cannot hold a persistent socket open the way these protocols
           need. Once a device is registered below, contact the AgoroX team to have
-          the Gateway Agent installed on a PC next to that equipment \u2014 setup
+          the Gateway Agent installed on a PC next to that equipment — setup
           is hands-on for now, not a self-service download. Until it's
           installed for a given device, each "receive/confirm/send" action
           here runs the exact code path a real listener would call, so Lab,
-          Radiology, and Alerts can't tell the difference \u2014 useful for
+          Radiology, and Alerts can't tell the difference — useful for
           testing the rest of the system before real hardware is connected.
         </span>
       </div>
@@ -99,7 +99,7 @@ export default function Instruments() {
           <div style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6, marginBottom: 12 }}>
             The small program that connects a real analyzer or printer to HospitalOS.
             Runs on any Windows PC on the same network as the equipment. Installed by the
-            AgoroX team as part of onboarding \u2014 register the device below, then reach out
+            AgoroX team as part of onboarding — register the device below, then reach out
             to get it set up.
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -156,7 +156,7 @@ export default function Instruments() {
                   <div style={meta}>{d.type} · {d.vendor}{d.year >= 2012 ? ` · ${d.year}` : ""}</div>
                   <div style={{ ...meta, fontFamily: "var(--font-mono)" }}>{d.ae} · {d.host} · {d.protocol}</div>
                   <div style={meta}>
-                    Handles: {d.handles.length ? d.handles.join(", ") : "\u2014"} · {d.messages.toLocaleString()} msgs
+                    Handles: {d.handles.length ? d.handles.join(", ") : "—"} · {d.messages.toLocaleString()} msgs
                     {d.errors > 0 && <span style={{ color: "var(--warn)" }}> · {d.errors} errors</span>} · seen {ago(d.lastSeen)}
                   </div>
                 </div>
@@ -255,7 +255,7 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
         connectionType: detected.connectionType, vendorId: detected.vendorId, productId: detected.productId,
         actor,
       });
-      // The token is returned ONLY on this response \u2014 it's never
+      // The token is returned ONLY on this response — it's never
       // fetchable again after this, same as any real API key. Show it
       // here instead of closing immediately.
       setRegistered({ deviceToken: created.deviceToken, name: created.name });
@@ -269,12 +269,12 @@ function DetectDeviceModal({ actor, onClose, onDone }) {
         <div style={detectedBox}>
           <Icons.CheckCircle2 size={14} color="var(--good)" style={{ flexShrink: 0, marginTop: 1 }} />
           <div style={{ fontSize: 13, color: "var(--ink-strong)" }}>
-            <strong>{registered.name}</strong> is registered. Save the token below \u2014 the AgoroX team
+            <strong>{registered.name}</strong> is registered. Save the token below — the AgoroX team
             will need it to set up the Gateway Agent on a PC next to this device.
           </div>
         </div>
         <div style={{ fontSize: 11, fontWeight: 600, color: "var(--muted)", marginTop: 14, marginBottom: 4 }}>
-          DEVICE TOKEN \u2014 shown once, copy it now
+          DEVICE TOKEN — shown once, copy it now
         </div>
         <div style={{
           fontFamily: "var(--font-mono)", fontSize: 12.5, background: "var(--surface)",
@@ -579,7 +579,7 @@ const note = { display: "flex", gap: 8, background: "var(--accent-soft)", border
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 10, marginBottom: 16 };
 const tabs = { display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" };
 const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 12px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 };
-const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
+const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
 const catCount = { fontSize: 10, fontWeight: 700, opacity: 0.75 };
 const row = { display: "flex", gap: 12, padding: "13px 16px" };
 const iconBox = { width: 36, height: 36, borderRadius: 9, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };

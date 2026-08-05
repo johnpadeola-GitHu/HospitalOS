@@ -58,7 +58,7 @@ export default function AcademyPlaceholder() {
 
 const card = {
   background: "var(--surface-2)", border: "1px solid var(--border)",
-  borderRadius: 12, padding: "22px 24px",
+  borderRadius: 0, padding: "22px 24px",
 };
 const badge = {
   display: "inline-flex", alignItems: "center", fontSize: 10.5, fontWeight: 700, color: "var(--warn)",
@@ -67,14 +67,14 @@ const badge = {
 };
 const row = {
   display: "flex", alignItems: "center", gap: 10, padding: "9px 12px",
-  border: "1px solid var(--border)", borderRadius: 10, background: "var(--surface)",
+  border: "1px solid var(--border)", borderRadius: 0, background: "var(--surface)",
 };
 const tierTag = {
   fontSize: 10, fontWeight: 600, color: "var(--muted)", flexShrink: 0, width: 118,
 };
 const codeTag = {
   fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accent-bg)",
-  padding: "3px 8px", borderRadius: 6, flexShrink: 0, fontFamily: "var(--font-mono)",
+  padding: "3px 8px", borderRadius: 0, flexShrink: 0, fontFamily: "var(--font-mono)",
 };
 const link = {
   display: "inline-flex", alignItems: "center", gap: 7, marginTop: 18,

@@ -308,14 +308,14 @@ function DisposeModal({ encounter, onClose, onDone }) {
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const acuityRow = { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" };
 const acuityChip = { fontSize: 12, padding: "5px 11px", borderRadius: 999 };
-const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "28px 24px", textAlign: "center" };
+const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "28px 24px", textAlign: "center" };
 const encCard = {
   display: "flex",
   gap: 12,
   alignItems: "stretch",
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "12px 16px",
   position: "relative",
   overflow: "hidden",
@@ -327,7 +327,7 @@ const dispBtn = {
   fontSize: 13,
   fontWeight: 500,
   padding: "10px 14px",
-  borderRadius: 8,
+  borderRadius: 0,
   border: "1px solid var(--border-strong)",
   background: "var(--surface-2)",
   color: "var(--ink)",
@@ -341,11 +341,11 @@ const resultRow = {
   alignItems: "center",
   padding: "8px 10px",
   border: "1px solid transparent",
-  borderRadius: 8,
+  borderRadius: 0,
   background: "none",
   cursor: "pointer",
   font: "inherit",
   fontSize: 13,
 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
-const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

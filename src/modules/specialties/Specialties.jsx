@@ -217,12 +217,12 @@ function ReferralModal({ onClose, onDone }) {
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
 const deptGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 10 };
-const deptCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", cursor: "pointer", font: "inherit" };
-const openBadge = { fontSize: 10, fontWeight: 600, color: "#8A5A17", background: "#FBF0DC", padding: "1px 6px", borderRadius: 5, marginLeft: 7 };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const deptCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 14px", cursor: "pointer", font: "inherit" };
+const openBadge = { fontSize: 10, fontWeight: 600, color: "#8A5A17", background: "#FBF0DC", padding: "1px 6px", borderRadius: 0, marginLeft: 7 };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
-const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 8, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };
+const resultRow = { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid transparent", borderRadius: 0, background: "none", cursor: "pointer", font: "inherit", fontSize: 13 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
-const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

@@ -163,5 +163,5 @@ const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: 
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
 const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
 const fill = { height: "100%", borderRadius: 999 };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

@@ -160,7 +160,6 @@ export default function GlobalSearch() {
               >
                 <Icons.X size={14} />
               </button>
-              <kbd style={kbd}>Esc</kbd>
             </div>
 
             <div style={{ maxHeight: 400, overflowY: "auto" }}>
@@ -170,7 +169,6 @@ export default function GlobalSearch() {
                   <div style={{ marginTop: 8, display: "flex", gap: 12, flexWrap: "wrap" }}>
                     <span><b style={kbdInline}>↑↓</b> navigate</span>
                     <span><b style={kbdInline}>↵</b> open</span>
-                    <span><b style={kbdInline}>esc</b> close</span>
                   </div>
                 </div>
               ) : flat.length === 0 ? (
@@ -310,17 +308,17 @@ function Row({ active, onClick, onHover, icon, title, sub, tag }) {
 const trigger = {
   display: "flex", alignItems: "center", gap: 8, flex: "1 1 480px", maxWidth: 520,
   background: "var(--surface)", border: "1px solid var(--border)",
-  borderRadius: 8, padding: "7px 10px", cursor: "pointer", font: "inherit",
+  borderRadius: 0, padding: "7px 10px", cursor: "pointer", font: "inherit",
 };
 const kbd = {
   fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--muted)",
   background: "var(--surface-2)", border: "1px solid var(--border)",
-  borderRadius: 4, padding: "2px 5px", flexShrink: 0,
+  borderRadius: 0, padding: "2px 5px", flexShrink: 0,
 };
 const closeButton = {
   display: "flex", alignItems: "center", justifyContent: "center",
-  width: 26, height: 26, borderRadius: 6, border: "1px solid var(--border)",
-  background: "var(--surface)", color: "var(--muted)", cursor: "pointer", flexShrink: 0,
+  width: 26, height: 26, borderRadius: 0, border: "none",
+  background: "var(--bad)", color: "#fff", cursor: "pointer", flexShrink: 0,
 };
 const kbdInline = { fontFamily: "var(--font-mono)", color: "var(--charcoal)" };
 const overlay = {
@@ -330,7 +328,7 @@ const overlay = {
 };
 const palette = {
   width: "100%", maxWidth: 560, background: "var(--surface-2)",
-  border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden",
+  border: "1px solid var(--border)", borderRadius: 0, overflow: "hidden",
   boxShadow: "0 16px 48px rgba(22,35,59,0.22)",
 };
 const inputRow = {
@@ -349,7 +347,7 @@ const row = {
 const rowActive = { background: "var(--charcoal-bg)" };
 const tagChip = {
   fontSize: 9.5, fontWeight: 700, color: "var(--muted)", background: "var(--surface)",
-  border: "1px solid var(--border)", padding: "1px 6px", borderRadius: 4,
+  border: "1px solid var(--border)", padding: "1px 6px", borderRadius: 0,
   textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0,
 };
 const hint = { padding: "22px 16px", fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6 };

@@ -51,7 +51,7 @@ export default function ClinicalRules() {
 function tabBtn(active) {
   return {
     font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "7px 13px",
-    borderRadius: 8, cursor: "pointer", border: "1px solid var(--border-strong)",
+    borderRadius: 0, cursor: "pointer", border: "1px solid var(--border-strong)",
     background: active ? "var(--accent)" : "var(--surface-2)",
     color: active ? "#fff" : "var(--ink)",
   };
@@ -228,7 +228,7 @@ function RuleEditorModal({ rule, onClose, onSaved }) {
       </Field>
 
       <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", marginBottom: 6 }}>Condition</div>
-      <div style={{ border: "1px solid var(--border)", borderRadius: 8, padding: 12, marginBottom: 14 }}>
+      <div style={{ border: "1px solid var(--border)", borderRadius: 0, padding: 12, marginBottom: 14 }}>
         <select style={{ ...inputStyle, width: 180, marginBottom: 10 }} value={combinator} onChange={(e) => setCombinator(e.target.value)}>
           <option value="all">All of (AND)</option>
           <option value="any">Any of (OR)</option>

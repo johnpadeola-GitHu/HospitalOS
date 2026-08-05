@@ -188,14 +188,14 @@ function EditModal({ doc, actor, onClose, onDone }) {
 }
 
 const dropZone = {
-  border: "1.5px dashed var(--border-strong)", borderRadius: 12, padding: "22px 16px",
+  border: "1.5px dashed var(--border-strong)", borderRadius: 0, padding: "22px 16px",
   textAlign: "center", cursor: "pointer", marginBottom: 16, background: "var(--surface)",
 };
 const dropZoneActive = { borderColor: "var(--accent)", background: "var(--accent-soft)" };
 const toolbar = { display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" };
 const row = { display: "flex", gap: 12, alignItems: "center", padding: "12px 16px" };
-const fileIcon = { width: 32, height: 32, borderRadius: 8, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
-const fileSummary = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 11px", marginBottom: 14 };
+const fileIcon = { width: 32, height: 32, borderRadius: 0, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const fileSummary = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "9px 11px", marginBottom: 14 };
 const linkBtn = { font: "inherit", fontSize: 11.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: "6px 0 0" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

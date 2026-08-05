@@ -247,8 +247,8 @@ function ScheduleModal({ onClose, onDone }) {
 }
 
 const header = { display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 };
-const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "28px 24px", textAlign: "center" };
-const caseCard = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" };
+const emptyState = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "28px 24px", textAlign: "center" };
+const caseCard = { display: "flex", gap: 14, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
 const resultRow = {
   width: "100%",
   display: "flex",
@@ -256,11 +256,11 @@ const resultRow = {
   alignItems: "center",
   padding: "8px 10px",
   border: "1px solid transparent",
-  borderRadius: 8,
+  borderRadius: 0,
   background: "none",
   cursor: "pointer",
   font: "inherit",
   fontSize: 13,
 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
-const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBox = { background: "#F7E9E9", color: "#7A2E2E", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

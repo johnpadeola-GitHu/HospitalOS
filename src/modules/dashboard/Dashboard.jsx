@@ -6,7 +6,7 @@ import { listWards } from "../wards/bedService";
 import { listVisits } from "../outpatient/visitService";
 import { listOrders } from "../lab/labService";
 import { listAlerts } from "../alerts/alertService";
-import { billingSummary, getEnterpriseRecommendation } from "../finance/billingService";
+import { billingSummary } from "../finance/billingService";
 import { listLowStock } from "../pharmacy/pharmacyService";
 import { PageHeader, StatCard, Card, Pill } from "../../lib/ui";
 
@@ -28,7 +28,7 @@ export default function Dashboard() {
     let alive = true;
     async function load() {
       setLoading(true);
-      const [patientsR, wardsR, visitsR, ordersR, alertsR, billingR, lowStockR, enterpriseR] = await Promise.allSettled([
+      const [patientsR, wardsR, visitsR, ordersR, alertsR, billingR, lowStockR] = await Promise.allSettled([
         listPatients({ status: "all" }),
         listWards(),
         listVisits({ includeCompleted: false }),
@@ -36,7 +36,6 @@ export default function Dashboard() {
         listAlerts({ includeAcknowledged: false }),
         billingSummary(),
         listLowStock(),
-        getEnterpriseRecommendation(),
       ]);
       if (!alive) return;
 
@@ -48,7 +47,6 @@ export default function Dashboard() {
       const alerts = ok(alertsR) || [];
       const billing = ok(billingR);
       const lowStock = ok(lowStockR);
-      const enterprise = ok(enterpriseR);
 
       const beds = wards ? wards.reduce((a, w) => ({ total: a.total + w.total, occupied: a.occupied + w.occupied }), { total: 0, occupied: 0 }) : null;
       const occPct = beds && beds.total ? Math.round((beds.occupied / beds.total) * 100) : 0;
@@ -68,7 +66,7 @@ export default function Dashboard() {
         patients: patients ? patients.length : null,
         admitted: patients ? patients.filter((p) => p.status === "admitted").length : null,
         beds, occPct, wards, queue: visits ? visits.length : null, pendingLab,
-        alerts, billing, trend, lowStock, enterprise,
+        alerts, billing, trend, lowStock,
         labChart: orders ? [
           { stage: "Ordered", n: labByStage.ordered || 0 },
           { stage: "Collected", n: labByStage.collected || 0 },
@@ -116,24 +114,6 @@ export default function Dashboard() {
         {hasFinance && <StatCard label="Outstanding" value={naira(data.billing.outstanding)} sub="receivables" tone="warn" onClick={() => navigate("/finance/billing")} />}
         {hasPharmacy && <StatCard label="Low stock" value={data.lowStock.length} sub="drugs at or below reorder" tone={data.lowStock.length ? "warn" : "default"} onClick={() => navigate("/pharmacy")} />}
       </div>
-
-      {data.enterprise && data.enterprise.applicable && data.enterprise.recommend && (
-        <div style={enterpriseBanner}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, color: "var(--ink-strong)", fontSize: 13.5, marginBottom: 3 }}>
-              Enterprise could reduce your annual cost
-            </div>
-            <div style={{ fontSize: 12.5, color: "var(--muted)" }}>
-              Based on your commission paid so far this year, you're projected to pay{" "}
-              <b style={{ color: "var(--ink-strong)" }}>{naira(data.enterprise.projectedAnnualCommissionKobo / 100)}</b> in
-              commission this year \u2014 the Enterprise annual licence is{" "}
-              <b style={{ color: "var(--ink-strong)" }}>{naira(data.enterprise.enterpriseAnnualKobo / 100)}</b>, an estimated
-              saving of <b style={{ color: "var(--good)" }}>{naira(data.enterprise.estimatedSavingsKobo / 100)}</b>.
-            </div>
-          </div>
-          <Pill tone="good">Advisory</Pill>
-        </div>
-      )}
 
       {(hasPatientCare || hasDiagnostics) && (
         <div style={chartRow}>
@@ -238,9 +218,8 @@ export default function Dashboard() {
 }
 
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 16 };
-const enterpriseBanner = { display: "flex", alignItems: "flex-start", gap: 14, background: "var(--good-bg)", border: "1px solid var(--good)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 };
 const chartRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
-const tooltip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12, boxShadow: "var(--shadow)" };
+const tooltip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, fontSize: 12, boxShadow: "var(--shadow)" };
 const barRow = { display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 };
 const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
 const fill = { height: "100%", borderRadius: 999 };

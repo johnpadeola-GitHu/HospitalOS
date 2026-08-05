@@ -354,7 +354,7 @@ const toggle = { display: "flex", alignItems: "center", gap: 7, fontSize: 13, co
 const tableWrap = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   overflow: "auto",
 };
 const th = {
@@ -374,7 +374,7 @@ const dispRow = {
   fontSize: 13,
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 10,
+  borderRadius: 0,
   padding: "9px 12px",
 };
 const resultRow = {
@@ -384,19 +384,19 @@ const resultRow = {
   alignItems: "center",
   padding: "8px 10px",
   border: "1px solid transparent",
-  borderRadius: 8,
+  borderRadius: 0,
   background: "none",
   cursor: "pointer",
   font: "inherit",
   fontSize: 13,
 };
 const resultRowActive = { background: "var(--accent-bg)", border: "1px solid var(--border-strong)" };
-const allergyWarn = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "10px 12px", borderRadius: 8, marginBottom: 14, lineHeight: 1.5 };
+const allergyWarn = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "10px 12px", borderRadius: 0, marginBottom: 14, lineHeight: 1.5 };
 const errBox = {
   background: "#F7E9E9",
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

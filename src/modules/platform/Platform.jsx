@@ -8,7 +8,6 @@ import { daysRemaining } from "../../engines/onboarding";
 import { PageHeader, StatCard, Card, Pill, Button, Modal, Field, inputStyle } from "../../lib/ui";
 import Settlement from "./Settlement";
 import ActivationCodes from "./ActivationCodes";
-import EnterpriseRecommendations from "./EnterpriseRecommendations";
 
 import { naira } from "../../lib/money";
 const ago = (iso) => {
@@ -83,14 +82,13 @@ export default function Platform() {
       />
 
       <div style={tabs}>
-        {[["overview", "Overview"], ["settlement", "Settlement & usage"], ["codes", "Activation codes"], ["enterprise", "Enterprise recommendations"]].map(([id, label]) => (
+        {[["overview", "Overview"], ["settlement", "Settlement & usage"], ["codes", "Activation codes"]].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ ...tabBtn, ...(tab === id ? tabActive : null) }}>{label}</button>
         ))}
       </div>
 
       {tab === "settlement" && <Settlement />}
       {tab === "codes" && <ActivationCodes />}
-      {tab === "enterprise" && <EnterpriseRecommendations />}
 
       {tab === "overview" && <>
       {err && <div style={errBanner}>{err}</div>}
@@ -220,10 +218,10 @@ const guideLink = {
   display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
   fontSize: 12, fontWeight: 600, color: "var(--charcoal-strong)",
   background: "var(--surface-2)", border: "1px solid var(--border-strong)",
-  borderRadius: 8, padding: "7px 12px",
+  borderRadius: 0, padding: "7px 12px",
 };
-const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
-const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
+const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 };
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 16px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
@@ -231,7 +229,7 @@ const td = { padding: "11px 16px", fontSize: 12.5, verticalAlign: "middle" };
 const dot = { width: 7, height: 7, borderRadius: "50%", flexShrink: 0 };
 const track = { width: 36, height: 20, borderRadius: 999, border: "none", cursor: "pointer", padding: 2, display: "flex", alignItems: "center", flexShrink: 0 };
 const knob = { width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "transform .15s" };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
 
 function CommercialPlanModal({ tenant, onClose, onDone }) {
   const [loading, setLoading] = useState(true);

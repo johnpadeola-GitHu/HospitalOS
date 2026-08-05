@@ -40,8 +40,12 @@ export async function listTraining() {
 export async function addTrainingProgramme({ programme, level, lead }) {
   return apiCall("/academic/training", { method: "POST", body: { programme, level, lead } });
 }
-export async function enrollTrainee(id) {
-  return apiCall(`/academic/training/${encodeURIComponent(id)}/enroll`, { method: "PATCH" });
+export async function enrollTrainee(id, { name, role } = {}) {
+  return apiCall(`/academic/training/${encodeURIComponent(id)}/enroll`, { method: "PATCH", body: { name, role } });
+}
+
+export async function listTrainees(id) {
+  return apiCall(`/academic/training/${encodeURIComponent(id)}/trainees`);
 }
 
 /* ---------------- Clinical logbooks ---------------- */

@@ -246,9 +246,9 @@ function ReviewModal({ txn, onClose, onDone }) {
 const filterRow = { display: "flex", alignItems: "center", gap: 8, marginBottom: 16, flexWrap: "wrap" };
 const filterChip = { fontSize: 12, fontWeight: 500, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
 const filterChipActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = { fontSize: 11, fontWeight: 600, color: "var(--muted)", padding: "11px 14px", background: "var(--surface)" };
 const td = { padding: "11px 14px", fontSize: 13, verticalAlign: "middle" };
 const emptyCell = { padding: "28px 14px", textAlign: "center", color: "var(--muted)", fontSize: 13 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
-const candidateRow = { display: "flex", alignItems: "center", padding: "9px 10px", border: "1px solid var(--border)", borderRadius: 8 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };
+const candidateRow = { display: "flex", alignItems: "center", padding: "9px 10px", border: "1px solid var(--border)", borderRadius: 0 };

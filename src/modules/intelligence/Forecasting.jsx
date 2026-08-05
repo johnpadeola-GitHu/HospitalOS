@@ -124,6 +124,6 @@ function RiskCard({ label, value, hint, danger }) {
   );
 }
 
-const note = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "var(--muted)", marginBottom: 16 };
+const note = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 14px", fontSize: 12, color: "var(--muted)", marginBottom: 16 };
 const panelRow = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 };
-const panel = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px" };
+const panel = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };

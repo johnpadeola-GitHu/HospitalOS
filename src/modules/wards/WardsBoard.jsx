@@ -117,7 +117,7 @@ const refreshBtn = {
   fontSize: 13,
   fontWeight: 500,
   padding: "8px 14px",
-  borderRadius: 8,
+  borderRadius: 0,
   border: "1px solid var(--border-strong)",
   background: "var(--surface-2)",
   color: "var(--ink)",
@@ -128,13 +128,13 @@ const statCard = {
   flex: "1 1 120px",
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "12px 16px",
 };
 const card = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   padding: "14px 16px",
 };
 const cardHead = {
@@ -150,7 +150,7 @@ const bedGrid = {
   gap: 8,
 };
 const bed = {
-  borderRadius: 8,
+  borderRadius: 0,
   padding: "8px 9px",
   display: "flex",
   flexDirection: "column",

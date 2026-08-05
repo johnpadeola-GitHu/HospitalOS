@@ -445,7 +445,7 @@ function OrderModal({ onClose, onDone }) {
           {selectedTests.map((t) => (
             <div key={t.code} style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
-              fontSize: 12.5, padding: "8px 10px", borderRadius: 6,
+              fontSize: 12.5, padding: "8px 10px", borderRadius: 0,
               background: "var(--surface-2)", border: "1px solid var(--border)",
             }}>
               <span>
@@ -579,7 +579,7 @@ const chipActive = { background: "var(--ink-strong)", color: "#fff", borderColor
 const tableWrap = {
   background: "var(--surface-2)",
   border: "1px solid var(--border)",
-  borderRadius: 12,
+  borderRadius: 0,
   overflow: "auto",
 };
 const th = {
@@ -608,7 +608,7 @@ const resultRow = {
   alignItems: "center",
   padding: "8px 10px",
   border: "1px solid transparent",
-  borderRadius: 8,
+  borderRadius: 0,
   background: "none",
   cursor: "pointer",
   font: "inherit",
@@ -622,13 +622,13 @@ const analyteRow = {
   padding: "8px 0",
   borderTop: "1px solid var(--border)",
 };
-const releasedBadge = { fontSize: 11, fontWeight: 600, color: "var(--good)", background: "var(--good-bg)", padding: "5px 10px", borderRadius: 7 };
-const urgentNote = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const releasedBadge = { fontSize: 11, fontWeight: 600, color: "var(--good)", background: "var(--good-bg)", padding: "5px 10px", borderRadius: 0 };
+const urgentNote = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };
 const errBox = {
   background: "#F7E9E9",
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

@@ -137,4 +137,4 @@ const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minma
 const toolbar = { display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 14px", fontSize: 12.5, verticalAlign: "middle" };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

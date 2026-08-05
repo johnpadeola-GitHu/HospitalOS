@@ -53,3 +53,22 @@ export async function getSettings() {
 export async function updateSettings(patch) {
   return apiCall("/system/settings", { method: "PATCH", body: patch });
 }
+
+export async function uploadLogo(file) {
+  const token = localStorage.getItem("hospitalos_session_token");
+  const formData = new FormData();
+  formData.append("logo", file);
+  let res, data;
+  try {
+    res = await fetch("https://hospitalos-api.johnpadeola.workers.dev/system/logo", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    data = await res.json();
+  } catch {
+    throw new Error("Couldn't reach the server. Check your connection.");
+  }
+  if (!res.ok) throw new Error(data.error || "Upload failed.");
+  return data; // { logoUrl }
+}

@@ -95,7 +95,7 @@ export default function Prescriptions() {
           {rows.map((rx) => {
             const tint = STATUS_TINT[rx.status] || STATUS_TINT.cancelled;
             return (
-              <div key={rx.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", border: "1px solid var(--border)", borderRadius: 10, background: "#fff" }}>
+              <div key={rx.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", border: "1px solid var(--border)", borderRadius: 0, background: "#fff" }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--charcoal-strong)" }}>
                     {rx.quantity} × {rx.drugName} <span style={{ color: "var(--muted)", fontWeight: 400 }}>· {rx.ref}</span>
@@ -113,7 +113,7 @@ export default function Prescriptions() {
                     <button
                       onClick={() => cancel(rx)}
                       disabled={busyId === rx.id}
-                      style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--muted)", fontSize: 12.5, cursor: "pointer" }}
+                      style={{ padding: "7px 12px", borderRadius: 0, border: "1px solid var(--border)", background: "transparent", color: "var(--muted)", fontSize: 12.5, cursor: "pointer" }}
                     >
                       Cancel
                     </button>
@@ -200,7 +200,7 @@ function NewPrescriptionModal({ onClose, onDone }) {
       </Field>
 
       {interactions.length > 0 && (
-        <div style={{ border: "1px solid #E9C6C2", background: "#FBF1F0", borderRadius: 8, padding: "10px 12px", marginBottom: 12 }}>
+        <div style={{ border: "1px solid #E9C6C2", background: "#FBF1F0", borderRadius: 0, padding: "10px 12px", marginBottom: 12 }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--bad)", marginBottom: 4 }}>
             ⚠ Interaction warning ({interactions.length})
           </div>

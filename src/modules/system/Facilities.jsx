@@ -101,6 +101,6 @@ function AddSiteModal({ onClose, onDone }) {
   );
 }
 
-const card = { display: "flex", gap: 12, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" };
+const card = { display: "flex", gap: 12, alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "12px 16px" };
 const activePill = { fontSize: 11, fontWeight: 500, color: "#4A6329", background: "#E6EFDF", padding: "2px 9px", borderRadius: 999 };
 const inactivePill = { fontSize: 11, fontWeight: 500, color: "var(--muted)", background: "var(--surface)", padding: "2px 9px", borderRadius: 999 };

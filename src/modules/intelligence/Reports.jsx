@@ -114,5 +114,5 @@ function Row({ label, value, sub }) {
   );
 }
 
-const printBtn = { font: "inherit", fontSize: 13, fontWeight: 500, padding: "8px 14px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--ink)", cursor: "pointer" };
-const sheet = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, padding: "22px 24px", maxWidth: 620 };
+const printBtn = { font: "inherit", fontSize: 13, fontWeight: 500, padding: "8px 14px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--ink)", cursor: "pointer" };
+const sheet = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, padding: "22px 24px", maxWidth: 620 };

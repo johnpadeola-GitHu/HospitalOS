@@ -150,12 +150,12 @@ function SpecimenTable() {
 }
 
 const tabs = { display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" };
-const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
-const tabActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
+const tabBtn = { font: "inherit", fontSize: 12.5, fontWeight: 600, padding: "6px 13px", borderRadius: 0, border: "1px solid var(--border-strong)", background: "var(--surface-2)", color: "var(--muted)", cursor: "pointer" };
+const tabActive = { background: "var(--accent)", color: "#fff", borderColor: "var(--accent)" };
 const calcRow = { width: "100%", textAlign: "left", padding: "10px 13px", fontSize: 12.5, fontWeight: 500, color: "var(--ink)", background: "none", border: "none", cursor: "pointer", font: "inherit" };
 const calcActive = { background: "var(--charcoal-bg)", color: "var(--charcoal-strong)", fontWeight: 700 };
 const fieldLabel = { display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted)", marginBottom: 4 };
-const resultBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 16px" };
-const convResult = { background: "var(--charcoal-bg)", borderRadius: 10, padding: "8px 16px", minWidth: 100 };
+const resultBox = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "14px 16px" };
+const convResult = { background: "var(--charcoal-bg)", borderRadius: 0, padding: "8px 16px", minWidth: 100 };
 const th = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const td = { padding: "10px 14px", fontSize: 12.5, verticalAlign: "top" };

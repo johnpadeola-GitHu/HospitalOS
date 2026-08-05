@@ -78,4 +78,4 @@ const metaVal = { padding: "4px 16px 4px 0", color: "#22272B" };
 const resultTable = { width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 20 };
 const th = { textAlign: "left", padding: "8px 10px", background: "#F4F6FA", borderBottom: "1.5px solid #22272B", fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.04em", color: "#5A6472" };
 const td = { padding: "7px 10px", borderBottom: "1px solid #E4E9F2" };
-const statusBlock = { fontSize: 12, color: "#22272B", lineHeight: 1.9, background: "#F8FAFC", border: "1px solid #E4E9F2", borderRadius: 8, padding: "12px 14px" };
+const statusBlock = { fontSize: 12, color: "#22272B", lineHeight: 1.9, background: "#F8FAFC", border: "1px solid #E4E9F2", borderRadius: 0, padding: "12px 14px" };

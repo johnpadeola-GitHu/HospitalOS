@@ -319,6 +319,15 @@ function Block({ b }) {
       <span>{b.warn}</span>
     </div>
   );
+  if (b.code) return (
+    <pre style={{
+      background: "var(--surface)", border: "1px solid var(--border)",
+      borderRadius: 0, padding: "12px 14px", fontSize: 11.5,
+      fontFamily: "var(--font-mono)", color: "var(--ink-strong)",
+      overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all",
+      margin: "0 0 14px",
+    }}>{b.code}</pre>
+  );
   if (b.table) return (
     <div style={{ overflowX: "auto", margin: "0 0 14px" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
@@ -348,14 +357,14 @@ const crumbLink = { font: "inherit", fontSize: 12, fontWeight: 600, color: "var(
 // stay on-brand) with the search box embedded directly in the banner.
 const hero = {
   background: "linear-gradient(135deg, #22272B 0%, #33393F 55%, #4A2422 100%)",
-  borderRadius: 16, padding: "40px 32px 34px", textAlign: "center", marginBottom: 24,
+  borderRadius: 0, padding: "40px 32px 34px", textAlign: "center", marginBottom: 24,
 };
 const heroKicker = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 };
 const heroTitle = { fontSize: 30, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 10px" };
 const heroSubtitle = { fontSize: 13.5, color: "rgba(255,255,255,0.72)", maxWidth: 480, margin: "0 auto 22px", lineHeight: 1.6 };
 const heroSearchWrap = { position: "relative", maxWidth: 520, margin: "0 auto" };
 const heroSearchInput = {
-  width: "100%", boxSizing: "border-box", border: "none", borderRadius: 12,
+  width: "100%", boxSizing: "border-box", border: "none", borderRadius: 0,
   padding: "13px 16px 13px 42px", fontSize: 13.5, font: "inherit", background: "#fff",
   color: "var(--ink-strong)", boxShadow: "0 6px 18px rgba(0,0,0,0.22)",
 };
@@ -367,28 +376,28 @@ const guideBanner = {
   background: "var(--surface-2)", border: "1px solid var(--border-strong)", borderRadius: "var(--radius)",
   padding: "13px 16px", textDecoration: "none", boxShadow: "var(--shadow-sm)",
 };
-const guideIcon = { width: 34, height: 34, borderRadius: 9, background: "var(--charcoal)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const guideIcon = { width: 34, height: 34, borderRadius: 0, background: "var(--charcoal)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const heroCard = { textAlign: "left", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px 16px 18px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const catGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 };
 const catCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "11px 12px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
 const catIcon = { width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
-const countChip = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--border)", padding: "1px 7px", borderRadius: 5 };
+const countChip = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--border)", padding: "1px 7px", borderRadius: 0 };
 const cardGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 };
 const artCard = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "13px 14px", cursor: "pointer", font: "inherit", boxShadow: "var(--shadow-sm)" };
-const artIcon = { width: 36, height: 36, borderRadius: 9, background: "var(--charcoal-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+const artIcon = { width: 36, height: 36, borderRadius: 0, background: "var(--charcoal-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
 const lead = { fontSize: 13.5, color: "var(--muted)", lineHeight: 1.6, paddingBottom: 14, marginBottom: 4, borderBottom: "1px solid var(--border)", fontStyle: "italic" };
 const h3 = { fontSize: 13.5, fontWeight: 700, color: "var(--ink-strong)", margin: "16px 0 8px", letterSpacing: "-0.01em" };
 const para = { fontSize: 13.5, lineHeight: 1.75, color: "var(--ink)", marginBottom: 12 };
 const li = { display: "flex", gap: 9, fontSize: 13.5, lineHeight: 1.7, color: "var(--ink)", marginBottom: 6 };
 const bullet = { color: "var(--charcoal)", fontWeight: 700, flexShrink: 0 };
 const stepNum = { flexShrink: 0, width: 19, height: 19, borderRadius: "50%", background: "var(--charcoal-bg)", color: "var(--charcoal-strong)", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2 };
-const noteBox = { display: "flex", gap: 8, background: "var(--info-bg)", color: "var(--info)", fontSize: 12.5, padding: "10px 12px", borderRadius: 8, margin: "0 0 13px", lineHeight: 1.6 };
-const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "10px 12px", borderRadius: 8, margin: "0 0 13px", lineHeight: 1.6 };
+const noteBox = { display: "flex", gap: 8, background: "var(--info-bg)", color: "var(--info)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, margin: "0 0 13px", lineHeight: 1.6 };
+const warnBox = { display: "flex", gap: 8, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "10px 12px", borderRadius: 0, margin: "0 0 13px", lineHeight: 1.6 };
 const tth = { textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "8px 11px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.04em" };
 const ttd = { padding: "8px 11px", verticalAlign: "top", lineHeight: 1.5 };
 const relatedWrap = { marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--border)" };
 const prevNextWrap = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 22, paddingTop: 16, borderTop: "1px solid var(--border)" };
-const prevNextBtn = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", cursor: "pointer", font: "inherit" };
+const prevNextBtn = { display: "flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 0, padding: "10px 14px", cursor: "pointer", font: "inherit" };
 const prevNextLabel = { fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" };
 const prevNextTitle = { fontSize: 12.5, fontWeight: 600, color: "var(--ink-strong)", marginTop: 1 };
 const relPill = { display: "inline-flex", alignItems: "center", gap: 6, font: "inherit", fontSize: 12, fontWeight: 600, color: "var(--ink-strong)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 999, padding: "5px 11px", cursor: "pointer" };

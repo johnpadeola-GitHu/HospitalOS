@@ -235,10 +235,10 @@ const clearBanner = {
   color: "#4A6329",
   fontSize: 13,
   padding: "10px 14px",
-  borderRadius: 10,
+  borderRadius: 0,
   marginBottom: 14,
 };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const th = {
   textAlign: "left",
   fontSize: 11,
@@ -254,6 +254,6 @@ const errBox = {
   color: "#7A2E2E",
   fontSize: 12,
   padding: "8px 11px",
-  borderRadius: 8,
+  borderRadius: 0,
   marginBottom: 14,
 };

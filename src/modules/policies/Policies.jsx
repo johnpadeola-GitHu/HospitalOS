@@ -163,5 +163,5 @@ const chip = { font: "inherit", fontSize: 12, fontWeight: 500, padding: "6px 12p
 const chipActive = { background: "var(--charcoal)", color: "#fff", borderColor: "var(--charcoal)" };
 const row = { display: "flex", gap: 14, padding: "13px 16px", alignItems: "center" };
 const fileLink = { display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "var(--accent)", marginTop: 5 };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
-const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 8, marginBottom: 14 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
+const errBox = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 12, padding: "8px 11px", borderRadius: 0, marginBottom: 14 };

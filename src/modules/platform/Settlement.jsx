@@ -254,15 +254,15 @@ export default function Settlement() {
 }
 
 const sectionTitle = { fontSize: 15, fontWeight: 700, color: "var(--ink-strong)", marginBottom: 12, letterSpacing: "-0.015em" };
-const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 12, overflow: "auto" };
+const tableWrap = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, overflow: "auto" };
 const statGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 14 };
 const row2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, alignItems: "start" };
 const th = { fontSize: 10.5, fontWeight: 700, color: "var(--muted)", padding: "10px 14px", background: "var(--surface)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" };
 const td = { padding: "11px 14px", fontSize: 12.5, verticalAlign: "middle" };
 const num = { textAlign: "right", fontFamily: "var(--font-mono)" };
 const kv = { display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderTop: "1px solid var(--border)" };
-const tip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12, boxShadow: "var(--shadow)" };
+const tip = { background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 0, fontSize: 12, boxShadow: "var(--shadow)" };
 const track = { height: 7, borderRadius: 999, background: "var(--surface)", overflow: "hidden" };
 const fill = { height: "100%", borderRadius: 999, background: "var(--chart-2)" };
-const churnBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "11px 13px", borderRadius: 10, marginBottom: 14, lineHeight: 1.55 };
-const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 10, marginBottom: 14 };
+const churnBox = { display: "flex", gap: 9, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12.5, padding: "11px 13px", borderRadius: 0, marginBottom: 14, lineHeight: 1.55 };
+const errBanner = { background: "var(--bad-bg)", color: "var(--bad)", fontSize: 13, padding: "10px 14px", borderRadius: 0, marginBottom: 14 };
